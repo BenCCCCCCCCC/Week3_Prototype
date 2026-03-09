@@ -1,19 +1,27 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
     [Header("Scene Reference")]
-    public Transform cameraTransform; // Drag Main Camera here
+    public Transform cameraTransform;
 
     [Header("Tuning (must assign)")]
-    public PlayerTuningSO tuning; // Drag PlayerTuning_Default here
+    public PlayerTuningSO tuning;
+
+    [Header("Input")]
+    public bool enablePlayerInput = true;
 
     [Header("Gravity")]
     public float gravity = -9.81f;
 
     [Header("Look Clamp")]
     public float pitchClamp = 80f;
+
+    [Header("Runtime Status")]
+    public float externalSpeedMultiplier = 1f; // kept for compatibility with your old test scripts
+    public bool IsInvincible { get; set; } = false;
 
     private CharacterController cc;
     private PlayerInputActions actions;
@@ -23,6 +31,15 @@ public class PlayerController : MonoBehaviour
 
     private float verticalVelocity;
     private float pitch;
+
+    private bool forcedMoveActive = false;
+    private Vector3 forcedMoveDirection = Vector3.forward;
+    private float forcedMoveSpeed = 0f;
+
+    private bool useManualSpeedOverride = false;
+    private float manualSpeedOverride = 0f;
+
+    public Vector3 LastMoveDirection { get; private set; } = Vector3.forward;
 
     void Awake()
     {
@@ -39,21 +56,38 @@ public class PlayerController : MonoBehaviour
 
     void OnEnable()
     {
-        actions.Enable();
-        Cursor.lockState = CursorLockMode.Locked;
+        if (enablePlayerInput)
+        {
+            actions.Enable();
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+        else
+        {
+            actions.Disable();
+        }
     }
 
     void OnDisable()
     {
         actions.Disable();
         Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
+    void OnDestroy()
+    {
+        if (actions != null)
+        {
+            actions.Dispose();
+        }
     }
 
     void Update()
     {
         if (tuning == null)
         {
-            Debug.LogError("PlayerController: tuning is not assigned. Drag PlayerTuning_Default into the Tuning field.");
+            Debug.LogError("PlayerController: tuning is not assigned. Drag layerTuning_Default into the Tuning field.");
             return;
         }
 
@@ -63,13 +97,68 @@ public class PlayerController : MonoBehaviour
 
     void HandleMove()
     {
-        Vector3 move = (transform.right * moveInput.x + transform.forward * moveInput.y).normalized;
+        Vector2 currentMoveInput = enablePlayerInput ? moveInput : Vector2.zero;
 
-        // Decide speed (walk/run/crouch)
+        Vector3 inputDirection = transform.right * currentMoveInput.x + transform.forward * currentMoveInput.y;
+
+        if (inputDirection.sqrMagnitude > 1f)
+        {
+            inputDirection.Normalize();
+        }
+
+        if (!forcedMoveActive && inputDirection.sqrMagnitude > 0.001f)
+        {
+            LastMoveDirection = inputDirection.normalized;
+        }
+
+        float currentSpeed = GetCurrentMoveSpeed();
+
+        Vector3 planarVelocity;
+        if (forcedMoveActive)
+        {
+            planarVelocity = forcedMoveDirection.normalized * forcedMoveSpeed;
+        }
+        else
+        {
+            planarVelocity = inputDirection.normalized * currentSpeed;
+        }
+
+        if (cc.isGrounded && verticalVelocity < 0f)
+        {
+            verticalVelocity = -2f;
+        }
+
+        verticalVelocity += gravity * Time.deltaTime;
+
+        Vector3 velocity = planarVelocity + Vector3.up * verticalVelocity;
+        cc.Move(velocity * Time.deltaTime);
+    }
+
+    void HandleLook()
+    {
+        if (!enablePlayerInput) return;
+        if (cameraTransform == null) return;
+
+        float yaw = lookInput.x * tuning.mouseSensitivity;
+        float pitchDelta = lookInput.y * tuning.mouseSensitivity;
+
+        transform.Rotate(Vector3.up * yaw);
+
+        pitch -= pitchDelta;
+        pitch = Mathf.Clamp(pitch, -pitchClamp, pitchClamp);
+
+        cameraTransform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
+    }
+
+    // Default move speed from current input state
+    public float GetDefaultMoveSpeed()
+    {
+        if (tuning == null) return 0f;
+
         float speed = tuning.walkSpeed;
 
         bool shiftHeld = Keyboard.current != null &&
-                 (Keyboard.current.leftShiftKey.isPressed || Keyboard.current.rightShiftKey.isPressed);
+                         (Keyboard.current.leftShiftKey.isPressed || Keyboard.current.rightShiftKey.isPressed);
 
         bool ctrlHeld = Keyboard.current != null &&
                         (Keyboard.current.leftCtrlKey.isPressed || Keyboard.current.rightCtrlKey.isPressed);
@@ -79,32 +168,81 @@ public class PlayerController : MonoBehaviour
             speed = tuning.runSpeed;
         }
 
-        // crouch overrides run if both pressed
         if (ctrlHeld)
         {
             speed = tuning.crouchSpeed;
         }
 
-        if (cc.isGrounded && verticalVelocity < 0f)
-            verticalVelocity = -2f;
-
-        verticalVelocity += gravity * Time.deltaTime;
-
-        Vector3 velocity = move * speed + Vector3.up * verticalVelocity;
-        cc.Move(velocity * Time.deltaTime);
+        return speed;
     }
 
-    void HandleLook()
+    // Kept for compatibility with your older test script names
+    public float GetBaseMoveSpeed()
     {
-        float yaw = lookInput.x * tuning.mouseSensitivity;
-        float pitchDelta = lookInput.y * tuning.mouseSensitivity;
+        return GetDefaultMoveSpeed();
+    }
 
-        transform.Rotate(Vector3.up * yaw);
+    public float GetCurrentMoveSpeed()
+    {
+        if (useManualSpeedOverride)
+        {
+            return manualSpeedOverride;
+        }
 
-        pitch -= pitchDelta;
-        pitch = Mathf.Clamp(pitch, -pitchClamp, pitchClamp);
+        return GetDefaultMoveSpeed() * externalSpeedMultiplier;
+    }
 
-        if (cameraTransform != null)
-            cameraTransform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
+    // Match teacher wording: SetSpeed(...)
+    public void SetSpeed(float newSpeed)
+    {
+        useManualSpeedOverride = true;
+        manualSpeedOverride = newSpeed;
+
+        float defaultSpeed = GetDefaultMoveSpeed();
+        if (defaultSpeed > 0.001f)
+        {
+            externalSpeedMultiplier = newSpeed / defaultSpeed;
+        }
+        else
+        {
+            externalSpeedMultiplier = 1f;
+        }
+    }
+
+    // Match "恢复原速"
+    public void RestoreDefaultSpeed()
+    {
+        useManualSpeedOverride = false;
+        manualSpeedOverride = 0f;
+        externalSpeedMultiplier = 1f;
+    }
+
+    public Vector3 GetCurrentForwardOrMoveDirection()
+    {
+        if (LastMoveDirection.sqrMagnitude > 0.001f)
+        {
+            return LastMoveDirection.normalized;
+        }
+
+        return transform.forward;
+    }
+
+    public void StartForcedMove(Vector3 worldDirection, float speed)
+    {
+        if (worldDirection.sqrMagnitude < 0.001f)
+        {
+            worldDirection = transform.forward;
+        }
+
+        forcedMoveActive = true;
+        forcedMoveDirection = worldDirection.normalized;
+        forcedMoveSpeed = speed;
+        LastMoveDirection = forcedMoveDirection;
+    }
+
+    public void StopForcedMove()
+    {
+        forcedMoveActive = false;
+        forcedMoveSpeed = 0f;
     }
 }
