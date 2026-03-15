@@ -7,8 +7,8 @@ public class PlayerController : MonoBehaviour
     [Header("Scene Reference")]
     public Transform cameraTransform;
 
-    [Header("Tuning (must assign)")]
-    public PlayerTuningSO tuning;
+    [Header("Player Stats (must assign)")]
+    public PlayerStatsSO playerStats;
 
     [Header("Input")]
     public bool enablePlayerInput = true;
@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviour
     public float pitchClamp = 80f;
 
     [Header("Runtime Status")]
-    public float externalSpeedMultiplier = 1f; // kept for compatibility with your old test scripts
+    public float externalSpeedMultiplier = 1f;
     public bool IsInvincible { get; set; } = false;
 
     private CharacterController cc;
@@ -85,9 +85,9 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (tuning == null)
+        if (playerStats == null)
         {
-            Debug.LogError("PlayerController: tuning is not assigned. Drag layerTuning_Default into the Tuning field.");
+            Debug.LogError("PlayerController: playerStats is not assigned.");
             return;
         }
 
@@ -139,8 +139,8 @@ public class PlayerController : MonoBehaviour
         if (!enablePlayerInput) return;
         if (cameraTransform == null) return;
 
-        float yaw = lookInput.x * tuning.mouseSensitivity;
-        float pitchDelta = lookInput.y * tuning.mouseSensitivity;
+        float yaw = lookInput.x * playerStats.mouseSensitivity;
+        float pitchDelta = lookInput.y * playerStats.mouseSensitivity;
 
         transform.Rotate(Vector3.up * yaw);
 
@@ -150,12 +150,11 @@ public class PlayerController : MonoBehaviour
         cameraTransform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
     }
 
-    // Default move speed from current input state
     public float GetDefaultMoveSpeed()
     {
-        if (tuning == null) return 0f;
+        if (playerStats == null) return 0f;
 
-        float speed = tuning.walkSpeed;
+        float speed = playerStats.walkSpeed;
 
         bool shiftHeld = Keyboard.current != null &&
                          (Keyboard.current.leftShiftKey.isPressed || Keyboard.current.rightShiftKey.isPressed);
@@ -165,18 +164,17 @@ public class PlayerController : MonoBehaviour
 
         if (shiftHeld)
         {
-            speed = tuning.runSpeed;
+            speed = playerStats.runSpeed;
         }
 
         if (ctrlHeld)
         {
-            speed = tuning.crouchSpeed;
+            speed = playerStats.crouchSpeed;
         }
 
         return speed;
     }
 
-    // Kept for compatibility with your older test script names
     public float GetBaseMoveSpeed()
     {
         return GetDefaultMoveSpeed();
@@ -192,7 +190,6 @@ public class PlayerController : MonoBehaviour
         return GetDefaultMoveSpeed() * externalSpeedMultiplier;
     }
 
-    // Match teacher wording: SetSpeed(...)
     public void SetSpeed(float newSpeed)
     {
         useManualSpeedOverride = true;
@@ -209,7 +206,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // Match "恢复原速"
     public void RestoreDefaultSpeed()
     {
         useManualSpeedOverride = false;

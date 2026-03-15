@@ -7,20 +7,13 @@ public class HunterDetectSkill : MonoBehaviour
 {
     [Header("References")]
     public PlayerController controller;
+    public SkillStatsSO skillStats;
     public Camera hunterCamera;
     public DetectionArrowUI arrowUI;
     public Text cooldownText;
 
-    [Header("Detect Settings")]
-    public float cooldown = 15f;
-    public float duration = 5f;
-    public float closeRadius = 6f;
-    public float maxRadius = 15f;
-    public float scanInterval = 0.1f;
+    [Header("Other")]
     public string targetTag = "Survivor";
-
-    [Header("UI")]
-    public float readyShowDuration = 1f;
 
     private InputAction detectAction;
     private float cooldownTimer = 0f;
@@ -58,6 +51,8 @@ public class HunterDetectSkill : MonoBehaviour
 
     void Update()
     {
+        if (skillStats == null) return;
+
         if (cooldownTimer > 0f)
         {
             cooldownTimer -= Time.deltaTime;
@@ -93,17 +88,17 @@ public class HunterDetectSkill : MonoBehaviour
     IEnumerator DetectRoutine()
     {
         isDetecting = true;
-        cooldownTimer = cooldown;
+        cooldownTimer = skillStats.detectCooldown;
 
         float timer = 0f;
 
-        while (timer < duration)
+        while (timer < skillStats.detectDuration)
         {
             CharacterStatus nearestTarget = FindNearestTarget();
             ApplyDetect(nearestTarget);
 
-            timer += scanInterval;
-            yield return new WaitForSeconds(scanInterval);
+            timer += skillStats.detectScanInterval;
+            yield return new WaitForSeconds(skillStats.detectScanInterval);
         }
 
         ClearDetect();
@@ -112,7 +107,7 @@ public class HunterDetectSkill : MonoBehaviour
 
     CharacterStatus FindNearestTarget()
     {
-        Collider[] hits = Physics.OverlapSphere(transform.position, maxRadius, ~0, QueryTriggerInteraction.Ignore);
+        Collider[] hits = Physics.OverlapSphere(transform.position, skillStats.detectMaxRadius, ~0, QueryTriggerInteraction.Ignore);
 
         CharacterStatus nearest = null;
         float nearestDistance = float.MaxValue;
@@ -163,7 +158,7 @@ public class HunterDetectSkill : MonoBehaviour
 
         float distance = Vector3.Distance(transform.position, currentTarget.transform.position);
 
-        if (distance <= closeRadius)
+        if (distance <= skillStats.detectCloseRadius)
         {
             currentTarget.SetCloseDetectMarker(true);
 
@@ -172,7 +167,7 @@ public class HunterDetectSkill : MonoBehaviour
                 arrowUI.ClearTarget();
             }
         }
-        else if (distance <= maxRadius)
+        else if (distance <= skillStats.detectMaxRadius)
         {
             currentTarget.SetCloseDetectMarker(false);
 
@@ -227,7 +222,7 @@ public class HunterDetectSkill : MonoBehaviour
         if (!readyShownThisCycle && !isDetecting)
         {
             readyShownThisCycle = true;
-            readyTimer = readyShowDuration;
+            readyTimer = skillStats.detectReadyShowDuration;
             ShowCooldownText();
             cooldownText.text = "Detect F: Ready";
         }

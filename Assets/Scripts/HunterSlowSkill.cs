@@ -6,28 +6,20 @@ public class HunterSlowSkill : MonoBehaviour
 {
     [Header("References")]
     public PlayerController controller;
+    public SkillStatsSO skillStats;
     public Camera hunterCamera;
     public Text cooldownText;
     public Text aimHintText;
 
-    [Header("Skill Settings")]
-    public float aimWindow = 3f;
-    public float hitCooldown = 15f;
-    public float missCooldown = 10f;
-    public float range = 25f;
-    public float castRadius = 0.25f;
-    public float slowMultiplier = 0.7f;
-    public float slowDuration = 2f;
+    [Header("Other")]
     public string targetTag = "Survivor";
-
-    [Header("UI")]
-    public float readyShowDuration = 1f;
 
     private InputAction qAction;
     private InputAction fireAction;
 
     private float cooldownTimer = 0f;
     private bool isAiming = false;
+    public bool IsAiming => isAiming;
     private float aimTimer = 0f;
 
     private bool hasBeenUsed = false;
@@ -70,6 +62,8 @@ public class HunterSlowSkill : MonoBehaviour
 
     void Update()
     {
+        if (skillStats == null) return;
+
         if (cooldownTimer > 0f)
         {
             cooldownTimer -= Time.deltaTime;
@@ -96,7 +90,7 @@ public class HunterSlowSkill : MonoBehaviour
         if (qAction.WasPressedThisFrame() && cooldownTimer <= 0f && !isAiming)
         {
             isAiming = true;
-            aimTimer = aimWindow;
+            aimTimer = skillStats.slowAimWindow;
             ShowAimHintText();
             Debug.Log("Hunter Slow Skill: Aim mode started.");
         }
@@ -118,7 +112,7 @@ public class HunterSlowSkill : MonoBehaviour
                 hasBeenUsed = true;
                 readyShownThisCycle = false;
                 readyTimer = 0f;
-                cooldownTimer = missCooldown;
+                cooldownTimer = skillStats.slowMissCooldown;
 
                 Debug.Log("Hunter Slow Skill: Missed window, skill on miss cooldown.");
             }
@@ -136,19 +130,19 @@ public class HunterSlowSkill : MonoBehaviour
             hasBeenUsed = true;
             readyShownThisCycle = false;
             readyTimer = 0f;
-            cooldownTimer = missCooldown;
+            cooldownTimer = skillStats.slowMissCooldown;
             return;
         }
 
         Ray ray = hunterCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
         bool hitSuccess = false;
 
-        Debug.DrawRay(ray.origin, ray.direction * range, Color.red, 1.5f);
+        Debug.DrawRay(ray.origin, ray.direction * skillStats.slowRange, Color.red, 1.5f);
 
         RaycastHit[] hits = Physics.SphereCastAll(
             ray,
-            castRadius,
-            range,
+            skillStats.slowCastRadius,
+            skillStats.slowRange,
             ~0,
             QueryTriggerInteraction.Ignore
         );
@@ -159,7 +153,7 @@ public class HunterSlowSkill : MonoBehaviour
             hasBeenUsed = true;
             readyShownThisCycle = false;
             readyTimer = 0f;
-            cooldownTimer = missCooldown;
+            cooldownTimer = skillStats.slowMissCooldown;
             return;
         }
 
@@ -176,7 +170,7 @@ public class HunterSlowSkill : MonoBehaviour
 
             if (targetStatus != null && root.CompareTag(targetTag))
             {
-                hitSuccess = targetStatus.ApplySlow(slowMultiplier, slowDuration);
+                hitSuccess = targetStatus.ApplySlow(skillStats.slowMultiplier, skillStats.slowDuration);
 
                 if (hitSuccess)
                 {
@@ -200,7 +194,7 @@ public class HunterSlowSkill : MonoBehaviour
         hasBeenUsed = true;
         readyShownThisCycle = false;
         readyTimer = 0f;
-        cooldownTimer = hitSuccess ? hitCooldown : missCooldown;
+        cooldownTimer = hitSuccess ? skillStats.slowHitCooldown : skillStats.slowMissCooldown;
     }
 
     void UpdateUI()
@@ -229,7 +223,7 @@ public class HunterSlowSkill : MonoBehaviour
         if (!readyShownThisCycle && !isAiming)
         {
             readyShownThisCycle = true;
-            readyTimer = readyShowDuration;
+            readyTimer = skillStats.slowReadyShowDuration;
             ShowCooldownText();
             cooldownText.text = "Slow Q: Ready";
         }

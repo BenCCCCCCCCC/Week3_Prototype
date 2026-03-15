@@ -7,16 +7,8 @@ public class SurvivorDashSkill : MonoBehaviour
     [Header("References")]
     public PlayerController controller;
     public CharacterStatus status;
+    public SkillStatsSO skillStats;
     public Text cooldownText;
-
-    [Header("Dash Settings")]
-    public float cooldown = 10f;
-    public float dashMultiplier = 2.5f;
-    public float dashDuration = 1f;
-    public float invincibleDuration = 0.5f;
-
-    [Header("UI")]
-    public float readyShowDuration = 1f;
 
     private InputAction dashAction;
     private float cooldownTimer = 0f;
@@ -54,7 +46,7 @@ public class SurvivorDashSkill : MonoBehaviour
 
     void Update()
     {
-        if (controller == null || controller.tuning == null) return;
+        if (controller == null || controller.playerStats == null || skillStats == null) return;
 
         HandleCooldownTimers();
         UpdateCooldownUI();
@@ -97,20 +89,20 @@ public class SurvivorDashSkill : MonoBehaviour
         hasShownReadyThisCycle = false;
         readyTimer = 0f;
 
-        cooldownTimer = cooldown;
+        cooldownTimer = skillStats.dashCooldown;
 
         Vector3 dashDirection = controller.GetCurrentForwardOrMoveDirection();
-        float dashSpeed = controller.GetDefaultMoveSpeed() * dashMultiplier;
+        float dashSpeed = controller.GetDefaultMoveSpeed() * skillStats.dashMultiplier;
 
         controller.SetSpeed(dashSpeed);
         controller.StartForcedMove(dashDirection, dashSpeed);
 
         if (status != null)
         {
-            status.StartInvincible(invincibleDuration);
+            status.StartInvincible(skillStats.dashInvincibleDuration);
         }
 
-        Invoke(nameof(EndDash), dashDuration);
+        Invoke(nameof(EndDash), skillStats.dashDuration);
     }
 
     void EndDash()
@@ -127,7 +119,6 @@ public class SurvivorDashSkill : MonoBehaviour
     void UpdateCooldownUI()
     {
         if (cooldownText == null) return;
-
         if (!hasBeenUsed)
         {
             HideCooldownUI();
@@ -141,13 +132,11 @@ public class SurvivorDashSkill : MonoBehaviour
             return;
         }
 
-        // 冷却结束后，只显示一次 Ready
-        if (!showingReady && !hasShownReadyThisCycle)
+        if (!hasShownReadyThisCycle && !isDashing)
         {
-            showingReady = true;
             hasShownReadyThisCycle = true;
-            readyTimer = readyShowDuration;
-
+            showingReady = true;
+            readyTimer = skillStats.dashReadyShowDuration;
             ShowCooldownUI();
             cooldownText.text = "Dash F: Ready";
         }

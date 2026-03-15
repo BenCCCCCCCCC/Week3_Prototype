@@ -9,18 +9,16 @@ public class InteractionUI : MonoBehaviour
     public GameObject progressBG;
     public GameObject hintText;
 
-    [Header("Tuning (must assign)")]
-    public PlayerTuningSO tuning; // Drag layerTuning_Default here
+    [Header("Interaction Stats (must assign)")]
+    public InteractionStatsSO interactionStats;
 
     private float progress = 0f;
     private bool inRange = false;
 
-    // Input System: runtime action for holding E
     private InputAction interactHoldAction;
 
     void Awake()
     {
-        // Create an InputAction that binds to keyboard E
         interactHoldAction = new InputAction(
             name: "InteractHold",
             type: InputActionType.Button,
@@ -46,9 +44,9 @@ public class InteractionUI : MonoBehaviour
 
     void Update()
     {
-        if (tuning == null)
+        if (interactionStats == null)
         {
-            Debug.LogError("InteractionUI: tuning is not assigned. Drag layerTuning_Default into the Tuning field.");
+            Debug.LogError("InteractionUI: interactionStats is not assigned.");
             return;
         }
 
@@ -65,7 +63,7 @@ public class InteractionUI : MonoBehaviour
         bool eHeld = interactHoldAction.IsPressed();
 
         if (eHeld)
-            progress += Time.deltaTime / tuning.interactHoldSeconds;
+            progress += Time.deltaTime / interactionStats.interactHoldSeconds;
         else
             progress = 0f;
 

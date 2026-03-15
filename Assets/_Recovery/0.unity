@@ -157,8 +157,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   cameraTransform: {fileID: 330585546}
-  playerStats: {fileID: 11400000, guid: b41053ba16440dc44b8eacfd2c71760f, type: 2}
-  enablePlayerInput: 1
+  tuning: {fileID: 11400000, guid: 091f2bee62093fe47992586fc6a5259e, type: 2}
+  enablePlayerInput: 0
   gravity: -9.81
   pitchClamp: 80
   externalSpeedMultiplier: 1
@@ -299,7 +299,7 @@ MonoBehaviour:
   progressFill: {fileID: 1101796982}
   progressBG: {fileID: 1730037489}
   hintText: {fileID: 1130855096}
-  interactionStats: {fileID: 11400000, guid: ab279834b05e19f41b343ae495376abb, type: 2}
+  tuning: {fileID: 11400000, guid: 091f2bee62093fe47992586fc6a5259e, type: 2}
 --- !u!114 &55908638
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -313,10 +313,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterStatus
   controller: {fileID: 55908630}
-  playerStats: {fileID: 11400000, guid: b41053ba16440dc44b8eacfd2c71760f, type: 2}
   closeDetectMarker: {fileID: 1825370874}
   slowWarningImage: {fileID: 2112662461}
+  maxHP: 2
   currentHP: 2
+  hitInvincibleDuration: 0.4
   logStateChanges: 1
 --- !u!114 &55908639
 MonoBehaviour:
@@ -347,8 +348,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SurvivorDashSkill
   controller: {fileID: 55908630}
   status: {fileID: 55908638}
-  skillStats: {fileID: 11400000, guid: 807532eae678332478918ac2912ef4b1, type: 2}
   cooldownText: {fileID: 1362977061}
+  cooldown: 10
+  dashMultiplier: 2.5
+  dashDuration: 1
+  invincibleDuration: 0.5
+  readyShowDuration: 1
 --- !u!1 &74959964
 GameObject:
   m_ObjectHideFlags: 0
@@ -3000,7 +3005,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!81 &330585544
 AudioListener:
   m_ObjectHideFlags: 0
@@ -7771,7 +7776,7 @@ MonoBehaviour:
   progressFill: {fileID: 1101796982}
   progressBG: {fileID: 1730037489}
   hintText: {fileID: 1130855096}
-  interactionStats: {fileID: 11400000, guid: ab279834b05e19f41b343ae495376abb, type: 2}
+  tuning: {fileID: 11400000, guid: 091f2bee62093fe47992586fc6a5259e, type: 2}
 --- !u!114 &856565041
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7785,8 +7790,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   cameraTransform: {fileID: 1418904642}
-  playerStats: {fileID: 11400000, guid: b41053ba16440dc44b8eacfd2c71760f, type: 2}
-  enablePlayerInput: 0
+  tuning: {fileID: 11400000, guid: 091f2bee62093fe47992586fc6a5259e, type: 2}
+  enablePlayerInput: 1
   gravity: -9.81
   pitchClamp: 80
   externalSpeedMultiplier: 1
@@ -7909,7 +7914,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1418904642}
-  - {fileID: 1062533337}
+  - {fileID: 2010453117}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &856565047
@@ -7925,11 +7930,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HunterSlowSkill
   controller: {fileID: 856565041}
-  skillStats: {fileID: 11400000, guid: 807532eae678332478918ac2912ef4b1, type: 2}
   hunterCamera: {fileID: 1418904645}
   cooldownText: {fileID: 1703268586}
   aimHintText: {fileID: 806462129}
+  aimWindow: 3
+  hitCooldown: 15
+  missCooldown: 10
+  range: 25
+  castRadius: 0.25
+  slowMultiplier: 0.7
+  slowDuration: 2
   targetTag: Survivor
+  readyShowDuration: 1
 --- !u!114 &856565048
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7943,11 +7955,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HunterDetectSkill
   controller: {fileID: 856565041}
-  skillStats: {fileID: 11400000, guid: 807532eae678332478918ac2912ef4b1, type: 2}
   hunterCamera: {fileID: 1418904645}
   arrowUI: {fileID: 982550275}
   cooldownText: {fileID: 411216553}
+  cooldown: 15
+  duration: 5
+  closeRadius: 6
+  maxRadius: 15
+  scanInterval: 0.1
   targetTag: Survivor
+  readyShowDuration: 1
 --- !u!114 &856565049
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7961,9 +7978,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HunterBasicAttack
   controller: {fileID: 856565041}
-  skillStats: {fileID: 11400000, guid: 807532eae678332478918ac2912ef4b1, type: 2}
   slowSkill: {fileID: 856565047}
-  attackPoint: {fileID: 1062533337}
+  attackPoint: {fileID: 2010453117}
+  attackRange: 2.2
+  attackRadius: 0.9
+  windup: 0.12
+  recovery: 0.35
+  attackCooldown: 0.55
+  minForwardDot: 0.15
   targetTag: Survivor
   drawGizmos: 1
   logAttackResult: 1
@@ -8663,37 +8685,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1062533336
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1062533337}
-  m_Layer: 0
-  m_Name: AttackPoint
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1062533337
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1062533336}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 1.2}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 856565046}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1069380770
 GameObject:
@@ -10187,7 +10178,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1418904642
 Transform:
   m_ObjectHideFlags: 0
@@ -13933,6 +13924,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1980698359}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &2010453116
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2010453117}
+  m_Layer: 0
+  m_Name: AttackPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2010453117
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2010453116}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1, z: 1.2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 856565046}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2072232657
 GameObject:
   m_ObjectHideFlags: 0
