@@ -17,11 +17,15 @@ public class CharacterStatus : MonoBehaviour
     public bool logStateChanges = true;
 
     private float pendingSlowDuration = 2f;
+    private float currentSlowMultiplier = 1f;
+
     private bool isDowned = false;
     private bool isHitStunned = false;
+    private bool isSlowed = false;
 
     public bool IsDowned => isDowned;
     public bool IsHitStunned => isHitStunned;
+    public bool IsSlowed => isSlowed;
     public bool IsInjured => !isDowned && currentHP < GetMaxHP();
 
     void Awake()
@@ -49,23 +53,32 @@ public class CharacterStatus : MonoBehaviour
 
         SetCloseDetectMarker(false);
         SetSlowWarning(false);
+
+        RefreshMoveSpeedFromState();
     }
 
     public bool ApplySlow(float slowMultiplier, float duration)
     {
         if (controller == null) return false;
+        if (playerStats == null) return false;
         if (isDowned) return false;
         if (controller.IsInvincible) return false;
 
         CancelInvoke(nameof(RecoverOriginalSpeed));
 
-        float slowedSpeed = controller.GetDefaultMoveSpeed() * slowMultiplier;
-        controller.SetSpeed(slowedSpeed);
+        isSlowed = true;
+        currentSlowMultiplier = slowMultiplier;
+        pendingSlowDuration = duration;
 
         SetSlowWarning(true);
+        RefreshMoveSpeedFromState();
 
-        pendingSlowDuration = duration;
         Invoke(nameof(RecoverOriginalSpeed), pendingSlowDuration);
+
+        if (logStateChanges)
+        {
+            Debug.Log(gameObject.name + " is slowed. Multiplier = " + slowMultiplier + ", Duration = " + duration);
+        }
 
         return true;
     }
@@ -90,9 +103,12 @@ public class CharacterStatus : MonoBehaviour
         {
             Down();
         }
-        else if (logStateChanges)
+        else
         {
-            Debug.Log(gameObject.name + " was hit. State = Injured. HP = " + currentHP);
+            if (logStateChanges)
+            {
+                Debug.Log(gameObject.name + " was hit. State = Injured. HP = " + currentHP);
+            }
         }
 
         return true;
@@ -127,13 +143,13 @@ public class CharacterStatus : MonoBehaviour
 
         yield return new WaitForSeconds(playerStats.hitStunDuration);
 
+        isHitStunned = false;
+
         if (!isDowned)
         {
-            controller.RestoreDefaultSpeed();
             controller.enablePlayerInput = previousInputState;
+            RefreshMoveSpeedFromState();
         }
-
-        isHitStunned = false;
 
         if (logStateChanges)
         {
@@ -171,11 +187,11 @@ public class CharacterStatus : MonoBehaviour
 
         if (controller != null)
         {
-            controller.RestoreDefaultSpeed();
             controller.enablePlayerInput = true;
+            RefreshMoveSpeedFromState();
         }
 
-        SetSlowWarning(false);
+        SetSlowWarning(isSlowed);
 
         if (logStateChanges)
         {
@@ -187,14 +203,17 @@ public class CharacterStatus : MonoBehaviour
     {
         isDowned = false;
         isHitStunned = false;
+        isSlowed = false;
+        currentSlowMultiplier = 1f;
+
         currentHP = GetMaxHP();
 
         if (controller != null)
         {
-            controller.RestoreDefaultSpeed();
             controller.enablePlayerInput = true;
             controller.IsInvincible = false;
             controller.StopForcedMove();
+            RefreshMoveSpeedFromState();
         }
 
         SetSlowWarning(false);
@@ -208,12 +227,42 @@ public class CharacterStatus : MonoBehaviour
 
     void RecoverOriginalSpeed()
     {
+        isSlowed = false;
+        currentSlowMultiplier = 1f;
+
         if (controller != null && !isDowned && !isHitStunned)
         {
-            controller.RestoreDefaultSpeed();
+            RefreshMoveSpeedFromState();
         }
 
         SetSlowWarning(false);
+
+        if (logStateChanges)
+        {
+            Debug.Log(gameObject.name + " slow expired.");
+        }
+    }
+
+    public void RefreshMoveSpeedFromState()
+    {
+        if (controller == null) return;
+        if (playerStats == null) return;
+        if (isDowned) return;
+        if (isHitStunned) return;
+
+        float finalSpeed = controller.GetDefaultMoveSpeed();
+
+        if (IsInjured)
+        {
+            finalSpeed *= playerStats.injuredMoveMultiplier;
+        }
+
+        if (isSlowed)
+        {
+            finalSpeed *= currentSlowMultiplier;
+        }
+
+        controller.SetSpeed(finalSpeed);
     }
 
     public void StartInvincible(float duration)

@@ -15,4 +15,8 @@ public class PlayerStatsSO : ScriptableObject
     public int maxHP = 2;
     public float hitInvincibleDuration = 0.4f;
     public float hitStunDuration = 0.25f;
+
+    [Header("State Move Multipliers")]
+    public float injuredMoveMultiplier = 0.95f;
+    public float criticalInjuredMoveMultiplier = 0.85f; // 先预留，当前版本可不用
 }

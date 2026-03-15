@@ -110,6 +110,14 @@ public class SurvivorDashSkill : MonoBehaviour
         if (controller != null)
         {
             controller.StopForcedMove();
+        }
+
+        if (status != null)
+        {
+            status.RefreshMoveSpeedFromState();
+        }
+        else if (controller != null)
+        {
             controller.RestoreDefaultSpeed();
         }
 
@@ -119,6 +127,7 @@ public class SurvivorDashSkill : MonoBehaviour
     void UpdateCooldownUI()
     {
         if (cooldownText == null) return;
+
         if (!hasBeenUsed)
         {
             HideCooldownUI();

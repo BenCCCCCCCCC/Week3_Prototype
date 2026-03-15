@@ -19,3 +19,5 @@ MonoBehaviour:
   maxHP: 2
   hitInvincibleDuration: 0.4
   hitStunDuration: 0.25
+  injuredMoveMultiplier: 0.95
+  criticalInjuredMoveMultiplier: 0.85

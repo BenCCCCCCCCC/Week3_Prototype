@@ -133,10 +133,10 @@ GameObject:
   - component: {fileID: 55908632}
   - component: {fileID: 55908631}
   - component: {fileID: 55908630}
-  - component: {fileID: 55908636}
   - component: {fileID: 55908638}
   - component: {fileID: 55908639}
   - component: {fileID: 55908640}
+  - component: {fileID: 55908641}
   m_Layer: 0
   m_Name: Survivor
   m_TagString: Survivor
@@ -158,7 +158,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   cameraTransform: {fileID: 330585546}
   playerStats: {fileID: 11400000, guid: b41053ba16440dc44b8eacfd2c71760f, type: 2}
-  enablePlayerInput: 1
+  enablePlayerInput: 0
   gravity: -9.81
   pitchClamp: 80
   externalSpeedMultiplier: 1
@@ -284,22 +284,6 @@ Transform:
   - {fileID: 1825370875}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &55908636
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 55908629}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70ffbbc392e683b43894f6abaaaa7b76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InteractionUI
-  progressFill: {fileID: 1101796982}
-  progressBG: {fileID: 1730037489}
-  hintText: {fileID: 1130855096}
-  interactionStats: {fileID: 11400000, guid: ab279834b05e19f41b343ae495376abb, type: 2}
 --- !u!114 &55908638
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -349,6 +333,22 @@ MonoBehaviour:
   status: {fileID: 55908638}
   skillStats: {fileID: 11400000, guid: 807532eae678332478918ac2912ef4b1, type: 2}
   cooldownText: {fileID: 1362977061}
+--- !u!114 &55908641
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 55908629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70ffbbc392e683b43894f6abaaaa7b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionUI
+  progressFill: {fileID: 1101796982}
+  progressBG: {fileID: 1730037489}
+  hintText: {fileID: 1130855096}
+  interactionStats: {fileID: 11400000, guid: ab279834b05e19f41b343ae495376abb, type: 2}
 --- !u!1 &74959964
 GameObject:
   m_ObjectHideFlags: 0
@@ -3000,7 +3000,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!81 &330585544
 AudioListener:
   m_ObjectHideFlags: 0
@@ -7745,10 +7745,10 @@ GameObject:
   - component: {fileID: 856565043}
   - component: {fileID: 856565042}
   - component: {fileID: 856565041}
-  - component: {fileID: 856565040}
   - component: {fileID: 856565047}
   - component: {fileID: 856565048}
   - component: {fileID: 856565049}
+  - component: {fileID: 856565050}
   m_Layer: 0
   m_Name: Hunter
   m_TagString: Hunter
@@ -7756,22 +7756,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &856565040
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 856565039}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70ffbbc392e683b43894f6abaaaa7b76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InteractionUI
-  progressFill: {fileID: 1101796982}
-  progressBG: {fileID: 1730037489}
-  hintText: {fileID: 1130855096}
-  interactionStats: {fileID: 11400000, guid: ab279834b05e19f41b343ae495376abb, type: 2}
 --- !u!114 &856565041
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7786,7 +7770,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   cameraTransform: {fileID: 1418904642}
   playerStats: {fileID: 11400000, guid: b41053ba16440dc44b8eacfd2c71760f, type: 2}
-  enablePlayerInput: 0
+  enablePlayerInput: 1
   gravity: -9.81
   pitchClamp: 80
   externalSpeedMultiplier: 1
@@ -7967,6 +7951,22 @@ MonoBehaviour:
   targetTag: Survivor
   drawGizmos: 1
   logAttackResult: 1
+--- !u!114 &856565050
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 856565039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70ffbbc392e683b43894f6abaaaa7b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionUI
+  progressFill: {fileID: 1101796982}
+  progressBG: {fileID: 1730037489}
+  hintText: {fileID: 1130855096}
+  interactionStats: {fileID: 11400000, guid: ab279834b05e19f41b343ae495376abb, type: 2}
 --- !u!1 &880692729
 GameObject:
   m_ObjectHideFlags: 0
@@ -10187,7 +10187,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1418904642
 Transform:
   m_ObjectHideFlags: 0
