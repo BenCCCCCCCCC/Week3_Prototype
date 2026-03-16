@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PlayerStats_Default
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStatsSO
   walkSpeed: 4
-  runSpeed: 6.5
+  runSpeed: 8.8
   crouchSpeed: 2.5
   mouseSensitivity: 0.08
   maxHP: 2

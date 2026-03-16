@@ -347,8 +347,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::InteractionUI
   progressFill: {fileID: 1101796982}
   progressBG: {fileID: 1730037489}
-  hintText: {fileID: 1130855096}
+  hintTextRoot: {fileID: 1130855096}
+  hintLabel: {fileID: 1130855098}
   interactionStats: {fileID: 11400000, guid: ab279834b05e19f41b343ae495376abb, type: 2}
+  showDebugLog: 1
 --- !u!1 &74959964
 GameObject:
   m_ObjectHideFlags: 0
@@ -361,6 +363,7 @@ GameObject:
   - component: {fileID: 74959967}
   - component: {fileID: 74959966}
   - component: {fileID: 74959965}
+  - component: {fileID: 74959969}
   m_Layer: 0
   m_Name: RandomTool_H3
   m_TagString: InteractPoint
@@ -462,6 +465,26 @@ Transform:
   - {fileID: 508558712}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &74959969
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 74959964}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa6d80265a3882d47ae58bf88cfa1bc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionTarget
+  interactionType: 0
+  displayName: Interact
+  disableAfterComplete: 0
+  oneShot: 0
+  isCompleted: 0
+  onInteractComplete:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!43 &94566056
 Mesh:
   m_ObjectHideFlags: 0
@@ -1522,6 +1545,7 @@ GameObject:
   - component: {fileID: 255674592}
   - component: {fileID: 255674591}
   - component: {fileID: 255674590}
+  - component: {fileID: 255674594}
   m_Layer: 0
   m_Name: RandomTool_H1
   m_TagString: InteractPoint
@@ -1623,6 +1647,26 @@ Transform:
   - {fileID: 1861793801}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &255674594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 255674589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa6d80265a3882d47ae58bf88cfa1bc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionTarget
+  interactionType: 0
+  displayName: Interact
+  disableAfterComplete: 0
+  oneShot: 0
+  isCompleted: 0
+  onInteractComplete:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &258260222
 GameObject:
   m_ObjectHideFlags: 0
@@ -1635,6 +1679,7 @@ GameObject:
   - component: {fileID: 258260225}
   - component: {fileID: 258260224}
   - component: {fileID: 258260223}
+  - component: {fileID: 258260227}
   m_Layer: 0
   m_Name: RandomTool_O2
   m_TagString: InteractPoint
@@ -1736,6 +1781,26 @@ Transform:
   - {fileID: 1732223927}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &258260227
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 258260222}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa6d80265a3882d47ae58bf88cfa1bc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionTarget
+  interactionType: 0
+  displayName: Interact
+  disableAfterComplete: 0
+  oneShot: 0
+  isCompleted: 0
+  onInteractComplete:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &273041644
 GameObject:
   m_ObjectHideFlags: 0
@@ -3132,6 +3197,7 @@ GameObject:
   - component: {fileID: 350187310}
   - component: {fileID: 350187309}
   - component: {fileID: 350187308}
+  - component: {fileID: 350187312}
   m_Layer: 0
   m_Name: Door_H
   m_TagString: InteractPoint
@@ -3233,6 +3299,26 @@ Transform:
   - {fileID: 145282657}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &350187312
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 350187307}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa6d80265a3882d47ae58bf88cfa1bc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionTarget
+  interactionType: 2
+  displayName: Gate
+  disableAfterComplete: 0
+  oneShot: 0
+  isCompleted: 0
+  onInteractComplete:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &350845406
 GameObject:
   m_ObjectHideFlags: 0
@@ -4341,6 +4427,7 @@ GameObject:
   - component: {fileID: 451039702}
   - component: {fileID: 451039701}
   - component: {fileID: 451039700}
+  - component: {fileID: 451039704}
   m_Layer: 0
   m_Name: Cipher_L
   m_TagString: InteractPoint
@@ -4442,6 +4529,26 @@ Transform:
   - {fileID: 95120267}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &451039704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 451039699}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa6d80265a3882d47ae58bf88cfa1bc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionTarget
+  interactionType: 1
+  displayName: Repair
+  disableAfterComplete: 0
+  oneShot: 0
+  isCompleted: 0
+  onInteractComplete:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &469621890
 GameObject:
   m_ObjectHideFlags: 0
@@ -4454,6 +4561,7 @@ GameObject:
   - component: {fileID: 469621893}
   - component: {fileID: 469621892}
   - component: {fileID: 469621891}
+  - component: {fileID: 469621895}
   m_Layer: 0
   m_Name: RandomTool_O1
   m_TagString: InteractPoint
@@ -4555,6 +4663,26 @@ Transform:
   - {fileID: 786302518}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &469621895
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 469621890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa6d80265a3882d47ae58bf88cfa1bc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionTarget
+  interactionType: 0
+  displayName: Interact
+  disableAfterComplete: 0
+  oneShot: 0
+  isCompleted: 0
+  onInteractComplete:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &505488881
 GameObject:
   m_ObjectHideFlags: 0
@@ -5259,6 +5387,7 @@ GameObject:
   - component: {fileID: 545438342}
   - component: {fileID: 545438341}
   - component: {fileID: 545438340}
+  - component: {fileID: 545438344}
   m_Layer: 0
   m_Name: Door_E
   m_TagString: InteractPoint
@@ -5360,6 +5489,26 @@ Transform:
   - {fileID: 849096570}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &545438344
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 545438339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa6d80265a3882d47ae58bf88cfa1bc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionTarget
+  interactionType: 2
+  displayName: Gate
+  disableAfterComplete: 0
+  oneShot: 0
+  isCompleted: 0
+  onInteractComplete:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &575293825
 GameObject:
   m_ObjectHideFlags: 0
@@ -7356,6 +7505,7 @@ GameObject:
   - component: {fileID: 819502227}
   - component: {fileID: 819502226}
   - component: {fileID: 819502225}
+  - component: {fileID: 819502229}
   m_Layer: 0
   m_Name: Chair_H2
   m_TagString: InteractPoint
@@ -7457,6 +7607,26 @@ Transform:
   - {fileID: 1980698360}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &819502229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 819502224}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa6d80265a3882d47ae58bf88cfa1bc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionTarget
+  interactionType: 3
+  displayName: Rescue
+  disableAfterComplete: 0
+  oneShot: 0
+  isCompleted: 0
+  onInteractComplete:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -7965,8 +8135,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::InteractionUI
   progressFill: {fileID: 1101796982}
   progressBG: {fileID: 1730037489}
-  hintText: {fileID: 1130855096}
+  hintTextRoot: {fileID: 1130855096}
+  hintLabel: {fileID: 1130855098}
   interactionStats: {fileID: 11400000, guid: ab279834b05e19f41b343ae495376abb, type: 2}
+  showDebugLog: 1
 --- !u!1 &880692729
 GameObject:
   m_ObjectHideFlags: 0
@@ -8203,6 +8375,7 @@ GameObject:
   - component: {fileID: 951238672}
   - component: {fileID: 951238671}
   - component: {fileID: 951238670}
+  - component: {fileID: 951238674}
   m_Layer: 0
   m_Name: Cipher_R
   m_TagString: InteractPoint
@@ -8304,6 +8477,26 @@ Transform:
   - {fileID: 1378467819}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &951238674
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 951238669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa6d80265a3882d47ae58bf88cfa1bc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionTarget
+  interactionType: 1
+  displayName: Repair
+  disableAfterComplete: 0
+  oneShot: 0
+  isCompleted: 0
+  onInteractComplete:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &982550271
 GameObject:
   m_ObjectHideFlags: 0
@@ -9524,6 +9717,7 @@ GameObject:
   - component: {fileID: 1239613399}
   - component: {fileID: 1239613398}
   - component: {fileID: 1239613397}
+  - component: {fileID: 1239613401}
   m_Layer: 0
   m_Name: Cipher_H1
   m_TagString: InteractPoint
@@ -9625,6 +9819,26 @@ Transform:
   - {fileID: 1593529781}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1239613401
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1239613396}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa6d80265a3882d47ae58bf88cfa1bc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionTarget
+  interactionType: 1
+  displayName: Repair
+  disableAfterComplete: 0
+  oneShot: 0
+  isCompleted: 0
+  onInteractComplete:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1261218356
 GameObject:
   m_ObjectHideFlags: 0
@@ -12234,6 +12448,7 @@ GameObject:
   - component: {fileID: 1732923793}
   - component: {fileID: 1732923792}
   - component: {fileID: 1732923791}
+  - component: {fileID: 1732923795}
   m_Layer: 0
   m_Name: Cipher_M
   m_TagString: InteractPoint
@@ -12335,6 +12550,26 @@ Transform:
   - {fileID: 880692730}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1732923795
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1732923790}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa6d80265a3882d47ae58bf88cfa1bc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionTarget
+  interactionType: 1
+  displayName: Repair
+  disableAfterComplete: 0
+  oneShot: 0
+  isCompleted: 0
+  onInteractComplete:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1769678019
 GameObject:
   m_ObjectHideFlags: 0
@@ -12881,6 +13116,7 @@ GameObject:
   - component: {fileID: 1805855731}
   - component: {fileID: 1805855730}
   - component: {fileID: 1805855729}
+  - component: {fileID: 1805855733}
   m_Layer: 0
   m_Name: RandomTool_H2
   m_TagString: InteractPoint
@@ -12982,6 +13218,26 @@ Transform:
   - {fileID: 898791200}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1805855733
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1805855728}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa6d80265a3882d47ae58bf88cfa1bc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionTarget
+  interactionType: 0
+  displayName: Interact
+  disableAfterComplete: 0
+  oneShot: 0
+  isCompleted: 0
+  onInteractComplete:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1825370874
 GameObject:
   m_ObjectHideFlags: 0
@@ -13138,6 +13394,7 @@ GameObject:
   - component: {fileID: 1911076652}
   - component: {fileID: 1911076651}
   - component: {fileID: 1911076650}
+  - component: {fileID: 1911076654}
   m_Layer: 0
   m_Name: Cipher_H2
   m_TagString: InteractPoint
@@ -13239,6 +13496,26 @@ Transform:
   - {fileID: 1069380771}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1911076654
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1911076649}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa6d80265a3882d47ae58bf88cfa1bc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionTarget
+  interactionType: 1
+  displayName: Repair
+  disableAfterComplete: 0
+  oneShot: 0
+  isCompleted: 0
+  onInteractComplete:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1912636708
 GameObject:
   m_ObjectHideFlags: 0
@@ -13251,6 +13528,7 @@ GameObject:
   - component: {fileID: 1912636711}
   - component: {fileID: 1912636710}
   - component: {fileID: 1912636709}
+  - component: {fileID: 1912636713}
   m_Layer: 0
   m_Name: Cipher_H3
   m_TagString: InteractPoint
@@ -13352,6 +13630,26 @@ Transform:
   - {fileID: 505488882}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1912636713
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1912636708}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa6d80265a3882d47ae58bf88cfa1bc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionTarget
+  interactionType: 1
+  displayName: Repair
+  disableAfterComplete: 0
+  oneShot: 0
+  isCompleted: 0
+  onInteractComplete:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1917787498
 GameObject:
   m_ObjectHideFlags: 0
@@ -14126,6 +14424,7 @@ GameObject:
   - component: {fileID: 2120987951}
   - component: {fileID: 2120987950}
   - component: {fileID: 2120987949}
+  - component: {fileID: 2120987953}
   m_Layer: 0
   m_Name: Chair_H1
   m_TagString: InteractPoint
@@ -14227,6 +14526,26 @@ Transform:
   - {fileID: 541222481}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2120987953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2120987948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa6d80265a3882d47ae58bf88cfa1bc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionTarget
+  interactionType: 3
+  displayName: Rescue
+  disableAfterComplete: 0
+  oneShot: 0
+  isCompleted: 0
+  onInteractComplete:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

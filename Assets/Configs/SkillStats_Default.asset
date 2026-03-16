@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SkillStats_Default
   m_EditorClassIdentifier: Assembly-CSharp::SkillStatsSO
   dashCooldown: 15
-  dashMultiplier: 2.5
+  dashMultiplier: 2.2
   dashDuration: 1
   dashInvincibleDuration: 0.5
   dashReadyShowDuration: 1
@@ -22,7 +22,7 @@ MonoBehaviour:
   slowMissCooldown: 10
   slowRange: 25
   slowCastRadius: 0.25
-  slowMultiplier: 0.7
+  slowMultiplier: 0.75
   slowDuration: 2
   slowReadyShowDuration: 1
   detectCooldown: 15

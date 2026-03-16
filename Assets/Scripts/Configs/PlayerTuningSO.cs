@@ -11,7 +11,4 @@ public class PlayerTuningSO : ScriptableObject
 
     [Header("Look")]
     public float mouseSensitivity = 0.08f;
-
-    [Header("Interact")]
-    public float interactHoldSeconds = 2.0f;
 }
