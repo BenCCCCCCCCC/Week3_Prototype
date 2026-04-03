@@ -19,6 +19,10 @@ public class InteractionTarget : MonoBehaviour
     public bool disableAfterComplete = false;
     public bool oneShot = false;
 
+    [Header("Who Can Interact")]
+    public bool allowSurvivor = true;
+    public bool allowHunter = false;
+
     [Header("Runtime")]
     public bool isCompleted = false;
 
@@ -43,6 +47,25 @@ public class InteractionTarget : MonoBehaviour
             default:
                 return stats.interactHoldSeconds;
         }
+    }
+
+    public bool CanBeInteractedBy(GameObject actor)
+    {
+        if (actor == null) return false;
+
+        Transform root = actor.transform.root;
+
+        if (root.CompareTag("Survivor"))
+        {
+            return allowSurvivor;
+        }
+
+        if (root.CompareTag("Hunter"))
+        {
+            return allowHunter;
+        }
+
+        return false;
     }
 
     public void CompleteInteraction()

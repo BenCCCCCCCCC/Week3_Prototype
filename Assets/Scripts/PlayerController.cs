@@ -65,12 +65,18 @@ public class PlayerController : MonoBehaviour
         else
         {
             actions.Disable();
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
     }
 
     void OnDisable()
     {
-        actions.Disable();
+        if (actions != null)
+        {
+            actions.Disable();
+        }
+
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
@@ -80,6 +86,32 @@ public class PlayerController : MonoBehaviour
         if (actions != null)
         {
             actions.Dispose();
+        }
+    }
+
+    public void SetPlayerInputEnabled(bool enabled)
+    {
+        enablePlayerInput = enabled;
+
+        if (actions == null)
+        {
+            return;
+        }
+
+        if (enabled)
+        {
+            actions.Enable();
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+        else
+        {
+            actions.Disable();
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+
+            moveInput = Vector2.zero;
+            lookInput = Vector2.zero;
         }
     }
 
@@ -97,6 +129,9 @@ public class PlayerController : MonoBehaviour
 
     void HandleMove()
     {
+        if (cc == null) return;
+        if (!cc.enabled) return;
+
         Vector2 currentMoveInput = enablePlayerInput ? moveInput : Vector2.zero;
 
         Vector3 inputDirection = transform.right * currentMoveInput.x + transform.forward * currentMoveInput.y;

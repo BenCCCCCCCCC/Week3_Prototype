@@ -1,15 +1,23 @@
 using UnityEngine;
 
-[RequireComponent(typeof(CharacterController))]
 public class SurvivorAutoMoveTest : MonoBehaviour
 {
+    [Header("References")]
     public PlayerController controller;
+    public CharacterStatus status;
+
+    [Header("Auto Move")]
     public float moveDistance = 4f;
     public float pauseAtEnds = 0.3f;
 
-    private Vector3 startPos;
-    private int direction = 1;
+    [Header("Debug")]
+    public bool showDebugLog = false;
+
+    private Vector3 startPosition;
+    private Vector3 moveAxis;
+    private bool moveToPositive = true;
     private float pauseTimer = 0f;
+    private bool initialized = false;
 
     void Awake()
     {
@@ -17,44 +25,121 @@ public class SurvivorAutoMoveTest : MonoBehaviour
         {
             controller = GetComponent<PlayerController>();
         }
+
+        if (status == null)
+        {
+            status = GetComponent<CharacterStatus>();
+        }
     }
 
-    void Start()
+    void OnEnable()
     {
-        startPos = transform.position;
+        if (!initialized)
+        {
+            startPosition = transform.position;
+            moveAxis = transform.right.normalized;
+
+            if (moveAxis.sqrMagnitude < 0.001f)
+            {
+                moveAxis = Vector3.right;
+            }
+
+            initialized = true;
+        }
+
+        pauseTimer = 0f;
+    }
+
+    void OnDisable()
+    {
+        StopAutoMove();
     }
 
     void Update()
     {
-        if (controller == null) return;
-        if (controller.enablePlayerInput) return; // 只在“非玩家控制”时自动移动
+        if (controller == null)
+        {
+            return;
+        }
+
+        if (!CanAutoMove())
+        {
+            StopAutoMove();
+            return;
+        }
 
         if (pauseTimer > 0f)
         {
             pauseTimer -= Time.deltaTime;
+            StopAutoMove();
             return;
         }
 
-        float speed = controller.GetBaseMoveSpeed() * controller.externalSpeedMultiplier;
-        Vector3 moveDir = transform.right * direction;
+        Vector3 targetOffset = moveToPositive ? moveAxis * moveDistance : -moveAxis * moveDistance;
+        Vector3 targetPosition = startPosition + targetOffset;
 
-        CharacterController cc = GetComponent<CharacterController>();
-        if (cc != null)
+        Vector3 toTarget = targetPosition - transform.position;
+        toTarget.y = 0f;
+
+        if (toTarget.magnitude <= 0.15f)
         {
-            cc.Move(moveDir * speed * Time.deltaTime);
+            moveToPositive = !moveToPositive;
+            pauseTimer = pauseAtEnds;
+            StopAutoMove();
+
+            if (showDebugLog)
+            {
+                Debug.Log("SurvivorAutoMoveTest: reached end point, turning around.");
+            }
+
+            return;
         }
 
-        float offset = transform.position.x - startPos.x;
+        float autoSpeed = controller.GetDefaultMoveSpeed();
+        controller.StartForcedMove(toTarget.normalized, autoSpeed);
+    }
 
-        if (offset >= moveDistance)
+    bool CanAutoMove()
+    {
+        if (!enabled)
         {
-            direction = -1;
-            pauseTimer = pauseAtEnds;
+            return false;
         }
-        else if (offset <= -moveDistance)
+
+        if (controller == null)
         {
-            direction = 1;
-            pauseTimer = pauseAtEnds;
+            return false;
+        }
+
+        CharacterController cc = controller.GetComponent<CharacterController>();
+        if (cc == null)
+        {
+            return false;
+        }
+
+        if (!cc.enabled)
+        {
+            return false;
+        }
+
+        if (status != null)
+        {
+            if (status.IsDowned) return false;
+            if (status.IsCarried) return false;
+            if (status.IsChaired) return false;
+            if (status.IsEliminated) return false;
+            if (status.IsEscaped) return false;
+            if (status.IsHitStunned) return false;
+        }
+
+        return true;
+    }
+
+    void StopAutoMove()
+    {
+        if (controller != null)
+        {
+            controller.StopForcedMove();
         }
     }
 }

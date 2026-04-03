@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: InteractionStats_Default
   m_EditorClassIdentifier: Assembly-CSharp::InteractionStatsSO
   interactHoldSeconds: 2
-  repairHoldSeconds: 45
+  repairHoldSeconds: 6
   repairInterruptLoss: 0.06
   multiRepairEfficiency: 0.85
-  gateOpenHoldSeconds: 18
-  rescueHoldSeconds: 2.5
+  gateOpenHoldSeconds: 5
+  rescueHoldSeconds: 10
   interactCancelLockSeconds: 0.4

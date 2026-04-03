@@ -8,11 +8,7 @@ public class InteractionUI : MonoBehaviour
     [Header("UI References")]
     public Image progressFill;
     public GameObject progressBG;
-
-    // 整个提示文字物体（用于显示/隐藏）
     public GameObject hintTextRoot;
-
-    // 真正显示文字的 TextMeshPro 文本组件
     public TMP_Text hintLabel;
 
     [Header("Interaction Stats (must assign)")]
@@ -27,6 +23,16 @@ public class InteractionUI : MonoBehaviour
     private InputAction interactHoldAction;
     private InteractionTarget currentTarget;
     private Collider currentTargetCollider;
+
+    private CipherMachine currentCipher;
+    private GateController currentGate;
+    private ChairController currentChair;
+
+    public bool IsInteractingRescue =>
+        inRange &&
+        currentTarget != null &&
+        currentTarget.interactionType == InteractionType.Rescue &&
+        progress > 0f;
 
     void Awake()
     {
@@ -45,6 +51,7 @@ public class InteractionUI : MonoBehaviour
     void OnDisable()
     {
         interactHoldAction.Disable();
+        StopSpecialInteractions();
     }
 
     void Start()
@@ -67,11 +74,110 @@ public class InteractionUI : MonoBehaviour
             return;
         }
 
+        if (!currentTarget.CanBeInteractedBy(gameObject))
+        {
+            ResetInteractionState(false);
+            return;
+        }
+
+        if (currentChair != null &&
+            currentTarget.interactionType == InteractionType.Rescue &&
+            !currentChair.CanRescue())
+        {
+            ResetInteractionState(false);
+            return;
+        }
+
         SetUI(true);
         UpdateHintText();
 
-        float holdSeconds = Mathf.Max(0.01f, currentTarget.GetHoldSeconds(interactionStats));
         bool eHeld = interactHoldAction.IsPressed();
+
+        if (currentCipher != null)
+        {
+            HandleCipherInteraction(eHeld);
+            return;
+        }
+
+        if (currentGate != null)
+        {
+            HandleGateInteraction(eHeld);
+            return;
+        }
+
+        HandleDefaultInteraction(eHeld);
+    }
+
+    void HandleCipherInteraction(bool eHeld)
+    {
+        if (currentCipher == null) return;
+
+        if (!currentTarget.CanBeInteractedBy(gameObject))
+        {
+            currentCipher.EndRepair(this);
+            SetProgress(currentCipher.progress01);
+            return;
+        }
+
+        if (currentCipher.isCompleted)
+        {
+            currentCipher.EndRepair(this);
+            SetProgress(currentCipher.progress01);
+            return;
+        }
+
+        if (eHeld)
+        {
+            currentCipher.BeginRepair(this);
+        }
+        else
+        {
+            currentCipher.EndRepair(this);
+        }
+
+        SetProgress(currentCipher.progress01);
+    }
+
+    void HandleGateInteraction(bool eHeld)
+    {
+        if (currentGate == null) return;
+
+        if (!currentTarget.CanBeInteractedBy(gameObject))
+        {
+            currentGate.EndOpen(this);
+            SetProgress(currentGate.progress01);
+            return;
+        }
+
+        if (!currentGate.isUnlocked)
+        {
+            currentGate.EndOpen(this);
+            SetProgress(0f);
+            return;
+        }
+
+        if (currentGate.isOpened)
+        {
+            currentGate.EndOpen(this);
+            SetProgress(1f);
+            return;
+        }
+
+        if (eHeld)
+        {
+            currentGate.BeginOpen(this);
+        }
+        else
+        {
+            currentGate.EndOpen(this);
+        }
+
+        SetProgress(currentGate.progress01);
+    }
+
+    void HandleDefaultInteraction(bool eHeld)
+    {
+        float holdSeconds = Mathf.Max(0.01f, currentTarget.GetHoldSeconds(interactionStats));
 
         if (eHeld)
         {
@@ -87,7 +193,7 @@ public class InteractionUI : MonoBehaviour
 
         if (progress >= 1f)
         {
-            OnInteractionCompleted();
+            OnDefaultInteractionCompleted();
         }
     }
 
@@ -100,21 +206,59 @@ public class InteractionUI : MonoBehaviour
         {
             if (showDebugLog)
             {
-                Debug.LogWarning($"InteractionUI: {other.name} has InteractPoint tag but no InteractionTarget.");
+                Debug.LogWarning("InteractionUI: " + other.name + " has InteractPoint tag but no InteractionTarget.");
+            }
+            return;
+        }
+
+        if (!target.CanBeInteractedBy(gameObject))
+        {
+            if (showDebugLog)
+            {
+                Debug.Log("InteractionUI: " + gameObject.name + " is not allowed to interact with " + other.name);
             }
             return;
         }
 
         currentTarget = target;
         currentTargetCollider = other;
+        currentCipher = other.GetComponent<CipherMachine>();
+        currentGate = other.GetComponent<GateController>();
+        currentChair = other.GetComponent<ChairController>();
+
+        if (currentChair != null &&
+            currentTarget.interactionType == InteractionType.Rescue &&
+            !currentChair.CanRescue())
+        {
+            currentTarget = null;
+            currentTargetCollider = null;
+            currentCipher = null;
+            currentGate = null;
+            currentChair = null;
+            return;
+        }
+
         inRange = true;
         progress = 0f;
-        SetProgress(0f);
+
+        if (currentCipher != null)
+        {
+            SetProgress(currentCipher.progress01);
+        }
+        else if (currentGate != null)
+        {
+            SetProgress(currentGate.progress01);
+        }
+        else
+        {
+            SetProgress(0f);
+        }
+
         UpdateHintText();
 
         if (showDebugLog)
         {
-            Debug.Log($"Enter interact range: {other.name}, Type = {target.interactionType}, Hold = {target.GetHoldSeconds(interactionStats)}s");
+            Debug.Log("Enter interact range: " + other.name + ", Type = " + target.interactionType);
         }
     }
 
@@ -124,19 +268,32 @@ public class InteractionUI : MonoBehaviour
 
         if (showDebugLog)
         {
-            Debug.Log($"Exit interact range: {other.name}");
+            Debug.Log("Exit interact range: " + other.name);
         }
 
         ResetInteractionState(false);
     }
 
-    void OnInteractionCompleted()
+    void OnDefaultInteractionCompleted()
     {
         if (currentTarget == null) return;
 
+        if (currentChair != null && currentTarget.interactionType == InteractionType.Rescue)
+        {
+            bool rescueSuccess = currentChair.RescueOccupant();
+
+            if (showDebugLog)
+            {
+                Debug.Log("Rescue complete on chair: " + currentChair.name + ", success = " + rescueSuccess);
+            }
+
+            ResetInteractionState(false);
+            return;
+        }
+
         if (showDebugLog)
         {
-            Debug.Log($"Interact Complete! Target = {currentTarget.name}, Type = {currentTarget.interactionType}");
+            Debug.Log("Default interaction complete: " + currentTarget.name);
         }
 
         currentTarget.CompleteInteraction();
@@ -157,10 +314,53 @@ public class InteractionUI : MonoBehaviour
     {
         if (hintLabel == null || currentTarget == null) return;
 
+        if (currentCipher != null)
+        {
+            if (currentCipher.isCompleted)
+            {
+                hintLabel.text = "Cipher already completed";
+            }
+            else
+            {
+                hintLabel.text = "Hold E to repair and decrypt the file";
+            }
+            return;
+        }
+
+        if (currentGate != null)
+        {
+            if (currentGate.isOpened)
+            {
+                hintLabel.text = "Gate already opened";
+            }
+            else if (!currentGate.isUnlocked)
+            {
+                hintLabel.text = "Door locked. Complete all required ciphers first";
+            }
+            else
+            {
+                hintLabel.text = "Hold E to open the evacuation door";
+            }
+            return;
+        }
+
+        if (currentChair != null && currentTarget.interactionType == InteractionType.Rescue)
+        {
+            if (currentChair.CanRescue())
+            {
+                hintLabel.text = "Hold E to rescue your teammate from the chair";
+            }
+            else
+            {
+                hintLabel.text = "No teammate on chair";
+            }
+            return;
+        }
+
         switch (currentTarget.interactionType)
         {
             case InteractionType.Repair:
-                hintLabel.text = "Hold  E to repair and decrypt the file";
+                hintLabel.text = "Hold E to repair and decrypt the file";
                 break;
 
             case InteractionType.Gate:
@@ -168,7 +368,7 @@ public class InteractionUI : MonoBehaviour
                 break;
 
             case InteractionType.Rescue:
-                hintLabel.text = "Hold  E to rescue your teammate from the chair";
+                hintLabel.text = "Hold E to rescue your teammate from the chair";
                 break;
 
             default:
@@ -177,8 +377,42 @@ public class InteractionUI : MonoBehaviour
         }
     }
 
+    public void ForceInterruptInteraction(string reason = "")
+    {
+        if (!inRange && currentTarget == null) return;
+
+        if (showDebugLog)
+        {
+            if (string.IsNullOrEmpty(reason))
+            {
+                Debug.Log("InteractionUI: interaction interrupted.");
+            }
+            else
+            {
+                Debug.Log("InteractionUI: interaction interrupted. Reason = " + reason);
+            }
+        }
+
+        ResetInteractionState(false);
+    }
+
+    void StopSpecialInteractions()
+    {
+        if (currentCipher != null)
+        {
+            currentCipher.EndRepair(this);
+        }
+
+        if (currentGate != null)
+        {
+            currentGate.EndOpen(this);
+        }
+    }
+
     void ResetInteractionState(bool keepTarget)
     {
+        StopSpecialInteractions();
+
         SetUI(false);
         progress = 0f;
         SetProgress(0f);
@@ -188,6 +422,9 @@ public class InteractionUI : MonoBehaviour
         {
             currentTarget = null;
             currentTargetCollider = null;
+            currentCipher = null;
+            currentGate = null;
+            currentChair = null;
         }
     }
 
