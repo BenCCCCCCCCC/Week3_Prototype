@@ -28,7 +28,6 @@ public class MatchManager : MonoBehaviour
 
     [Header("Gameplay References")]
     public RoleSwitchController roleSwitchController;
-
     public PlayerController hunterController;
     public InteractionUI hunterInteractionUI;
     public HunterSlowSkill hunterSlowSkill;
@@ -57,8 +56,8 @@ public class MatchManager : MonoBehaviour
     public int CompletedCipherCount => completedCipherSet.Count;
     public int EscapedSurvivorCount => escapedSurvivorSet.Count;
     public int EliminatedSurvivorCount => eliminatedSurvivorSet.Count;
-    public int DownedCount { get; private set; } = 0;
 
+    public int DownedCount { get; private set; } = 0;
     public bool GatesUnlocked { get; private set; } = false;
     public bool IsMatchEnded { get; private set; } = false;
     public bool IsEndgameActive { get; private set; } = false;
@@ -105,7 +104,6 @@ public class MatchManager : MonoBehaviour
         matchStartTime = Time.time;
         matchEndTime = 0f;
         endgameRemainingTime = 0f;
-
         IsMatchEnded = false;
         IsEndgameActive = false;
         FinalResult = MatchResult.None;
@@ -119,6 +117,16 @@ public class MatchManager : MonoBehaviour
         if (resultPanelUI != null)
         {
             resultPanelUI.HidePanel();
+        }
+
+        // Week 8: reset current match stats
+        if (MatchStatsManager.Instance != null)
+        {
+            MatchStatsManager.Instance.StartMatch();
+        }
+        else if (logMatchEvents)
+        {
+            Debug.LogWarning("MatchManager: MatchStatsManager not found in scene.");
         }
 
         UpdateEndgameCountdownUI();
@@ -135,6 +143,7 @@ public class MatchManager : MonoBehaviour
         if (!IsEndgameActive) return;
 
         endgameRemainingTime -= Time.deltaTime;
+
         if (endgameRemainingTime < 0f)
         {
             endgameRemainingTime = 0f;
@@ -159,6 +168,12 @@ public class MatchManager : MonoBehaviour
         }
 
         completedCipherSet.Add(cipher);
+
+        // Week 8: sync completed cipher count
+        if (MatchStatsManager.Instance != null)
+        {
+            MatchStatsManager.Instance.SetCompletedCipherCount(CompletedCipherCount);
+        }
 
         if (logMatchEvents)
         {
@@ -197,6 +212,12 @@ public class MatchManager : MonoBehaviour
         IsEndgameActive = true;
         endgameRemainingTime = endgameDuration;
 
+        // Week 8: record gate open event
+        if (MatchStatsManager.Instance != null)
+        {
+            MatchStatsManager.Instance.AddGateOpen();
+        }
+
         UpdateEndgameCountdownUI();
 
         if (logMatchEvents)
@@ -221,7 +242,6 @@ public class MatchManager : MonoBehaviour
             {
                 GameObject survivor = trackedSurvivors[i];
                 if (survivor == null) continue;
-
                 if (escapedSurvivorSet.Contains(survivor)) continue;
                 if (eliminatedSurvivorSet.Contains(survivor)) continue;
 
@@ -249,6 +269,12 @@ public class MatchManager : MonoBehaviour
         if (survivor == null) return;
 
         DownedCount++;
+
+        // Week 8: record down count
+        if (MatchStatsManager.Instance != null)
+        {
+            MatchStatsManager.Instance.AddDown();
+        }
 
         if (logMatchEvents)
         {
@@ -350,6 +376,17 @@ public class MatchManager : MonoBehaviour
 
         UpdateEndgameCountdownUI();
         FreezeGameplay();
+
+        // Week 8: write final match data
+        if (MatchStatsManager.Instance != null)
+        {
+            MatchStatsManager.Instance.SetCompletedCipherCount(CompletedCipherCount);
+
+            bool escaped = EscapedSurvivorCount > 0;
+            bool eliminated = EliminatedSurvivorCount > 0;
+
+            MatchStatsManager.Instance.EndMatch(escaped, eliminated);
+        }
 
         if (resultPanelUI != null)
         {

@@ -21,6 +21,7 @@ public class InteractionUI : MonoBehaviour
     private bool inRange = false;
 
     private InputAction interactHoldAction;
+
     private InteractionTarget currentTarget;
     private Collider currentTargetCollider;
 
@@ -39,7 +40,7 @@ public class InteractionUI : MonoBehaviour
         interactHoldAction = new InputAction(
             name: "InteractHold",
             type: InputActionType.Button,
-            binding: "<Keyboard>/e"
+            binding: "/e"
         );
     }
 
@@ -112,6 +113,8 @@ public class InteractionUI : MonoBehaviour
     {
         if (currentCipher == null) return;
 
+        float beforeProgress = currentCipher.progress01;
+
         if (!currentTarget.CanBeInteractedBy(gameObject))
         {
             currentCipher.EndRepair(this);
@@ -133,6 +136,15 @@ public class InteractionUI : MonoBehaviour
         else
         {
             currentCipher.EndRepair(this);
+        }
+
+        float afterProgress = currentCipher.progress01;
+        float delta = afterProgress - beforeProgress;
+
+        if (delta > 0f && MatchStatsManager.Instance != null)
+        {
+            // 用百分比累计，1.0 代表 100%
+            MatchStatsManager.Instance.AddRepairProgress(delta * 100f);
         }
 
         SetProgress(currentCipher.progress01);
@@ -204,6 +216,10 @@ public class InteractionUI : MonoBehaviour
         InteractionTarget target = other.GetComponent<InteractionTarget>();
         if (target == null)
         {
+            target = other.GetComponentInParent<InteractionTarget>();
+        }
+        if (target == null)
+        {
             if (showDebugLog)
             {
                 Debug.LogWarning("InteractionUI: " + other.name + " has InteractPoint tag but no InteractionTarget.");
@@ -222,9 +238,24 @@ public class InteractionUI : MonoBehaviour
 
         currentTarget = target;
         currentTargetCollider = other;
+
         currentCipher = other.GetComponent<CipherMachine>();
+        if (currentCipher == null)
+        {
+            currentCipher = other.GetComponentInParent<CipherMachine>();
+        }
+
         currentGate = other.GetComponent<GateController>();
+        if (currentGate == null)
+        {
+            currentGate = other.GetComponentInParent<GateController>();
+        }
+
         currentChair = other.GetComponent<ChairController>();
+        if (currentChair == null)
+        {
+            currentChair = other.GetComponentInParent<ChairController>();
+        }
 
         if (currentChair != null &&
             currentTarget.interactionType == InteractionType.Rescue &&
@@ -282,6 +313,11 @@ public class InteractionUI : MonoBehaviour
         {
             bool rescueSuccess = currentChair.RescueOccupant();
 
+            if (rescueSuccess && MatchStatsManager.Instance != null)
+            {
+                MatchStatsManager.Instance.AddRescue();
+            }
+
             if (showDebugLog)
             {
                 Debug.Log("Rescue complete on chair: " + currentChair.name + ", success = " + rescueSuccess);
@@ -297,6 +333,17 @@ public class InteractionUI : MonoBehaviour
         }
 
         currentTarget.CompleteInteraction();
+
+        // 如果以后有环境交互类的一次性交互，可以在这里记一次
+        if (currentTarget.interactionType != InteractionType.Repair &&
+            currentTarget.interactionType != InteractionType.Gate &&
+            currentTarget.interactionType != InteractionType.Rescue)
+        {
+            if (MatchStatsManager.Instance != null)
+            {
+                MatchStatsManager.Instance.AddEnvironmentInteract();
+            }
+        }
 
         if (currentTarget.oneShot || currentTarget.disableAfterComplete)
         {
@@ -335,7 +382,7 @@ public class InteractionUI : MonoBehaviour
             }
             else if (!currentGate.isUnlocked)
             {
-                hintLabel.text = "Door locked. Complete all required ciphers first";
+                hintLabel.text = "Door locked.\nComplete all required ciphers first";
             }
             else
             {
@@ -362,15 +409,12 @@ public class InteractionUI : MonoBehaviour
             case InteractionType.Repair:
                 hintLabel.text = "Hold E to repair and decrypt the file";
                 break;
-
             case InteractionType.Gate:
                 hintLabel.text = "Hold E to open the evacuation door";
                 break;
-
             case InteractionType.Rescue:
                 hintLabel.text = "Hold E to rescue your teammate from the chair";
                 break;
-
             default:
                 hintLabel.text = "Hold E to interact";
                 break;

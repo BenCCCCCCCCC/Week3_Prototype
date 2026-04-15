@@ -52,7 +52,6 @@ public class HunterBasicAttack : MonoBehaviour
     {
         if (isAttacking) return;
         if (cooldownTimer > 0f) return;
-
         if (slowSkill != null && slowSkill.IsAiming) return;
 
         StartCoroutine(AttackRoutine());
@@ -103,8 +102,8 @@ public class HunterBasicAttack : MonoBehaviour
 
             Vector3 toTarget = root.position - transform.position;
             Vector3 flatToTarget = new Vector3(toTarget.x, 0f, toTarget.z);
-
             float distance = flatToTarget.magnitude;
+
             if (distance > skillStats.attackRange)
             {
                 continue;
@@ -126,6 +125,15 @@ public class HunterBasicAttack : MonoBehaviour
         if (bestTarget != null)
         {
             bool hitSuccess = bestTarget.TakeHit(transform.position);
+
+            if (hitSuccess)
+            {
+                if (MatchStatsManager.Instance != null)
+                {
+                    MatchStatsManager.Instance.AddHunterHit();
+                    MatchStatsManager.Instance.AddSurvivorHitTaken();
+                }
+            }
 
             if (logAttackResult)
             {
