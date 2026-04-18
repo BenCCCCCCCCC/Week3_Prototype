@@ -10,50 +10,59 @@ public class SurvivorDashSkill : MonoBehaviour
     public SkillStatsSO skillStats;
     public Text cooldownText;
 
-    private InputAction dashAction;
     private float cooldownTimer = 0f;
     private bool isDashing = false;
-
     private bool hasBeenUsed = false;
     private bool showingReady = false;
     private bool hasShownReadyThisCycle = false;
     private float readyTimer = 0f;
 
+    private PlayerLoadout localLoadout;
+
     void Awake()
     {
-        if (controller == null) controller = GetComponent<PlayerController>();
-        if (status == null) status = GetComponent<CharacterStatus>();
+        if (controller == null)
+        {
+            controller = GetComponent<PlayerController>();
+        }
 
-        dashAction = new InputAction(
-            name: "Dash",
-            type: InputActionType.Button,
-            binding: "<Keyboard>/f"
-        );
+        if (status == null)
+        {
+            status = GetComponent<CharacterStatus>();
+        }
+
+        localLoadout = GetComponent<PlayerLoadout>();
     }
 
     void OnEnable()
     {
-        dashAction.Enable();
         HideCooldownUI();
     }
 
     void OnDisable()
     {
-        dashAction.Disable();
         CancelInvoke(nameof(EndDash));
         HideCooldownUI();
     }
 
     void Update()
     {
-        if (controller == null || controller.playerStats == null || skillStats == null) return;
+        if (controller == null || controller.playerStats == null || skillStats == null)
+        {
+            return;
+        }
 
         HandleCooldownTimers();
         UpdateCooldownUI();
 
-        if (!controller.enablePlayerInput) return;
+        if (!controller.enablePlayerInput)
+        {
+            return;
+        }
 
-        if (dashAction.WasPressedThisFrame() && cooldownTimer <= 0f && !isDashing)
+        bool fPressed = Keyboard.current != null && Keyboard.current.fKey.wasPressedThisFrame;
+
+        if (fPressed && cooldownTimer <= 0f && !isDashing)
         {
             StartDash();
         }
@@ -89,10 +98,10 @@ public class SurvivorDashSkill : MonoBehaviour
         hasShownReadyThisCycle = false;
         readyTimer = 0f;
 
-        cooldownTimer = skillStats.dashCooldown;
+        cooldownTimer = GetModifiedDashCooldown();
 
         Vector3 dashDirection = controller.GetCurrentForwardOrMoveDirection();
-        float dashSpeed = controller.GetDefaultMoveSpeed() * skillStats.dashMultiplier;
+        float dashSpeed = controller.GetDefaultMoveSpeed() * skillStats.dashMultiplier * GetDashPowerMultiplier();
 
         controller.SetSpeed(dashSpeed);
         controller.StartForcedMove(dashDirection, dashSpeed);
@@ -103,6 +112,40 @@ public class SurvivorDashSkill : MonoBehaviour
         }
 
         Invoke(nameof(EndDash), skillStats.dashDuration);
+    }
+
+    float GetModifiedDashCooldown()
+    {
+        float baseCooldown = skillStats.dashCooldown;
+
+        if (localLoadout == null)
+        {
+            return baseCooldown;
+        }
+
+        float multiplier = localLoadout.GetSurvivorDashCooldownMultiplier();
+        if (multiplier < 0.01f)
+        {
+            multiplier = 1f;
+        }
+
+        return baseCooldown / multiplier;
+    }
+
+    float GetDashPowerMultiplier()
+    {
+        if (localLoadout == null)
+        {
+            return 1f;
+        }
+
+        float multiplier = localLoadout.GetSurvivorDashPowerMultiplier();
+        if (multiplier < 0.01f)
+        {
+            multiplier = 1f;
+        }
+
+        return multiplier;
     }
 
     void EndDash()
@@ -126,7 +169,10 @@ public class SurvivorDashSkill : MonoBehaviour
 
     void UpdateCooldownUI()
     {
-        if (cooldownText == null) return;
+        if (cooldownText == null)
+        {
+            return;
+        }
 
         if (!hasBeenUsed)
         {

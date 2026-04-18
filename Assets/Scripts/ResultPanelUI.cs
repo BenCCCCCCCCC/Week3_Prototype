@@ -22,7 +22,8 @@ public class ResultPanelUI : MonoBehaviour
         int escapedCount,
         int eliminatedCount,
         int downedCount,
-        int completedCipherCount
+        int completedCipherCount,
+        SettlementSummary settlementSummary
     )
     {
         if (panelRoot != null)
@@ -37,12 +38,35 @@ public class ResultPanelUI : MonoBehaviour
 
         if (resultBodyText != null)
         {
-            resultBodyText.text =
-                "Match Duration: " + matchDuration.ToString("F1") + " s\n" +
-                "Escaped Survivors: " + escapedCount + "\n" +
-                "Eliminated Survivors: " + eliminatedCount + "\n" +
-                "Hunter Downs: " + downedCount + "\n" +
-                "Completed Ciphers: " + completedCipherCount;
+            string body = "";
+            body += "\n\n\n";   // 给标题让出空间，避免和正文重叠
+
+            body += "Match Duration: " + matchDuration.ToString("F1") + " s\n";
+            body += "Escaped Survivors: " + escapedCount + "\n";
+            body += "Eliminated Survivors: " + eliminatedCount + "\n";
+            body += "Hunter Downs: " + downedCount + "\n";
+            body += "Completed Ciphers: " + completedCipherCount;
+
+            if (settlementSummary != null)
+            {
+                body += "\n\nRewards";
+                body += "\nSoft Currency: +" + settlementSummary.totalSoft;
+                body += "\nPremium Currency: +" + settlementSummary.totalPremium;
+                body += "\nArchive Material: +" + settlementSummary.totalMaterial;
+
+                if (settlementSummary.loadoutSoft > 0 || settlementSummary.loadoutMaterial > 0)
+                {
+                    body += "\nExtra From Loadout";
+                    body += "\nSoft: +" + settlementSummary.loadoutSoft;
+                    body += "\nMaterial: +" + settlementSummary.loadoutMaterial;
+                }
+
+                body += "\n\nCompleted Tasks: " + settlementSummary.completedTaskText;
+                body += "\n\nEquipped Loadout";
+                body += "\n" + settlementSummary.equippedLoadoutText;
+            }
+
+            resultBodyText.text = body;
         }
 
         if (logResultUI)
@@ -56,6 +80,16 @@ public class ResultPanelUI : MonoBehaviour
         if (panelRoot != null)
         {
             panelRoot.SetActive(false);
+        }
+
+        if (resultTitleText != null)
+        {
+            resultTitleText.text = "";
+        }
+
+        if (resultBodyText != null)
+        {
+            resultBodyText.text = "";
         }
     }
 

@@ -45,20 +45,66 @@ public class CipherMachine : MonoBehaviour
             multiRepairEfficiency = interactionStats.multiRepairEfficiency;
         }
 
-        float totalRateMultiplier = 1f;
-
+        float baseTeamRateMultiplier = 1f;
         if (repairerCount > 1)
         {
-            totalRateMultiplier = 1f + (repairerCount - 1) * multiRepairEfficiency;
+            baseTeamRateMultiplier = 1f + (repairerCount - 1) * multiRepairEfficiency;
         }
 
-        float delta = (Time.deltaTime / repairSeconds) * totalRateMultiplier;
+        float averageLoadoutMultiplier = GetAverageRepairSpeedMultiplier();
+        float finalRateMultiplier = baseTeamRateMultiplier * averageLoadoutMultiplier;
+
+        float beforeProgress = progress01;
+
+        float delta = (Time.deltaTime / repairSeconds) * finalRateMultiplier;
         progress01 = Mathf.Clamp01(progress01 + delta);
+
+        float actualDelta = progress01 - beforeProgress;
+
+        if (actualDelta > 0f && MatchStatsManager.Instance != null)
+        {
+            int objectiveCipherCount = 1;
+
+            if (matchManager != null)
+            {
+                objectiveCipherCount = Mathf.Max(1, matchManager.requiredCompletedCiphers);
+            }
+
+            // 主目标：修满本局要求的全部密码机 100
+            float normalizedProgress = (actualDelta * 100f) / objectiveCipherCount;
+            MatchStatsManager.Instance.AddRepairProgress(normalizedProgress);
+        }
 
         if (progress01 >= 1f)
         {
             CompleteCipher();
         }
+    }
+
+    float GetAverageRepairSpeedMultiplier()
+    {
+        if (activeRepairers.Count <= 0)
+        {
+            return 1f;
+        }
+
+        float total = 0f;
+        int count = 0;
+
+        foreach (InteractionUI ui in activeRepairers)
+        {
+            if (ui == null) continue;
+
+            total += ui.GetCipherRepairSpeedMultiplier();
+            count++;
+        }
+
+        if (count <= 0)
+        {
+            return 1f;
+        }
+
+        return total / count;
     }
 
     void CleanupNullRepairers()

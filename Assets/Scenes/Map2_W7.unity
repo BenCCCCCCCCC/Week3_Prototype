@@ -501,6 +501,7 @@ GameObject:
   - component: {fileID: 55908640}
   - component: {fileID: 55908641}
   - component: {fileID: 55908642}
+  - component: {fileID: 55908643}
   m_Layer: 0
   m_Name: Survivor_01_Player
   m_TagString: Survivor
@@ -735,6 +736,20 @@ MonoBehaviour:
   detectRange: 3
   restartDelayAfterInterrupt: 0.5
   showDebugLog: 1
+--- !u!114 &55908643
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 55908629}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3a1374149ce65642a806950bc222a40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerLoadout
+  slotA: {fileID: 11400000, guid: a412738bc6640274c8f776aef527b67e, type: 2}
+  slotB: {fileID: 11400000, guid: a01b4e8639b4c8b4e84580c93638e2d3, type: 2}
 --- !u!1 &62853521
 GameObject:
   m_ObjectHideFlags: 0
@@ -4032,6 +4047,7 @@ GameObject:
   - component: {fileID: 311994697}
   - component: {fileID: 311994701}
   - component: {fileID: 311994698}
+  - component: {fileID: 311994707}
   m_Layer: 0
   m_Name: Survivor_02_Dummy
   m_TagString: Survivor
@@ -4248,6 +4264,20 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 311994696}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &311994707
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 311994696}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3a1374149ce65642a806950bc222a40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerLoadout
+  slotA: {fileID: 0}
+  slotB: {fileID: 0}
 --- !u!1 &319534749
 GameObject:
   m_ObjectHideFlags: 0
@@ -11329,6 +11359,7 @@ GameObject:
   - component: {fileID: 856565049}
   - component: {fileID: 856565050}
   - component: {fileID: 856565051}
+  - component: {fileID: 856565052}
   m_Layer: 0
   m_Name: Hunter
   m_TagString: Hunter
@@ -11569,6 +11600,20 @@ MonoBehaviour:
   chairRange: 3
   survivorTag: Survivor
   showDebugLog: 1
+--- !u!114 &856565052
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 856565039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3a1374149ce65642a806950bc222a40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerLoadout
+  slotA: {fileID: 11400000, guid: b1a11cefe3b50544aa66b09b0517c7f5, type: 2}
+  slotB: {fileID: 11400000, guid: 8d7dee47f8929ce42a192a9eaa9360f6, type: 2}
 --- !u!1 &862244301
 GameObject:
   m_ObjectHideFlags: 0
@@ -13742,11 +13787,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dcb720be2ee5e6468fe92db7cf3ebc6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MatchSettlement
-  activeTasks: []
+  activeTasks:
+  - {fileID: 11400000, guid: 5d023c47b12e0d043909b48df5fe753b, type: 2}
+  - {fileID: 11400000, guid: a08b592944b1aef4da1c0d38376ee443, type: 2}
+  settlementLoadout: {fileID: 55908643}
   baseSoftReward: 30
   winSoftReward: 20
   baseMaterialReward: 1
   logSettlement: 1
+  lastSummary:
+    baseSoft: 0
+    winSoft: 0
+    taskSoft: 0
+    loadoutSoft: 0
+    totalSoft: 0
+    totalPremium: 0
+    baseMaterial: 0
+    taskMaterial: 0
+    loadoutMaterial: 0
+    totalMaterial: 0
+    completedTaskText: None
+    equippedLoadoutText: No loadout equipped
 --- !u!1 &1145640441
 GameObject:
   m_ObjectHideFlags: 0
@@ -22291,7 +22352,6 @@ SceneRoots:
   - {fileID: 545438343}
   - {fileID: 1917787502}
   - {fileID: 832942144}
-  - {fileID: 1139914419}
   - {fileID: 25179035}
   - {fileID: 1301153452}
   - {fileID: 2096135486}
@@ -22302,3 +22362,4 @@ SceneRoots:
   - {fileID: 653538140}
   - {fileID: 918149778}
   - {fileID: 1872868437}
+  - {fileID: 1139914419}

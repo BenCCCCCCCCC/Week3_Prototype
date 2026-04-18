@@ -7,7 +7,7 @@ public class RescueAutoTest : MonoBehaviour
     public InteractionStatsSO interactionStats;
 
     [Header("Auto Rescue Test")]
-    public bool autoRescueEnabled = true;
+    public bool autoRescueEnabled = false;
     public float detectRange = 3f;
     public float restartDelayAfterInterrupt = 0.5f;
 
@@ -82,6 +82,11 @@ public class RescueAutoTest : MonoBehaviour
         {
             bool success = currentChair.RescueOccupant();
 
+            if (success && MatchStatsManager.Instance != null)
+            {
+                MatchStatsManager.Instance.AddRescue();
+            }
+
             if (showDebugLog)
             {
                 Debug.Log("RescueAutoTest: auto rescue complete. success = " + success);
@@ -94,14 +99,12 @@ public class RescueAutoTest : MonoBehaviour
     bool CanAttemptRescue()
     {
         if (selfStatus == null) return true;
-
         if (selfStatus.IsDowned) return false;
         if (selfStatus.IsCarried) return false;
         if (selfStatus.IsChaired) return false;
         if (selfStatus.IsEliminated) return false;
         if (selfStatus.IsEscaped) return false;
         if (selfStatus.IsHitStunned) return false;
-
         return true;
     }
 
@@ -129,6 +132,7 @@ public class RescueAutoTest : MonoBehaviour
             if (!chair.CanRescue()) continue;
 
             float distance = Vector3.Distance(transform.position, chair.transform.position);
+
             if (distance < nearestDistance)
             {
                 nearestDistance = distance;

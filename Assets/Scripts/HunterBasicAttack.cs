@@ -19,6 +19,7 @@ public class HunterBasicAttack : MonoBehaviour
 
     private bool isAttacking = false;
     private float cooldownTimer = 0f;
+    private PlayerLoadout localLoadout;
 
     void Awake()
     {
@@ -26,6 +27,8 @@ public class HunterBasicAttack : MonoBehaviour
         {
             controller = GetComponent<PlayerController>();
         }
+
+        localLoadout = GetComponent<PlayerLoadout>();
     }
 
     void Update()
@@ -68,7 +71,25 @@ public class HunterBasicAttack : MonoBehaviour
         yield return new WaitForSeconds(skillStats.attackRecovery);
 
         isAttacking = false;
-        cooldownTimer = skillStats.attackCooldown;
+        cooldownTimer = GetModifiedAttackCooldown();
+    }
+
+    float GetModifiedAttackCooldown()
+    {
+        float baseCooldown = skillStats.attackCooldown;
+
+        if (localLoadout == null)
+        {
+            return baseCooldown;
+        }
+
+        float multiplier = localLoadout.GetHunterBasicAttackCooldownMultiplier();
+        if (multiplier < 0.01f)
+        {
+            multiplier = 1f;
+        }
+
+        return baseCooldown / multiplier;
     }
 
     void DoHitCheck()

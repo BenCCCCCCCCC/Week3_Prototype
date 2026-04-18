@@ -14,17 +14,16 @@ public class HunterSlowSkill : MonoBehaviour
     [Header("Other")]
     public string targetTag = "Survivor";
 
-    private InputAction qAction;
-    private InputAction fireAction;
-
     private float cooldownTimer = 0f;
     private bool isAiming = false;
     public bool IsAiming => isAiming;
-    private float aimTimer = 0f;
 
+    private float aimTimer = 0f;
     private bool hasBeenUsed = false;
     private float readyTimer = 0f;
     private bool readyShownThisCycle = false;
+
+    private PlayerLoadout localLoadout;
 
     void Awake()
     {
@@ -33,31 +32,19 @@ public class HunterSlowSkill : MonoBehaviour
             controller = GetComponent<PlayerController>();
         }
 
-        qAction = new InputAction(
-            name: "HunterSlowAim",
-            type: InputActionType.Button,
-            binding: "<Keyboard>/q"
-        );
-
-        fireAction = new InputAction(
-            name: "HunterSlowFire",
-            type: InputActionType.Button,
-            binding: "<Mouse>/leftButton"
-        );
+        localLoadout = GetComponent<PlayerLoadout>();
     }
 
     void OnEnable()
     {
-        qAction.Enable();
-        fireAction.Enable();
         HideCooldownText();
         HideAimHintText();
     }
 
     void OnDisable()
     {
-        qAction.Disable();
-        fireAction.Disable();
+        HideCooldownText();
+        HideAimHintText();
     }
 
     void Update()
@@ -87,7 +74,10 @@ public class HunterSlowSkill : MonoBehaviour
         if (controller == null) return;
         if (!controller.enablePlayerInput) return;
 
-        if (qAction.WasPressedThisFrame() && cooldownTimer <= 0f && !isAiming)
+        bool qPressed = Keyboard.current != null && Keyboard.current.qKey.wasPressedThisFrame;
+        bool leftPressed = Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
+
+        if (qPressed && cooldownTimer <= 0f && !isAiming)
         {
             isAiming = true;
             aimTimer = skillStats.slowAimWindow;
@@ -99,7 +89,7 @@ public class HunterSlowSkill : MonoBehaviour
         {
             aimTimer -= Time.deltaTime;
 
-            if (fireAction.WasPressedThisFrame())
+            if (leftPressed)
             {
                 FireSlowRay();
             }
@@ -108,15 +98,29 @@ public class HunterSlowSkill : MonoBehaviour
             {
                 isAiming = false;
                 HideAimHintText();
-
                 hasBeenUsed = true;
                 readyShownThisCycle = false;
                 readyTimer = 0f;
-                cooldownTimer = skillStats.slowMissCooldown;
-
+                cooldownTimer = GetModifiedSlowSkillCooldown(skillStats.slowMissCooldown);
                 Debug.Log("Hunter Slow Skill: Missed window, skill on miss cooldown.");
             }
         }
+    }
+
+    float GetModifiedSlowSkillCooldown(float baseCooldown)
+    {
+        if (localLoadout == null)
+        {
+            return baseCooldown;
+        }
+
+        float multiplier = localLoadout.GetHunterSlowSkillCooldownMultiplier();
+        if (multiplier < 0.01f)
+        {
+            multiplier = 1f;
+        }
+
+        return baseCooldown / multiplier;
     }
 
     void FireSlowRay()
@@ -130,7 +134,7 @@ public class HunterSlowSkill : MonoBehaviour
             hasBeenUsed = true;
             readyShownThisCycle = false;
             readyTimer = 0f;
-            cooldownTimer = skillStats.slowMissCooldown;
+            cooldownTimer = GetModifiedSlowSkillCooldown(skillStats.slowMissCooldown);
             return;
         }
 
@@ -153,7 +157,7 @@ public class HunterSlowSkill : MonoBehaviour
             hasBeenUsed = true;
             readyShownThisCycle = false;
             readyTimer = 0f;
-            cooldownTimer = skillStats.slowMissCooldown;
+            cooldownTimer = GetModifiedSlowSkillCooldown(skillStats.slowMissCooldown);
             return;
         }
 
@@ -194,7 +198,9 @@ public class HunterSlowSkill : MonoBehaviour
         hasBeenUsed = true;
         readyShownThisCycle = false;
         readyTimer = 0f;
-        cooldownTimer = hitSuccess ? skillStats.slowHitCooldown : skillStats.slowMissCooldown;
+        cooldownTimer = GetModifiedSlowSkillCooldown(
+            hitSuccess ? skillStats.slowHitCooldown : skillStats.slowMissCooldown
+        );
     }
 
     void UpdateUI()

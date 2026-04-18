@@ -48,9 +48,15 @@ public class MatchStatsManager : MonoBehaviour
     public void AddRepairProgress(float value)
     {
         currentStats.totalRepairProgress += value;
+
         if (currentStats.totalRepairProgress < 0f)
         {
             currentStats.totalRepairProgress = 0f;
+        }
+
+        if (currentStats.totalRepairProgress > 100f)
+        {
+            currentStats.totalRepairProgress = 100f;
         }
     }
 

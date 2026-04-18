@@ -27,11 +27,18 @@ public class InteractionUI : MonoBehaviour
     private GateController currentGate;
     private ChairController currentChair;
 
+    private PlayerLoadout localLoadout;
+
     public bool IsInteractingRescue =>
         inRange &&
         currentTarget != null &&
         currentTarget.interactionType == InteractionType.Rescue &&
         progress > 0f;
+
+    void Awake()
+    {
+        localLoadout = GetComponent<PlayerLoadout>();
+    }
 
     void Start()
     {
@@ -96,8 +103,6 @@ public class InteractionUI : MonoBehaviour
     {
         if (currentCipher == null) return;
 
-        float beforeProgress = currentCipher.progress01;
-
         if (!currentTarget.CanBeInteractedBy(gameObject))
         {
             currentCipher.EndRepair(this);
@@ -119,14 +124,6 @@ public class InteractionUI : MonoBehaviour
         else
         {
             currentCipher.EndRepair(this);
-        }
-
-        float afterProgress = currentCipher.progress01;
-        float delta = afterProgress - beforeProgress;
-
-        if (delta > 0f && MatchStatsManager.Instance != null)
-        {
-            MatchStatsManager.Instance.AddRepairProgress(delta * 100f);
         }
 
         SetProgress(currentCipher.progress01);
@@ -171,7 +168,7 @@ public class InteractionUI : MonoBehaviour
 
     void HandleDefaultInteraction(bool eHeld)
     {
-        float holdSeconds = Mathf.Max(0.01f, currentTarget.GetHoldSeconds(interactionStats));
+        float holdSeconds = GetModifiedDefaultHoldSeconds();
 
         if (eHeld)
         {
@@ -189,6 +186,48 @@ public class InteractionUI : MonoBehaviour
         {
             OnDefaultInteractionCompleted();
         }
+    }
+
+    float GetModifiedDefaultHoldSeconds()
+    {
+        float holdSeconds = Mathf.Max(0.01f, currentTarget.GetHoldSeconds(interactionStats));
+
+        float speedMultiplier = 1f;
+
+        if (localLoadout != null)
+        {
+            if (currentChair != null && currentTarget.interactionType == InteractionType.Rescue)
+            {
+                speedMultiplier = localLoadout.GetRescueSpeedMultiplier();
+            }
+            else
+            {
+                speedMultiplier = localLoadout.GetGenericInteractSpeedMultiplier();
+            }
+        }
+
+        if (speedMultiplier < 0.01f)
+        {
+            speedMultiplier = 1f;
+        }
+
+        return holdSeconds / speedMultiplier;
+    }
+
+    public float GetCipherRepairSpeedMultiplier()
+    {
+        if (localLoadout == null)
+        {
+            return 1f;
+        }
+
+        float value = localLoadout.GetCipherRepairSpeedMultiplier();
+        if (value < 0.01f)
+        {
+            value = 1f;
+        }
+
+        return value;
     }
 
     void OnTriggerEnter(Collider other)

@@ -69,40 +69,14 @@ public class MatchManager : MonoBehaviour
 
     void Start()
     {
-        if (requiredCompletedCiphers < 1)
-        {
-            requiredCompletedCiphers = 1;
-        }
+        if (requiredCompletedCiphers < 1) requiredCompletedCiphers = 1;
+        if (survivorWinEscapeCount < 1) survivorWinEscapeCount = 1;
+        if (hunterWinEliminationCount < 1) hunterWinEliminationCount = 1;
+        if (endgameDuration < 1f) endgameDuration = 90f;
 
-        if (survivorWinEscapeCount < 1)
-        {
-            survivorWinEscapeCount = 1;
-        }
-
-        if (hunterWinEliminationCount < 1)
-        {
-            hunterWinEliminationCount = 1;
-        }
-
-        if (endgameDuration < 1f)
-        {
-            endgameDuration = 90f;
-        }
-
-        if (ciphers == null)
-        {
-            ciphers = new CipherMachine[0];
-        }
-
-        if (gates == null)
-        {
-            gates = new GateController[0];
-        }
-
-        if (trackedSurvivors == null)
-        {
-            trackedSurvivors = new GameObject[0];
-        }
+        if (ciphers == null) ciphers = new CipherMachine[0];
+        if (gates == null) gates = new GateController[0];
+        if (trackedSurvivors == null) trackedSurvivors = new GameObject[0];
 
         matchStartTime = Time.time;
         matchEndTime = 0f;
@@ -163,11 +137,7 @@ public class MatchManager : MonoBehaviour
     {
         if (IsMatchEnded) return;
         if (cipher == null) return;
-
-        if (completedCipherSet.Contains(cipher))
-        {
-            return;
-        }
+        if (completedCipherSet.Contains(cipher)) return;
 
         completedCipherSet.Add(cipher);
 
@@ -386,9 +356,12 @@ public class MatchManager : MonoBehaviour
             MatchStatsManager.Instance.EndMatch(escaped, eliminated);
         }
 
+        SettlementSummary summary = null;
+
         if (matchSettlement != null)
         {
             matchSettlement.SettleMatch();
+            summary = matchSettlement.LastSummary;
         }
 
         if (resultPanelUI != null)
@@ -400,7 +373,8 @@ public class MatchManager : MonoBehaviour
                 EscapedSurvivorCount,
                 EliminatedSurvivorCount,
                 DownedCount,
-                CompletedCipherCount
+                CompletedCipherCount,
+                summary
             );
         }
 
@@ -412,81 +386,44 @@ public class MatchManager : MonoBehaviour
 
     void FreezeGameplay()
     {
-        if (roleSwitchController != null)
-        {
-            roleSwitchController.enabled = false;
-        }
-
-        if (hunterController != null)
-        {
-            hunterController.SetPlayerInputEnabled(false);
-        }
-
-        if (survivorPlayerController != null)
-        {
-            survivorPlayerController.SetPlayerInputEnabled(false);
-        }
-
         if (hunterInteractionUI != null)
         {
+            hunterInteractionUI.ForceInterruptInteraction("Match ended");
             hunterInteractionUI.enabled = false;
         }
 
         if (survivorInteractionUI != null)
         {
+            survivorInteractionUI.ForceInterruptInteraction("Match ended");
             survivorInteractionUI.enabled = false;
         }
 
-        if (hunterSlowSkill != null)
-        {
-            hunterSlowSkill.enabled = false;
-        }
+        if (roleSwitchController != null) roleSwitchController.enabled = false;
+        if (hunterController != null) hunterController.SetPlayerInputEnabled(false);
+        if (survivorPlayerController != null) survivorPlayerController.SetPlayerInputEnabled(false);
 
-        if (hunterDetectSkill != null)
-        {
-            hunterDetectSkill.enabled = false;
-        }
-
-        if (hunterBasicAttack != null)
-        {
-            hunterBasicAttack.enabled = false;
-        }
-
-        if (hunterCarryController != null)
-        {
-            hunterCarryController.enabled = false;
-        }
-
-        if (survivorDashSkill != null)
-        {
-            survivorDashSkill.enabled = false;
-        }
+        if (hunterSlowSkill != null) hunterSlowSkill.enabled = false;
+        if (hunterDetectSkill != null) hunterDetectSkill.enabled = false;
+        if (hunterBasicAttack != null) hunterBasicAttack.enabled = false;
+        if (hunterCarryController != null) hunterCarryController.enabled = false;
+        if (survivorDashSkill != null) survivorDashSkill.enabled = false;
 
         CipherMachine[] allCiphers = FindObjectsByType<CipherMachine>(FindObjectsSortMode.None);
         for (int i = 0; i < allCiphers.Length; i++)
         {
-            if (allCiphers[i] != null)
-            {
-                allCiphers[i].enabled = false;
-            }
+            if (allCiphers[i] != null) allCiphers[i].enabled = false;
         }
 
         GateController[] allGates = FindObjectsByType<GateController>(FindObjectsSortMode.None);
         for (int i = 0; i < allGates.Length; i++)
         {
-            if (allGates[i] != null)
-            {
-                allGates[i].enabled = false;
-            }
+            if (allGates[i] != null) allGates[i].enabled = false;
         }
 
         ChairController[] allChairs = FindObjectsByType<ChairController>(FindObjectsSortMode.None);
         for (int i = 0; i < allChairs.Length; i++)
         {
-            if (allChairs[i] != null)
-            {
-                allChairs[i].enabled = false;
-            }
+            if (allChairs[i] != null) allChairs[i].enabled = false;
         }
     }
 

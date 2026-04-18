@@ -15,14 +15,14 @@ public class HunterDetectSkill : MonoBehaviour
     [Header("Other")]
     public string targetTag = "Survivor";
 
-    private InputAction detectAction;
     private float cooldownTimer = 0f;
     private bool isDetecting = false;
     private CharacterStatus currentTarget;
-
     private bool hasBeenUsed = false;
     private float readyTimer = 0f;
     private bool readyShownThisCycle = false;
+
+    private PlayerLoadout localLoadout;
 
     void Awake()
     {
@@ -31,22 +31,17 @@ public class HunterDetectSkill : MonoBehaviour
             controller = GetComponent<PlayerController>();
         }
 
-        detectAction = new InputAction(
-            name: "HunterDetect",
-            type: InputActionType.Button,
-            binding: "<Keyboard>/f"
-        );
+        localLoadout = GetComponent<PlayerLoadout>();
     }
 
     void OnEnable()
     {
-        detectAction.Enable();
         HideCooldownText();
     }
 
     void OnDisable()
     {
-        detectAction.Disable();
+        HideCooldownText();
     }
 
     void Update()
@@ -76,7 +71,9 @@ public class HunterDetectSkill : MonoBehaviour
         if (controller == null) return;
         if (!controller.enablePlayerInput) return;
 
-        if (detectAction.WasPressedThisFrame() && cooldownTimer <= 0f && !isDetecting)
+        bool fPressed = Keyboard.current != null && Keyboard.current.fKey.wasPressedThisFrame;
+
+        if (fPressed && cooldownTimer <= 0f && !isDetecting)
         {
             hasBeenUsed = true;
             readyShownThisCycle = false;
@@ -88,7 +85,7 @@ public class HunterDetectSkill : MonoBehaviour
     IEnumerator DetectRoutine()
     {
         isDetecting = true;
-        cooldownTimer = skillStats.detectCooldown;
+        cooldownTimer = GetModifiedDetectCooldown();
 
         float timer = 0f;
 
@@ -105,9 +102,32 @@ public class HunterDetectSkill : MonoBehaviour
         isDetecting = false;
     }
 
+    float GetModifiedDetectCooldown()
+    {
+        float baseCooldown = skillStats.detectCooldown;
+
+        if (localLoadout == null)
+        {
+            return baseCooldown;
+        }
+
+        float multiplier = localLoadout.GetHunterDetectSkillCooldownMultiplier();
+        if (multiplier < 0.01f)
+        {
+            multiplier = 1f;
+        }
+
+        return baseCooldown / multiplier;
+    }
+
     CharacterStatus FindNearestTarget()
     {
-        Collider[] hits = Physics.OverlapSphere(transform.position, skillStats.detectMaxRadius, ~0, QueryTriggerInteraction.Ignore);
+        Collider[] hits = Physics.OverlapSphere(
+            transform.position,
+            skillStats.detectMaxRadius,
+            ~0,
+            QueryTriggerInteraction.Ignore
+        );
 
         CharacterStatus nearest = null;
         float nearestDistance = float.MaxValue;
