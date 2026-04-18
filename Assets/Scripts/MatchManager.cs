@@ -39,6 +39,9 @@ public class MatchManager : MonoBehaviour
     public InteractionUI survivorInteractionUI;
     public SurvivorDashSkill survivorDashSkill;
 
+    [Header("Week 8")]
+    public MatchSettlement matchSettlement;
+
     [Header("UI")]
     public ResultPanelUI resultPanelUI;
 
@@ -119,7 +122,6 @@ public class MatchManager : MonoBehaviour
             resultPanelUI.HidePanel();
         }
 
-        // Week 8: reset current match stats
         if (MatchStatsManager.Instance != null)
         {
             MatchStatsManager.Instance.StartMatch();
@@ -169,7 +171,6 @@ public class MatchManager : MonoBehaviour
 
         completedCipherSet.Add(cipher);
 
-        // Week 8: sync completed cipher count
         if (MatchStatsManager.Instance != null)
         {
             MatchStatsManager.Instance.SetCompletedCipherCount(CompletedCipherCount);
@@ -212,7 +213,6 @@ public class MatchManager : MonoBehaviour
         IsEndgameActive = true;
         endgameRemainingTime = endgameDuration;
 
-        // Week 8: record gate open event
         if (MatchStatsManager.Instance != null)
         {
             MatchStatsManager.Instance.AddGateOpen();
@@ -270,7 +270,6 @@ public class MatchManager : MonoBehaviour
 
         DownedCount++;
 
-        // Week 8: record down count
         if (MatchStatsManager.Instance != null)
         {
             MatchStatsManager.Instance.AddDown();
@@ -377,7 +376,6 @@ public class MatchManager : MonoBehaviour
         UpdateEndgameCountdownUI();
         FreezeGameplay();
 
-        // Week 8: write final match data
         if (MatchStatsManager.Instance != null)
         {
             MatchStatsManager.Instance.SetCompletedCipherCount(CompletedCipherCount);
@@ -386,6 +384,11 @@ public class MatchManager : MonoBehaviour
             bool eliminated = EliminatedSurvivorCount > 0;
 
             MatchStatsManager.Instance.EndMatch(escaped, eliminated);
+        }
+
+        if (matchSettlement != null)
+        {
+            matchSettlement.SettleMatch();
         }
 
         if (resultPanelUI != null)

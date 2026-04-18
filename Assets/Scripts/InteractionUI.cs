@@ -20,8 +20,6 @@ public class InteractionUI : MonoBehaviour
     private float progress = 0f;
     private bool inRange = false;
 
-    private InputAction interactHoldAction;
-
     private InteractionTarget currentTarget;
     private Collider currentTargetCollider;
 
@@ -35,30 +33,15 @@ public class InteractionUI : MonoBehaviour
         currentTarget.interactionType == InteractionType.Rescue &&
         progress > 0f;
 
-    void Awake()
-    {
-        interactHoldAction = new InputAction(
-            name: "InteractHold",
-            type: InputActionType.Button,
-            binding: "/e"
-        );
-    }
-
-    void OnEnable()
-    {
-        interactHoldAction.Enable();
-    }
-
-    void OnDisable()
-    {
-        interactHoldAction.Disable();
-        StopSpecialInteractions();
-    }
-
     void Start()
     {
         SetUI(false);
         SetProgress(0f);
+    }
+
+    void OnDisable()
+    {
+        StopSpecialInteractions();
     }
 
     void Update()
@@ -92,7 +75,7 @@ public class InteractionUI : MonoBehaviour
         SetUI(true);
         UpdateHintText();
 
-        bool eHeld = interactHoldAction.IsPressed();
+        bool eHeld = Keyboard.current != null && Keyboard.current.eKey.isPressed;
 
         if (currentCipher != null)
         {
@@ -143,7 +126,6 @@ public class InteractionUI : MonoBehaviour
 
         if (delta > 0f && MatchStatsManager.Instance != null)
         {
-            // 用百分比累计，1.0 代表 100%
             MatchStatsManager.Instance.AddRepairProgress(delta * 100f);
         }
 
@@ -211,6 +193,32 @@ public class InteractionUI : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        TryBindInteractionTarget(other);
+    }
+
+    void OnTriggerStay(Collider other)
+    {
+        if (!inRange || currentTarget == null)
+        {
+            TryBindInteractionTarget(other);
+        }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other != currentTargetCollider) return;
+
+        if (showDebugLog)
+        {
+            Debug.Log("Exit interact range: " + other.name);
+        }
+
+        ResetInteractionState(false);
+    }
+
+    void TryBindInteractionTarget(Collider other)
+    {
+        if (other == null) return;
         if (!other.CompareTag("InteractPoint")) return;
 
         InteractionTarget target = other.GetComponent<InteractionTarget>();
@@ -218,11 +226,12 @@ public class InteractionUI : MonoBehaviour
         {
             target = other.GetComponentInParent<InteractionTarget>();
         }
+
         if (target == null)
         {
             if (showDebugLog)
             {
-                Debug.LogWarning("InteractionUI: " + other.name + " has InteractPoint tag but no InteractionTarget.");
+                Debug.LogWarning("InteractionUI: " + other.name + " has InteractPoint tag but no InteractionTarget on self or parent.");
             }
             return;
         }
@@ -236,38 +245,36 @@ public class InteractionUI : MonoBehaviour
             return;
         }
 
-        currentTarget = target;
-        currentTargetCollider = other;
-
-        currentCipher = other.GetComponent<CipherMachine>();
-        if (currentCipher == null)
+        CipherMachine cipher = other.GetComponent<CipherMachine>();
+        if (cipher == null)
         {
-            currentCipher = other.GetComponentInParent<CipherMachine>();
+            cipher = other.GetComponentInParent<CipherMachine>();
         }
 
-        currentGate = other.GetComponent<GateController>();
-        if (currentGate == null)
+        GateController gate = other.GetComponent<GateController>();
+        if (gate == null)
         {
-            currentGate = other.GetComponentInParent<GateController>();
+            gate = other.GetComponentInParent<GateController>();
         }
 
-        currentChair = other.GetComponent<ChairController>();
-        if (currentChair == null)
+        ChairController chair = other.GetComponent<ChairController>();
+        if (chair == null)
         {
-            currentChair = other.GetComponentInParent<ChairController>();
+            chair = other.GetComponentInParent<ChairController>();
         }
 
-        if (currentChair != null &&
-            currentTarget.interactionType == InteractionType.Rescue &&
-            !currentChair.CanRescue())
+        if (chair != null &&
+            target.interactionType == InteractionType.Rescue &&
+            !chair.CanRescue())
         {
-            currentTarget = null;
-            currentTargetCollider = null;
-            currentCipher = null;
-            currentGate = null;
-            currentChair = null;
             return;
         }
+
+        currentTarget = target;
+        currentTargetCollider = other;
+        currentCipher = cipher;
+        currentGate = gate;
+        currentChair = chair;
 
         inRange = true;
         progress = 0f;
@@ -285,24 +292,13 @@ public class InteractionUI : MonoBehaviour
             SetProgress(0f);
         }
 
+        SetUI(true);
         UpdateHintText();
 
         if (showDebugLog)
         {
             Debug.Log("Enter interact range: " + other.name + ", Type = " + target.interactionType);
         }
-    }
-
-    void OnTriggerExit(Collider other)
-    {
-        if (other != currentTargetCollider) return;
-
-        if (showDebugLog)
-        {
-            Debug.Log("Exit interact range: " + other.name);
-        }
-
-        ResetInteractionState(false);
     }
 
     void OnDefaultInteractionCompleted()
@@ -334,7 +330,6 @@ public class InteractionUI : MonoBehaviour
 
         currentTarget.CompleteInteraction();
 
-        // 如果以后有环境交互类的一次性交互，可以在这里记一次
         if (currentTarget.interactionType != InteractionType.Repair &&
             currentTarget.interactionType != InteractionType.Gate &&
             currentTarget.interactionType != InteractionType.Rescue)

@@ -11860,6 +11860,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1917787502}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &918149776
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 918149778}
+  - component: {fileID: 918149777}
+  m_Layer: 0
+  m_Name: TaskChecker
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &918149777
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 918149776}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fdb4acadc76c6c4dab2a05a937f79db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TaskChecker
+--- !u!4 &918149778
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 918149776}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &951238669
 GameObject:
   m_ObjectHideFlags: 0
@@ -13592,6 +13636,7 @@ GameObject:
   - component: {fileID: 1139914419}
   - component: {fileID: 1139914418}
   - component: {fileID: 1139914420}
+  - component: {fileID: 1139914421}
   m_Layer: 0
   m_Name: GameSystems
   m_TagString: Untagged
@@ -13682,8 +13727,26 @@ MonoBehaviour:
   survivorPlayerController: {fileID: 55908630}
   survivorInteractionUI: {fileID: 55908641}
   survivorDashSkill: {fileID: 55908640}
+  matchSettlement: {fileID: 1139914421}
   resultPanelUI: {fileID: 163677241}
   logMatchEvents: 1
+--- !u!114 &1139914421
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1139914417}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dcb720be2ee5e6468fe92db7cf3ebc6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MatchSettlement
+  activeTasks: []
+  baseSoftReward: 30
+  winSoftReward: 20
+  baseMaterialReward: 1
+  logSettlement: 1
 --- !u!1 &1145640441
 GameObject:
   m_ObjectHideFlags: 0
@@ -20209,6 +20272,53 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1861793800}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1872868435
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1872868437}
+  - component: {fileID: 1872868436}
+  m_Layer: 0
+  m_Name: PlayerProfile
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1872868436
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1872868435}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be274efa27f73ef488b40e41e631913e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerProfile
+  softCurrency: 0
+  premiumCurrency: 0
+  archiveMaterial: 0
+--- !u!4 &1872868437
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1872868435}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1882294744
 GameObject:
   m_ObjectHideFlags: 0
@@ -22190,3 +22300,5 @@ SceneRoots:
   - {fileID: 1489114248}
   - {fileID: 1859148771}
   - {fileID: 653538140}
+  - {fileID: 918149778}
+  - {fileID: 1872868437}
