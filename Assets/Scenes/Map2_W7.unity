@@ -2627,7 +2627,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Active Tasks
 
-    
+
 
     1. Repair 50 progress
 
@@ -2636,14 +2636,14 @@ MonoBehaviour:
     Reward:
     +60 Soft, +1 Material
 
-    
+
 
     2. Rescue once
 
     Target: 1
 
-    Reward:
-    +20 Soft, +1 Material'
+    Reward: +20 Soft,
+    +1 Material'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -22411,7 +22411,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ArchiveProgress
   archiveLevel: 1
-  baseUpgradeCost: 2
+  baseUpgradeCost: 1
 --- !u!4 &1553138876
 Transform:
   m_ObjectHideFlags: 0
@@ -30263,11 +30263,11 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Archive collection is the light progression line.
 
-    Spend archive
-    materials to increase archive level.
+    Spend archive materials
+    to increase archive level.
 
-    This can later unlock profile nodes,
-    story entries, or small passive growth.'
+    This can later unlock profile nodes, story entries,
+    or small passive growth.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -30876,6 +30876,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ArchivePanelUI
   archiveProgress: {fileID: 1553138875}
+  lobbyUIManager: {fileID: 1097554822}
   archiveLevelText: {fileID: 778695231}
   archiveCostText: {fileID: 1939123847}
   archiveDescText: {fileID: 2063791968}

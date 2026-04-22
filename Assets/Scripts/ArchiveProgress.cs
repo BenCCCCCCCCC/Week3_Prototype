@@ -58,4 +58,21 @@ public class ArchiveProgress : MonoBehaviour
     {
         archiveLevel = PlayerPrefs.GetInt(ArchiveLevelKey, 1);
     }
+
+    [ContextMenu("Reset Archive To Level 1")]
+    public void ResetArchiveToLevel1()
+    {
+        archiveLevel = 1;
+        Save();
+        Debug.Log("Archive level reset to 1.");
+    }
+
+    [ContextMenu("Delete Archive Save Key")]
+    public void DeleteArchiveSaveKey()
+    {
+        PlayerPrefs.DeleteKey(ArchiveLevelKey);
+        PlayerPrefs.Save();
+        Load();
+        Debug.Log("Archive save key deleted. Current archive level = " + archiveLevel);
+    }
 }

@@ -6,6 +6,7 @@ public class ArchivePanelUI : MonoBehaviour
 {
     [Header("References")]
     public ArchiveProgress archiveProgress;
+    public LobbyUIManager lobbyUIManager;
     public TMP_Text archiveLevelText;
     public TMP_Text archiveCostText;
     public TMP_Text archiveDescText;
@@ -13,6 +14,11 @@ public class ArchivePanelUI : MonoBehaviour
 
     private void OnEnable()
     {
+        if (archiveProgress == null)
+        {
+            archiveProgress = ArchiveProgress.Instance;
+        }
+
         Refresh();
     }
 
@@ -61,12 +67,12 @@ public class ArchivePanelUI : MonoBehaviour
             archiveProgress = ArchiveProgress.Instance;
         }
 
-        if (archiveProgress == null)
-        {
-            return;
-        }
+        bool success = false;
 
-        bool success = archiveProgress.TryUpgrade();
+        if (archiveProgress != null)
+        {
+            success = archiveProgress.TryUpgrade();
+        }
 
         if (success)
         {
@@ -78,5 +84,10 @@ public class ArchivePanelUI : MonoBehaviour
         }
 
         Refresh();
+
+        if (lobbyUIManager != null)
+        {
+            lobbyUIManager.RefreshAll();
+        }
     }
 }

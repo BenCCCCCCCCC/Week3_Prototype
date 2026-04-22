@@ -39,23 +39,20 @@ public class PlayerController : MonoBehaviour
     private bool useManualSpeedOverride = false;
     private float manualSpeedOverride = 0f;
 
+    private bool inputCallbacksBound = false;
+
     public Vector3 LastMoveDirection { get; private set; } = Vector3.forward;
 
     void Awake()
     {
         cc = GetComponent<CharacterController>();
-
-        actions = new PlayerInputActions();
-
-        actions.Player.Move.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
-        actions.Player.Move.canceled += _ => moveInput = Vector2.zero;
-
-        actions.Player.Look.performed += ctx => lookInput = ctx.ReadValue<Vector2>();
-        actions.Player.Look.canceled += _ => lookInput = Vector2.zero;
+        EnsureActionsInitialized();
     }
 
     void OnEnable()
     {
+        EnsureActionsInitialized();
+
         if (enablePlayerInput)
         {
             actions.Enable();
@@ -85,18 +82,72 @@ public class PlayerController : MonoBehaviour
     {
         if (actions != null)
         {
+            UnbindInputCallbacks();
             actions.Dispose();
+            actions = null;
         }
+    }
+
+    void EnsureActionsInitialized()
+    {
+        if (actions == null)
+        {
+            actions = new PlayerInputActions();
+        }
+
+        if (!inputCallbacksBound)
+        {
+            actions.Player.Move.performed += OnMovePerformed;
+            actions.Player.Move.canceled += OnMoveCanceled;
+
+            actions.Player.Look.performed += OnLookPerformed;
+            actions.Player.Look.canceled += OnLookCanceled;
+
+            inputCallbacksBound = true;
+        }
+    }
+
+    void UnbindInputCallbacks()
+    {
+        if (actions == null || !inputCallbacksBound)
+        {
+            return;
+        }
+
+        actions.Player.Move.performed -= OnMovePerformed;
+        actions.Player.Move.canceled -= OnMoveCanceled;
+
+        actions.Player.Look.performed -= OnLookPerformed;
+        actions.Player.Look.canceled -= OnLookCanceled;
+
+        inputCallbacksBound = false;
+    }
+
+    void OnMovePerformed(InputAction.CallbackContext ctx)
+    {
+        moveInput = ctx.ReadValue<Vector2>();
+    }
+
+    void OnMoveCanceled(InputAction.CallbackContext ctx)
+    {
+        moveInput = Vector2.zero;
+    }
+
+    void OnLookPerformed(InputAction.CallbackContext ctx)
+    {
+        lookInput = ctx.ReadValue<Vector2>();
+    }
+
+    void OnLookCanceled(InputAction.CallbackContext ctx)
+    {
+        lookInput = Vector2.zero;
     }
 
     public void SetPlayerInputEnabled(bool enabled)
     {
         enablePlayerInput = enabled;
 
-        if (actions == null)
-        {
-            return;
-        }
+        EnsureActionsInitialized();
 
         if (enabled)
         {
