@@ -21,6 +21,10 @@ public class HunterBasicAttack : MonoBehaviour
     private float cooldownTimer = 0f;
     private PlayerLoadout localLoadout;
 
+    public bool IsAttacking => isAttacking;
+    public float CooldownTimer => cooldownTimer;
+    public bool IsReady => cooldownTimer <= 0f && !isAttacking;
+
     void Awake()
     {
         if (controller == null)

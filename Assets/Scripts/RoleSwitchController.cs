@@ -1,7 +1,16 @@
 using UnityEngine;
 
+public enum PlayableRole
+{
+    Hunter,
+    Survivor
+}
+
 public class RoleSwitchController : MonoBehaviour
 {
+    [Header("Current Role")]
+    public PlayableRole currentRole = PlayableRole.Hunter;
+
     [Header("Hunter")]
     public PlayerController hunterController;
     public Camera hunterCamera;
@@ -10,6 +19,7 @@ public class RoleSwitchController : MonoBehaviour
     public HunterSlowSkill hunterSlowSkill;
     public HunterDetectSkill hunterDetectSkill;
     public HunterBasicAttack hunterBasicAttack;
+    public HunterCarryController hunterCarryController;
 
     [Header("Survivor Player")]
     public PlayerController survivorController;
@@ -25,45 +35,47 @@ public class RoleSwitchController : MonoBehaviour
     public InteractionUI dummyInteractionUI;
     public SurvivorAutoMoveTest dummyAutoMoveTest;
 
+    [Header("Debug")]
+    public bool allowKeyboardSwitch = true;
+    public bool logRoleSwitch = true;
+
     void Start()
     {
+        AutoFindMissingReferences();
         ValidateReferences();
-        SetHunterActive();
+
+        if (currentRole == PlayableRole.Hunter)
+        {
+            SelectHunter();
+        }
+        else
+        {
+            SelectSurvivor();
+        }
     }
 
     void Update()
     {
+        if (!allowKeyboardSwitch)
+        {
+            return;
+        }
+
+        // Keep 1 / 2 switch for testing.
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            SetHunterActive();
+            SelectHunter();
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            SetSurvivorActive();
+            SelectSurvivor();
         }
     }
 
-    void ValidateReferences()
+    public void SelectHunter()
     {
-        Debug.Log("=== RoleSwitchController Reference Check ===");
-
-        Debug.Log("Hunter Controller: " + (hunterController != null ? "OK" : "Missing"));
-        Debug.Log("Hunter Camera: " + (hunterCamera != null ? hunterCamera.name : "Missing"));
-        Debug.Log("Hunter AudioListener: " + (hunterAudioListener != null ? "OK" : "Missing"));
-
-        Debug.Log("Survivor Controller: " + (survivorController != null ? "OK" : "Missing"));
-        Debug.Log("Survivor Camera: " + (survivorCamera != null ? survivorCamera.name : "Missing"));
-        Debug.Log("Survivor AudioListener: " + (survivorAudioListener != null ? "OK" : "Missing"));
-
-        Debug.Log("Dummy Controller: " + (dummyController != null ? "OK" : "Missing"));
-        Debug.Log("Dummy Camera: " + (dummyCamera != null ? dummyCamera.name : "Missing"));
-        Debug.Log("Dummy AudioListener: " + (dummyAudioListener != null ? "OK" : "Missing"));
-        Debug.Log("Dummy Auto Move Test: " + (dummyAutoMoveTest != null ? "OK" : "Missing"));
-    }
-
-    void SetHunterActive()
-    {
+        currentRole = PlayableRole.Hunter;
         DisableAllRoles();
 
         if (hunterController != null)
@@ -93,17 +105,26 @@ public class RoleSwitchController : MonoBehaviour
             hunterBasicAttack.enabled = true;
         }
 
+        if (hunterCarryController != null)
+        {
+            hunterCarryController.enabled = true;
+        }
+
         if (dummyAutoMoveTest != null)
         {
             dummyAutoMoveTest.enabled = true;
         }
 
-        Debug.Log("Role Switch: Hunter Active");
-        DebugCurrentCameraState();
+        if (logRoleSwitch)
+        {
+            Debug.Log("Role Switch: Hunter Active");
+            DebugCurrentCameraState();
+        }
     }
 
-    void SetSurvivorActive()
+    public void SelectSurvivor()
     {
+        currentRole = PlayableRole.Survivor;
         DisableAllRoles();
 
         if (survivorController != null)
@@ -128,8 +149,21 @@ public class RoleSwitchController : MonoBehaviour
             dummyAutoMoveTest.enabled = true;
         }
 
-        Debug.Log("Role Switch: Survivor_01_Player Active");
-        DebugCurrentCameraState();
+        if (logRoleSwitch)
+        {
+            Debug.Log("Role Switch: Survivor Active");
+            DebugCurrentCameraState();
+        }
+    }
+
+    public bool IsHunterActive()
+    {
+        return currentRole == PlayableRole.Hunter;
+    }
+
+    public bool IsSurvivorActive()
+    {
+        return currentRole == PlayableRole.Survivor;
     }
 
     void DisableAllRoles()
@@ -183,6 +217,11 @@ public class RoleSwitchController : MonoBehaviour
             hunterBasicAttack.enabled = false;
         }
 
+        if (hunterCarryController != null)
+        {
+            hunterCarryController.enabled = false;
+        }
+
         if (survivorDashSkill != null)
         {
             survivorDashSkill.enabled = false;
@@ -200,23 +239,64 @@ public class RoleSwitchController : MonoBehaviour
         {
             cam.enabled = active;
         }
-        else
-        {
-            Debug.LogWarning("SetCameraState: Camera reference is missing.");
-        }
 
         if (listener != null)
         {
             listener.enabled = active;
         }
-        else
+    }
+
+    void AutoFindMissingReferences()
+    {
+        if (hunterCarryController == null)
         {
-            Debug.LogWarning("SetCameraState: AudioListener reference is missing.");
+            if (hunterController != null)
+            {
+                hunterCarryController = hunterController.GetComponent<HunterCarryController>();
+            }
         }
+
+        if (hunterCarryController == null && hunterController != null)
+        {
+            hunterCarryController = hunterController.GetComponentInChildren<HunterCarryController>();
+        }
+
+        if (hunterCarryController == null)
+        {
+            hunterCarryController = FindFirstObjectByType<HunterCarryController>();
+        }
+    }
+    void ValidateReferences()
+    {
+        if (!logRoleSwitch)
+        {
+            return;
+        }
+
+        Debug.Log("=== RoleSwitchController Reference Check ===");
+
+        Debug.Log("Hunter Controller: " + (hunterController != null ? "OK" : "Missing"));
+        Debug.Log("Hunter Camera: " + (hunterCamera != null ? hunterCamera.name : "Missing"));
+        Debug.Log("Hunter AudioListener: " + (hunterAudioListener != null ? "OK" : "Missing"));
+        Debug.Log("Hunter Slow Skill: " + (hunterSlowSkill != null ? "OK" : "Missing"));
+        Debug.Log("Hunter Detect Skill: " + (hunterDetectSkill != null ? "OK" : "Missing"));
+        Debug.Log("Hunter Basic Attack: " + (hunterBasicAttack != null ? "OK" : "Missing"));
+        Debug.Log("Hunter Carry Controller: " + (hunterCarryController != null ? "OK" : "Missing"));
+
+        Debug.Log("Survivor Controller: " + (survivorController != null ? "OK" : "Missing"));
+        Debug.Log("Survivor Camera: " + (survivorCamera != null ? survivorCamera.name : "Missing"));
+        Debug.Log("Survivor AudioListener: " + (survivorAudioListener != null ? "OK" : "Missing"));
+        Debug.Log("Survivor Dash Skill: " + (survivorDashSkill != null ? "OK" : "Missing"));
+
+        Debug.Log("Dummy Controller: " + (dummyController != null ? "OK" : "Missing"));
+        Debug.Log("Dummy Camera: " + (dummyCamera != null ? dummyCamera.name : "Missing"));
+        Debug.Log("Dummy AudioListener: " + (dummyAudioListener != null ? "OK" : "Missing"));
+        Debug.Log("Dummy Auto Move Test: " + (dummyAutoMoveTest != null ? "OK" : "Missing"));
     }
 
     void DebugCurrentCameraState()
     {
+        Debug.Log("Current Role: " + currentRole);
         Debug.Log("Hunter Camera Enabled: " + (hunterCamera != null && hunterCamera.enabled));
         Debug.Log("Survivor Camera Enabled: " + (survivorCamera != null && survivorCamera.enabled));
         Debug.Log("Dummy Camera Enabled: " + (dummyCamera != null && dummyCamera.enabled));

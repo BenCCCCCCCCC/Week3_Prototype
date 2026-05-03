@@ -16,7 +16,11 @@ public class HunterSlowSkill : MonoBehaviour
 
     private float cooldownTimer = 0f;
     private bool isAiming = false;
+
+    public float CooldownTimer => cooldownTimer;
     public bool IsAiming => isAiming;
+    public bool HasBeenUsed => hasBeenUsed;
+    public bool IsReady => cooldownTimer <= 0f && !isAiming;
 
     private float aimTimer = 0f;
     private bool hasBeenUsed = false;

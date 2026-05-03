@@ -17,6 +17,11 @@ public class SurvivorDashSkill : MonoBehaviour
     private bool hasShownReadyThisCycle = false;
     private float readyTimer = 0f;
 
+    public float CooldownTimer => cooldownTimer;
+    public bool IsDashing => isDashing;
+    public bool HasBeenUsed => hasBeenUsed;
+    public bool IsReady => cooldownTimer <= 0f && !isDashing;
+
     private PlayerLoadout localLoadout;
 
     void Awake()

@@ -22,6 +22,12 @@ public class HunterDetectSkill : MonoBehaviour
     private float readyTimer = 0f;
     private bool readyShownThisCycle = false;
 
+    public float CooldownTimer => cooldownTimer;
+    public bool IsDetecting => isDetecting;
+    public bool HasBeenUsed => hasBeenUsed;
+    public bool IsReady => cooldownTimer <= 0f && !isDetecting;
+    public CharacterStatus CurrentTarget => currentTarget;
+
     private PlayerLoadout localLoadout;
 
     void Awake()
