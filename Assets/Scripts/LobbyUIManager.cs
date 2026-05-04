@@ -120,6 +120,22 @@ public class LobbyUIManager : MonoBehaviour
         SceneManager.LoadScene(activeScene.name);
     }
 
+    public void BeginGameplayWithoutReload()
+    {
+        StartGameplayMode();
+    }
+
+    public void ReturnToLobbyWithoutReload()
+    {
+        if (resultPanelUI != null)
+        {
+            resultPanelUI.HidePanel();
+        }
+
+        ShowHome();
+        EnterLobbyMode();
+    }
+
     void StartGameplayMode()
     {
         if (lobbyRoot != null)
