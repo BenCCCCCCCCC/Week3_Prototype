@@ -15,6 +15,7 @@ public class GameHUDManager : MonoBehaviour
     [Header("Survivor References")]
     public CharacterStatus playerSurvivorStatus;
     public SurvivorDashSkill survivorDashSkill;
+    public InteractionUI playerSurvivorInteractionUI;
 
     [Header("Hunter References")]
     public HunterBasicAttack hunterBasicAttack;
@@ -23,6 +24,7 @@ public class GameHUDManager : MonoBehaviour
 
     [Header("Tracked Survivors")]
     public CharacterStatus[] trackedSurvivorStatuses;
+    public InteractionUI[] trackedSurvivorInteractionUIs;
 
     [Header("Survivor HUD Texts")]
     public TMP_Text survivorObjectiveText;
@@ -31,6 +33,7 @@ public class GameHUDManager : MonoBehaviour
     public TMP_Text survivorTeamStatusText;
     public TMP_Text survivorDashText;
     public TMP_Text survivorStateHintText;
+    public TMP_Text survivorEventFeedbackText;
 
     [Header("Hunter HUD Texts")]
     public TMP_Text hunterObjectiveText;
@@ -40,16 +43,31 @@ public class GameHUDManager : MonoBehaviour
     public TMP_Text hunterSlowText;
     public TMP_Text hunterDetectText;
     public TMP_Text hunterHintText;
+    public TMP_Text hunterEventFeedbackText;
 
     [Header("Settings")]
     public bool showHUD = false;
     public float refreshInterval = 0.1f;
+    public float feedbackVisibleTime = 2f;
 
     private float refreshTimer = 0f;
 
+    private bool feedbackStateInitialized = false;
+    private int previousCompletedCipherCount = 0;
+    private bool previousGateUnlocked = false;
+    private int previousSelfHP = -1;
+    private string previousSelfState = "";
+    private string[] previousSurvivorStateKeys = new string[0];
+
+    private float survivorFeedbackTimer = 0f;
+    private float hunterFeedbackTimer = 0f;
+
     void Start()
     {
-        SetHUDVisible(false);
+        AutoFindReferences();
+
+        bool startVisible = showHUD;
+        SetHUDVisible(startVisible);
     }
 
     void Update()
@@ -58,6 +76,8 @@ public class GameHUDManager : MonoBehaviour
         {
             return;
         }
+
+        UpdateFeedbackTimers();
 
         refreshTimer -= Time.deltaTime;
 
@@ -84,18 +104,18 @@ public class GameHUDManager : MonoBehaviour
                 hunterHUDRoot.SetActive(false);
             }
 
+            ClearFeedbackTexts();
             return;
         }
 
+        refreshTimer = 0f;
         RefreshHUD();
     }
 
     public void RefreshHUD()
     {
-        if (roleSwitchController == null)
-        {
-            AutoFindReferences();
-        }
+        AutoFindReferences();
+        DetectImportantFeedbackEvents();
 
         if (roleSwitchController == null)
         {
@@ -238,10 +258,46 @@ public class GameHUDManager : MonoBehaviour
     {
         if (matchManager == null)
         {
-            return "0 / ?";
+            return "0 / ? | 0%";
         }
 
-        return matchManager.CompletedCipherCount + " / " + matchManager.requiredCompletedCiphers;
+        int completed = matchManager.CompletedCipherCount;
+        int required = Mathf.Max(1, matchManager.requiredCompletedCiphers);
+        int percent = Mathf.RoundToInt(GetCipherOverallProgress01() * 100f);
+
+        return completed + " / " + required + " | " + percent + "%";
+    }
+
+    float GetCipherOverallProgress01()
+    {
+        if (matchManager == null)
+        {
+            return 0f;
+        }
+
+        int required = Mathf.Max(1, matchManager.requiredCompletedCiphers);
+
+        if (matchManager.ciphers == null || matchManager.ciphers.Length == 0)
+        {
+            return Mathf.Clamp01((float)matchManager.CompletedCipherCount / required);
+        }
+
+        float totalProgress = 0f;
+
+        for (int i = 0; i < matchManager.ciphers.Length; i++)
+        {
+            CipherMachine cipher = matchManager.ciphers[i];
+
+            if (cipher == null)
+            {
+                continue;
+            }
+
+            totalProgress += Mathf.Clamp01(cipher.progress01);
+        }
+
+        float progress01 = totalProgress / required;
+        return Mathf.Clamp01(progress01);
     }
 
     string GetTeamStatusText()
@@ -286,6 +342,63 @@ public class GameHUDManager : MonoBehaviour
             return "Unknown";
         }
 
+        string stateKey = GetStatusKey(status);
+
+        if (stateKey == "Escaped")
+        {
+            return "Escaped";
+        }
+
+        if (stateKey == "Eliminated")
+        {
+            return "Eliminated";
+        }
+
+        if (stateKey == "BeingRescued")
+        {
+            return "Being Rescued";
+        }
+
+        if (stateKey == "OnChair")
+        {
+            return "On Chair";
+        }
+
+        if (stateKey == "Carried")
+        {
+            return "Carried";
+        }
+
+        if (stateKey == "Downed")
+        {
+            return "Downed";
+        }
+
+        if (stateKey == "HitStun")
+        {
+            return "Hit Stun";
+        }
+
+        if (stateKey == "Slowed")
+        {
+            return "Slowed";
+        }
+
+        if (stateKey == "Injured")
+        {
+            return "Injured HP " + status.currentHP;
+        }
+
+        return "Normal HP " + status.currentHP;
+    }
+
+    string GetStatusKey(CharacterStatus status)
+    {
+        if (status == null)
+        {
+            return "Unknown";
+        }
+
         if (status.IsEscaped)
         {
             return "Escaped";
@@ -296,9 +409,14 @@ public class GameHUDManager : MonoBehaviour
             return "Eliminated";
         }
 
+        if (status.IsChaired && AnyRescueInteractionInProgress())
+        {
+            return "BeingRescued";
+        }
+
         if (status.IsChaired)
         {
-            return "On Chair";
+            return "OnChair";
         }
 
         if (status.IsCarried)
@@ -313,7 +431,7 @@ public class GameHUDManager : MonoBehaviour
 
         if (status.IsHitStunned)
         {
-            return "Hit Stun";
+            return "HitStun";
         }
 
         if (status.IsSlowed)
@@ -323,10 +441,30 @@ public class GameHUDManager : MonoBehaviour
 
         if (status.IsInjured)
         {
-            return "Injured HP " + status.currentHP;
+            return "Injured";
         }
 
-        return "Normal HP " + status.currentHP;
+        return "Normal";
+    }
+
+    bool AnyRescueInteractionInProgress()
+    {
+        if (trackedSurvivorInteractionUIs == null || trackedSurvivorInteractionUIs.Length == 0)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < trackedSurvivorInteractionUIs.Length; i++)
+        {
+            InteractionUI ui = trackedSurvivorInteractionUIs[i];
+
+            if (ui != null && ui.IsInteractingRescue)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     string GetDashText()
@@ -416,17 +554,24 @@ public class GameHUDManager : MonoBehaviour
             return "L2 Hint: Find a cipher and hold E to interact";
         }
 
-        if (playerSurvivorStatus.IsDowned)
+        string stateKey = GetStatusKey(playerSurvivorStatus);
+
+        if (stateKey == "Downed")
         {
             return "L1 Critical: You are downed. Wait for rescue.";
         }
 
-        if (playerSurvivorStatus.IsCarried)
+        if (stateKey == "BeingRescued")
+        {
+            return "L1 Critical: Teammate is rescuing you.";
+        }
+
+        if (stateKey == "Carried")
         {
             return "L1 Critical: You are being carried by the Hunter.";
         }
 
-        if (playerSurvivorStatus.IsChaired)
+        if (stateKey == "OnChair")
         {
             return "L1 Critical: You are on chair. Teammate rescue needed.";
         }
@@ -457,6 +602,222 @@ public class GameHUDManager : MonoBehaviour
         }
 
         return "L2 Hint: Track survivors, interrupt repair, secure downed targets.";
+    }
+
+    void DetectImportantFeedbackEvents()
+    {
+        if (!feedbackStateInitialized)
+        {
+            SaveCurrentFeedbackState();
+            feedbackStateInitialized = true;
+            return;
+        }
+
+        int currentCompletedCipherCount = 0;
+        bool currentGateUnlocked = false;
+
+        if (matchManager != null)
+        {
+            currentCompletedCipherCount = matchManager.CompletedCipherCount;
+            currentGateUnlocked = matchManager.GatesUnlocked;
+        }
+
+        if (currentCompletedCipherCount > previousCompletedCipherCount)
+        {
+            ShowFeedbackBoth("L1 Event: Cipher completed");
+        }
+
+        if (currentGateUnlocked && !previousGateUnlocked)
+        {
+            ShowFeedbackBoth("L1 Event: Gate unlocked");
+        }
+
+        if (playerSurvivorStatus != null)
+        {
+            string currentSelfState = GetStatusKey(playerSurvivorStatus);
+
+            if (previousSelfHP >= 0 && playerSurvivorStatus.currentHP < previousSelfHP)
+            {
+                ShowSurvivorFeedback("L1 Critical: You were hit. HP " + playerSurvivorStatus.currentHP);
+            }
+
+            if (currentSelfState != previousSelfState)
+            {
+                if (currentSelfState == "Downed")
+                {
+                    ShowSurvivorFeedback("L1 Critical: You are downed");
+                }
+                else if (currentSelfState == "BeingRescued")
+                {
+                    ShowSurvivorFeedback("L1 Critical: You are being rescued");
+                }
+                else if (currentSelfState == "OnChair")
+                {
+                    ShowSurvivorFeedback("L1 Critical: You are on chair");
+                }
+            }
+        }
+
+        if (trackedSurvivorStatuses != null)
+        {
+            EnsurePreviousSurvivorStateArray();
+
+            for (int i = 0; i < trackedSurvivorStatuses.Length; i++)
+            {
+                CharacterStatus status = trackedSurvivorStatuses[i];
+                string currentState = GetStatusKey(status);
+                string previousState = previousSurvivorStateKeys[i];
+
+                if (currentState != previousState)
+                {
+                    string label = "S" + (i + 1);
+
+                    if (currentState == "Downed")
+                    {
+                        ShowSurvivorFeedback("L1 Event: " + label + " downed");
+                        ShowHunterFeedback("L1 Signal: " + label + " downed");
+                    }
+                    else if (currentState == "BeingRescued")
+                    {
+                        ShowSurvivorFeedback("L1 Event: " + label + " being rescued");
+                        ShowHunterFeedback("L2 Signal: " + label + " rescue in progress");
+                    }
+                    else if (currentState == "OnChair")
+                    {
+                        ShowSurvivorFeedback("L1 Event: " + label + " on chair");
+                        ShowHunterFeedback("L1 Signal: " + label + " secured on chair");
+                    }
+                    else if (currentState == "Eliminated")
+                    {
+                        ShowFeedbackBoth("L1 Event: " + label + " eliminated");
+                    }
+                    else if (currentState == "Escaped")
+                    {
+                        ShowFeedbackBoth("L1 Event: " + label + " escaped");
+                    }
+                }
+            }
+        }
+
+        SaveCurrentFeedbackState();
+    }
+
+    void SaveCurrentFeedbackState()
+    {
+        if (matchManager != null)
+        {
+            previousCompletedCipherCount = matchManager.CompletedCipherCount;
+            previousGateUnlocked = matchManager.GatesUnlocked;
+        }
+
+        if (playerSurvivorStatus != null)
+        {
+            previousSelfHP = playerSurvivorStatus.currentHP;
+            previousSelfState = GetStatusKey(playerSurvivorStatus);
+        }
+
+        EnsurePreviousSurvivorStateArray();
+
+        if (trackedSurvivorStatuses != null)
+        {
+            for (int i = 0; i < trackedSurvivorStatuses.Length; i++)
+            {
+                previousSurvivorStateKeys[i] = GetStatusKey(trackedSurvivorStatuses[i]);
+            }
+        }
+    }
+
+    void EnsurePreviousSurvivorStateArray()
+    {
+        int targetLength = 0;
+
+        if (trackedSurvivorStatuses != null)
+        {
+            targetLength = trackedSurvivorStatuses.Length;
+        }
+
+        if (previousSurvivorStateKeys == null || previousSurvivorStateKeys.Length != targetLength)
+        {
+            previousSurvivorStateKeys = new string[targetLength];
+
+            for (int i = 0; i < previousSurvivorStateKeys.Length; i++)
+            {
+                previousSurvivorStateKeys[i] = "";
+            }
+        }
+    }
+
+    void ShowFeedbackBoth(string message)
+    {
+        ShowSurvivorFeedback(message);
+        ShowHunterFeedback(message);
+    }
+
+    void ShowSurvivorFeedback(string message)
+    {
+        if (survivorEventFeedbackText == null)
+        {
+            return;
+        }
+
+        survivorEventFeedbackText.gameObject.SetActive(true);
+        survivorEventFeedbackText.text = message;
+        survivorFeedbackTimer = feedbackVisibleTime;
+    }
+
+    void ShowHunterFeedback(string message)
+    {
+        if (hunterEventFeedbackText == null)
+        {
+            return;
+        }
+
+        hunterEventFeedbackText.gameObject.SetActive(true);
+        hunterEventFeedbackText.text = message;
+        hunterFeedbackTimer = feedbackVisibleTime;
+    }
+
+    void UpdateFeedbackTimers()
+    {
+        if (survivorFeedbackTimer > 0f)
+        {
+            survivorFeedbackTimer -= Time.deltaTime;
+
+            if (survivorFeedbackTimer <= 0f && survivorEventFeedbackText != null)
+            {
+                survivorEventFeedbackText.text = "";
+                survivorEventFeedbackText.gameObject.SetActive(false);
+            }
+        }
+
+        if (hunterFeedbackTimer > 0f)
+        {
+            hunterFeedbackTimer -= Time.deltaTime;
+
+            if (hunterFeedbackTimer <= 0f && hunterEventFeedbackText != null)
+            {
+                hunterEventFeedbackText.text = "";
+                hunterEventFeedbackText.gameObject.SetActive(false);
+            }
+        }
+    }
+
+    void ClearFeedbackTexts()
+    {
+        survivorFeedbackTimer = 0f;
+        hunterFeedbackTimer = 0f;
+
+        if (survivorEventFeedbackText != null)
+        {
+            survivorEventFeedbackText.text = "";
+            survivorEventFeedbackText.gameObject.SetActive(false);
+        }
+
+        if (hunterEventFeedbackText != null)
+        {
+            hunterEventFeedbackText.text = "";
+            hunterEventFeedbackText.gameObject.SetActive(false);
+        }
     }
 
     void AutoFindReferences()
@@ -494,6 +855,16 @@ public class GameHUDManager : MonoBehaviour
         if (playerSurvivorStatus == null && roleSwitchController != null && roleSwitchController.survivorController != null)
         {
             playerSurvivorStatus = roleSwitchController.survivorController.GetComponent<CharacterStatus>();
+        }
+
+        if (playerSurvivorInteractionUI == null && roleSwitchController != null && roleSwitchController.survivorController != null)
+        {
+            playerSurvivorInteractionUI = roleSwitchController.survivorController.GetComponent<InteractionUI>();
+        }
+
+        if (trackedSurvivorInteractionUIs == null || trackedSurvivorInteractionUIs.Length == 0)
+        {
+            trackedSurvivorInteractionUIs = FindObjectsByType<InteractionUI>(FindObjectsSortMode.None);
         }
     }
 }

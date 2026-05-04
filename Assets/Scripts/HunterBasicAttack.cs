@@ -20,6 +20,7 @@ public class HunterBasicAttack : MonoBehaviour
     private bool isAttacking = false;
     private float cooldownTimer = 0f;
     private PlayerLoadout localLoadout;
+    private HUDVisualFeedback visualFeedback;
 
     public bool IsAttacking => isAttacking;
     public float CooldownTimer => cooldownTimer;
@@ -33,6 +34,7 @@ public class HunterBasicAttack : MonoBehaviour
         }
 
         localLoadout = GetComponent<PlayerLoadout>();
+        visualFeedback = FindFirstObjectByType<HUDVisualFeedback>();
     }
 
     void Update()
@@ -157,6 +159,16 @@ public class HunterBasicAttack : MonoBehaviour
                 {
                     MatchStatsManager.Instance.AddHunterHit();
                     MatchStatsManager.Instance.AddSurvivorHitTaken();
+                }
+
+                if (visualFeedback == null)
+                {
+                    visualFeedback = FindFirstObjectByType<HUDVisualFeedback>();
+                }
+
+                if (visualFeedback != null)
+                {
+                    visualFeedback.TriggerHunterHitMarker();
                 }
             }
 

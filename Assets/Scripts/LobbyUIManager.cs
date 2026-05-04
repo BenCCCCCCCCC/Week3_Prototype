@@ -26,6 +26,7 @@ public class LobbyUIManager : MonoBehaviour
     public TaskPanelUI taskPanelUI;
     public LoadoutPanelUI loadoutPanelUI;
     public ArchivePanelUI archivePanelUI;
+    public GameHUDManager gameHUDManager;
 
     [Header("Gameplay References")]
     public RoleSwitchController roleSwitchController;
@@ -133,6 +134,11 @@ public class LobbyUIManager : MonoBehaviour
         {
             resultPanelUI.HidePanel();
         }
+
+        if (gameHUDManager != null)
+        {
+            gameHUDManager.SetHUDVisible(true);
+        }
     }
 
     void EnterLobbyMode()
@@ -144,6 +150,11 @@ public class LobbyUIManager : MonoBehaviour
 
         SetGameplayEnabled(false);
         UnlockCursorForUI();
+
+        if (gameHUDManager != null)
+        {
+            gameHUDManager.SetHUDVisible(false);
+        }
     }
 
     void SetGameplayEnabled(bool enabled)
