@@ -18,7 +18,11 @@ public class HUDVisualFeedback : MonoBehaviour
     public float downedOverlayAlpha = 0.45f;
 
     [Header("Hunter Visual Feedback")]
-    public TMP_Text hunterHitMarkerText;
+    public TMP_Text crosshairText;
+    public string normalCrosshairText = "+";
+    public string hitMarkerText = "×";
+    public Color normalCrosshairColor = Color.white;
+    public Color hitMarkerColor = Color.red;
     public float hunterHitMarkerDuration = 0.25f;
 
     [Header("Debug")]
@@ -35,7 +39,7 @@ public class HUDVisualFeedback : MonoBehaviour
         AutoFindMissingReferences();
         SaveCurrentHPState();
         HideSurvivorOverlay();
-        HideHunterHitMarker();
+        RestoreCrosshair();
     }
 
     void Update()
@@ -57,7 +61,9 @@ public class HUDVisualFeedback : MonoBehaviour
             roleSwitchController = FindFirstObjectByType<RoleSwitchController>();
         }
 
-        if (playerSurvivorStatus == null && roleSwitchController != null && roleSwitchController.survivorController != null)
+        if (playerSurvivorStatus == null &&
+            roleSwitchController != null &&
+            roleSwitchController.survivorController != null)
         {
             playerSurvivorStatus = roleSwitchController.survivorController.GetComponent<CharacterStatus>();
         }
@@ -146,14 +152,15 @@ public class HUDVisualFeedback : MonoBehaviour
         hitFlashTimer = hitFlashDuration;
     }
 
-    void TriggerHunterHitMarker()
+    public void TriggerHunterHitMarker()
     {
         hunterHitMarkerTimer = hunterHitMarkerDuration;
 
-        if (hunterHitMarkerText != null)
+        if (crosshairText != null)
         {
-            hunterHitMarkerText.gameObject.SetActive(true);
-            hunterHitMarkerText.text = "X";
+            crosshairText.gameObject.SetActive(true);
+            crosshairText.text = hitMarkerText;
+            crosshairText.color = hitMarkerColor;
         }
     }
 
@@ -194,7 +201,7 @@ public class HUDVisualFeedback : MonoBehaviour
 
     void UpdateHunterHitMarker()
     {
-        if (hunterHitMarkerText == null)
+        if (crosshairText == null)
         {
             return;
         }
@@ -203,7 +210,7 @@ public class HUDVisualFeedback : MonoBehaviour
 
         if (!hunterViewActive)
         {
-            HideHunterHitMarker();
+            RestoreCrosshair();
             return;
         }
 
@@ -211,12 +218,12 @@ public class HUDVisualFeedback : MonoBehaviour
         {
             hunterHitMarkerTimer -= Time.deltaTime;
 
-            hunterHitMarkerText.gameObject.SetActive(true);
-            hunterHitMarkerText.text = "X";
+            crosshairText.text = hitMarkerText;
+            crosshairText.color = hitMarkerColor;
 
             if (hunterHitMarkerTimer <= 0f)
             {
-                HideHunterHitMarker();
+                RestoreCrosshair();
             }
         }
     }
@@ -248,14 +255,15 @@ public class HUDVisualFeedback : MonoBehaviour
         survivorRedOverlay.gameObject.SetActive(false);
     }
 
-    void HideHunterHitMarker()
+    void RestoreCrosshair()
     {
-        if (hunterHitMarkerText == null)
+        if (crosshairText == null)
         {
             return;
         }
 
-        hunterHitMarkerText.text = "";
-        hunterHitMarkerText.gameObject.SetActive(false);
+        crosshairText.gameObject.SetActive(true);
+        crosshairText.text = normalCrosshairText;
+        crosshairText.color = normalCrosshairColor;
     }
 }
