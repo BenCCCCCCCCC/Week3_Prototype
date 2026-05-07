@@ -38,6 +38,7 @@ public class GameHUDManager : MonoBehaviour
     [Header("Hunter HUD Texts")]
     public TMP_Text hunterObjectiveText;
     public TMP_Text hunterCipherText;
+    public TMP_Text hunterRepairInfoText;
     public TMP_Text hunterSurvivorSignalText;
     public TMP_Text hunterAttackText;
     public TMP_Text hunterSlowText;
@@ -195,6 +196,7 @@ public class GameHUDManager : MonoBehaviour
             survivorCipherText.text = "L1 Ciphers: " + GetCipherProgressText();
         }
 
+
         if (survivorSelfStatusText != null)
         {
             survivorSelfStatusText.text = "L1 Your Status: " + GetStatusText(playerSurvivorStatus);
@@ -227,7 +229,10 @@ public class GameHUDManager : MonoBehaviour
         {
             hunterCipherText.text = "L1 Cipher Pressure: " + GetCipherProgressText();
         }
-
+        if (hunterRepairInfoText != null)
+        {
+            hunterRepairInfoText.text = GetActiveRepairTextForHunter();
+        }
         if (hunterSurvivorSignalText != null)
         {
             hunterSurvivorSignalText.text = "L1 Survivor Signals:\n" + GetTeamStatusText();
@@ -300,6 +305,67 @@ public class GameHUDManager : MonoBehaviour
         return Mathf.Clamp01(progress01);
     }
 
+    string GetActiveRepairTextForHunter()
+    {
+        if (trackedSurvivorInteractionUIs == null || trackedSurvivorInteractionUIs.Length == 0)
+        {
+            return "L1 Repair Signal: No active repair";
+        }
+
+        StringBuilder builder = new StringBuilder();
+        bool hasActiveRepair = false;
+
+        builder.Append("L1 Repair Signal:");
+
+        for (int i = 0; i < trackedSurvivorInteractionUIs.Length; i++)
+        {
+            InteractionUI ui = trackedSurvivorInteractionUIs[i];
+
+            if (ui == null)
+            {
+                continue;
+            }
+
+            if (!ui.IsInteractingRepair)
+            {
+                continue;
+            }
+
+            CipherMachine cipher = ui.CurrentRepairCipher;
+
+            if (cipher == null)
+            {
+                continue;
+            }
+
+            hasActiveRepair = true;
+
+            builder.Append("\nS");
+            builder.Append(i + 1);
+            builder.Append(" repairing ");
+            builder.Append(GetCleanCipherName(cipher.name));
+            builder.Append(" | ");
+            builder.Append(Mathf.RoundToInt(cipher.progress01 * 100f));
+            builder.Append("%");
+        }
+
+        if (!hasActiveRepair)
+        {
+            return "L1 Repair Signal: No active repair";
+        }
+
+        return builder.ToString();
+    }
+
+    string GetCleanCipherName(string rawName)
+    {
+        if (string.IsNullOrEmpty(rawName))
+        {
+            return "Unknown Cipher";
+        }
+
+        return rawName.Replace("(Clone)", "").Trim();
+    }
     string GetTeamStatusText()
     {
         if (trackedSurvivorStatuses == null || trackedSurvivorStatuses.Length == 0)
@@ -334,6 +400,8 @@ public class GameHUDManager : MonoBehaviour
 
         return builder.ToString();
     }
+
+
 
     string GetStatusText(CharacterStatus status)
     {

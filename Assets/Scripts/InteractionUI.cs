@@ -27,6 +27,8 @@ public class InteractionUI : MonoBehaviour
     private GateController currentGate;
     private ChairController currentChair;
 
+    private bool isRepairInputHeld = false;
+
     private PlayerLoadout localLoadout;
 
     public bool IsInteractingRescue =>
@@ -34,6 +36,27 @@ public class InteractionUI : MonoBehaviour
         currentTarget != null &&
         currentTarget.interactionType == InteractionType.Rescue &&
         progress > 0f;
+
+    public bool IsInteractingRepair =>
+        inRange &&
+        currentCipher != null &&
+        currentTarget != null &&
+        currentTarget.interactionType == InteractionType.Repair &&
+        isRepairInputHeld &&
+        !currentCipher.isCompleted;
+
+    public CipherMachine CurrentRepairCipher
+    {
+        get
+        {
+            if (IsInteractingRepair)
+            {
+                return currentCipher;
+            }
+
+            return null;
+        }
+    }
 
     void Awake()
     {
@@ -101,10 +124,15 @@ public class InteractionUI : MonoBehaviour
 
     void HandleCipherInteraction(bool eHeld)
     {
-        if (currentCipher == null) return;
+        if (currentCipher == null)
+        {
+            isRepairInputHeld = false;
+            return;
+        }
 
         if (!currentTarget.CanBeInteractedBy(gameObject))
         {
+            isRepairInputHeld = false;
             currentCipher.EndRepair(this);
             SetProgress(currentCipher.progress01);
             return;
@@ -112,6 +140,7 @@ public class InteractionUI : MonoBehaviour
 
         if (currentCipher.isCompleted)
         {
+            isRepairInputHeld = false;
             currentCipher.EndRepair(this);
             SetProgress(currentCipher.progress01);
             return;
@@ -119,10 +148,12 @@ public class InteractionUI : MonoBehaviour
 
         if (eHeld)
         {
+            isRepairInputHeld = true;
             currentCipher.BeginRepair(this);
         }
         else
         {
+            isRepairInputHeld = false;
             currentCipher.EndRepair(this);
         }
 
@@ -476,6 +507,8 @@ public class InteractionUI : MonoBehaviour
 
     void StopSpecialInteractions()
     {
+        isRepairInputHeld = false;
+
         if (currentCipher != null)
         {
             currentCipher.EndRepair(this);
