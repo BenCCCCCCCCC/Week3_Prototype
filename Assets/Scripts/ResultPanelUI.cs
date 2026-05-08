@@ -29,6 +29,7 @@ public class ResultPanelUI : MonoBehaviour
         if (panelRoot != null)
         {
             panelRoot.SetActive(true);
+            panelRoot.transform.SetAsLastSibling();
         }
 
         if (resultTitleText != null)

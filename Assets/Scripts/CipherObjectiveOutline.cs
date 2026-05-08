@@ -7,13 +7,27 @@ public class CipherObjectiveOutline : MonoBehaviour
     public GameObject outlineRoot;
     public RoleSwitchController roleSwitchController;
 
-    [Header("Settings")]
+    [Header("Basic Settings")]
     public bool hideWhenCompleted = true;
     public bool hideWhenHunterActive = true;
+
+    [Header("Survivor Objective X-Ray")]
+    public Color survivorOutlineColor = new Color(0f, 1f, 1f, 0.28f);
+
+    [Header("Hunter Repair Signal")]
+    public bool showHunterRepairSignal = true;
+    public Color hunterRepairSignalColor = new Color(1f, 0.35f, 0f, 0.75f);
+    public float hunterSignalMinAlpha = 0.15f;
+    public float hunterSignalMaxAlpha = 0.85f;
+    public float hunterSignalFlashSpeed = 5f;
+
+    private Renderer[] outlineRenderers;
+    private MaterialPropertyBlock propertyBlock;
 
     void Start()
     {
         AutoFindReferences();
+        CacheRenderers();
         RefreshOutline();
     }
 
@@ -35,6 +49,16 @@ public class CipherObjectiveOutline : MonoBehaviour
         }
     }
 
+    void CacheRenderers()
+    {
+        if (outlineRoot != null)
+        {
+            outlineRenderers = outlineRoot.GetComponentsInChildren<Renderer>(true);
+        }
+
+        propertyBlock = new MaterialPropertyBlock();
+    }
+
     void RefreshOutline()
     {
         if (outlineRoot == null)
@@ -42,21 +66,98 @@ public class CipherObjectiveOutline : MonoBehaviour
             return;
         }
 
-        bool shouldShow = true;
-
-        if (hideWhenHunterActive && roleSwitchController != null && !roleSwitchController.IsSurvivorActive())
+        if (outlineRenderers == null || outlineRenderers.Length == 0)
         {
-            shouldShow = false;
+            CacheRenderers();
         }
 
-        if (hideWhenCompleted && cipherMachine != null && cipherMachine.progress01 >= 1f)
+        bool isCompleted = false;
+
+        if (cipherMachine != null && cipherMachine.isCompleted)
         {
-            shouldShow = false;
+            isCompleted = true;
         }
 
-        if (outlineRoot.activeSelf != shouldShow)
+        if (hideWhenCompleted && isCompleted)
         {
-            outlineRoot.SetActive(shouldShow);
+            SetOutlineVisible(false);
+            return;
+        }
+
+        bool isSurvivorView = roleSwitchController == null || roleSwitchController.IsSurvivorActive();
+        bool isHunterView = roleSwitchController != null && roleSwitchController.IsHunterActive();
+
+        if (isSurvivorView)
+        {
+            SetOutlineVisible(true);
+            SetOutlineColor(survivorOutlineColor);
+            return;
+        }
+
+        if (isHunterView)
+        {
+            bool isBeingRepaired = false;
+
+            if (cipherMachine != null && cipherMachine.ActiveRepairerCount > 0)
+            {
+                isBeingRepaired = true;
+            }
+
+            if (showHunterRepairSignal && isBeingRepaired)
+            {
+                float flash01 = (Mathf.Sin(Time.time * hunterSignalFlashSpeed) + 1f) * 0.5f;
+                float alpha = Mathf.Lerp(hunterSignalMinAlpha, hunterSignalMaxAlpha, flash01);
+
+                Color flashColor = hunterRepairSignalColor;
+                flashColor.a = alpha;
+
+                SetOutlineVisible(true);
+                SetOutlineColor(flashColor);
+                return;
+            }
+
+            if (hideWhenHunterActive)
+            {
+                SetOutlineVisible(false);
+                return;
+            }
+        }
+
+        SetOutlineVisible(false);
+    }
+
+    void SetOutlineVisible(bool visible)
+    {
+        if (outlineRoot != null && outlineRoot.activeSelf != visible)
+        {
+            outlineRoot.SetActive(visible);
+        }
+    }
+
+    void SetOutlineColor(Color color)
+    {
+        if (outlineRenderers == null)
+        {
+            return;
+        }
+
+        if (propertyBlock == null)
+        {
+            propertyBlock = new MaterialPropertyBlock();
+        }
+
+        for (int i = 0; i < outlineRenderers.Length; i++)
+        {
+            Renderer renderer = outlineRenderers[i];
+
+            if (renderer == null)
+            {
+                continue;
+            }
+
+            renderer.GetPropertyBlock(propertyBlock);
+            propertyBlock.SetColor("_BaseColor", color);
+            renderer.SetPropertyBlock(propertyBlock);
         }
     }
 }

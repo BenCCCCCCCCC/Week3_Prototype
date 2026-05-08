@@ -755,7 +755,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f0528b8137062346b4acbd1f8f9a2b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SurvivorAutoMoveTest
-  controller: {fileID: 55908630}
+  controller: {fileID: 0}
   status: {fileID: 0}
   moveDistance: 4
   pauseAtEnds: 0.3
@@ -839,9 +839,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SurvivorAutoRepairTest
   autoRepairEnabled: 1
-  targetCipher: {fileID: 0}
+  targetCipher: {fileID: 1732923796}
   startDelay: 2
-  repairerUI: {fileID: 0}
+  onlyWorkWhenHUDVisible: 1
+  requireNearCipher: 1
+  maxRepairDistance: 4
+  repairerUI: {fileID: 55908641}
+  gameHUDManager: {fileID: 1049735810}
+  selfStatus: {fileID: 55908638}
   showDebugLog: 1
 --- !u!1 &62853521
 GameObject:
@@ -6031,7 +6036,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SurvivorAutoMoveTest
   controller: {fileID: 311994700}
-  status: {fileID: 0}
+  status: {fileID: 311994702}
   moveDistance: 4
   pauseAtEnds: 0.3
   showDebugLog: 0
@@ -19952,14 +19957,16 @@ MonoBehaviour:
   matchManager: {fileID: 1139914420}
   playerSurvivorStatus: {fileID: 55908638}
   survivorDashSkill: {fileID: 55908640}
-  playerSurvivorInteractionUI: {fileID: 0}
+  playerSurvivorInteractionUI: {fileID: 55908641}
   hunterBasicAttack: {fileID: 856565049}
   hunterSlowSkill: {fileID: 856565047}
   hunterDetectSkill: {fileID: 856565048}
   trackedSurvivorStatuses:
   - {fileID: 55908638}
   - {fileID: 311994702}
-  trackedSurvivorInteractionUIs: []
+  trackedSurvivorInteractionUIs:
+  - {fileID: 55908641}
+  - {fileID: 311994698}
   survivorObjectiveText: {fileID: 410370495}
   survivorCipherText: {fileID: 1206226384}
   survivorSelfStatusText: {fileID: 743884329}
@@ -19969,7 +19976,7 @@ MonoBehaviour:
   survivorEventFeedbackText: {fileID: 1023108302}
   hunterObjectiveText: {fileID: 1895371345}
   hunterCipherText: {fileID: 876651602}
-  hunterRepairInfoText: {fileID: 0}
+  hunterRepairInfoText: {fileID: 2017476309}
   hunterSurvivorSignalText: {fileID: 113104656}
   hunterAttackText: {fileID: 812877985}
   hunterSlowText: {fileID: 1528036823}
@@ -20008,7 +20015,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HUDVisualFeedback
   roleSwitchController: {fileID: 1139914418}
   playerSurvivorStatus: {fileID: 55908638}
-  trackedSurvivorStatuses: []
+  trackedSurvivorStatuses:
+  - {fileID: 55908638}
+  - {fileID: 311994702}
   survivorRedOverlay: {fileID: 1383089982}
   hitFlashAlpha: 0.28
   hitFlashDuration: 0.45
@@ -21291,7 +21300,7 @@ MonoBehaviour:
   dummyCamera: {fileID: 648871669}
   dummyAudioListener: {fileID: 648871666}
   dummyInteractionUI: {fileID: 311994698}
-  dummyAutoMoveTest: {fileID: 311994697}
+  dummyAutoMoveTest: {fileID: 0}
   allowKeyboardSwitch: 1
   logRoleSwitch: 1
 --- !u!4 &1139914419
@@ -21350,6 +21359,7 @@ MonoBehaviour:
   survivorDashSkill: {fileID: 55908640}
   matchSettlement: {fileID: 1139914421}
   resultPanelUI: {fileID: 163677241}
+  gameHUDManager: {fileID: 1049735810}
   logMatchEvents: 1
 --- !u!114 &1139914421
 MonoBehaviour:
@@ -22570,6 +22580,12 @@ MonoBehaviour:
   roleSwitchController: {fileID: 1139914418}
   hideWhenCompleted: 1
   hideWhenHunterActive: 1
+  survivorOutlineColor: {r: 0, g: 1, b: 1, a: 0.28}
+  showHunterRepairSignal: 1
+  hunterRepairSignalColor: {r: 1, g: 0.35, b: 0, a: 0.75}
+  hunterSignalMinAlpha: 0.15
+  hunterSignalMaxAlpha: 0.85
+  hunterSignalFlashSpeed: 5
 --- !u!1 &1248466287
 GameObject:
   m_ObjectHideFlags: 0
@@ -30730,6 +30746,12 @@ MonoBehaviour:
   roleSwitchController: {fileID: 1139914418}
   hideWhenCompleted: 1
   hideWhenHunterActive: 1
+  survivorOutlineColor: {r: 0, g: 1, b: 1, a: 0.28}
+  showHunterRepairSignal: 1
+  hunterRepairSignalColor: {r: 1, g: 0.35, b: 0, a: 0.75}
+  hunterSignalMinAlpha: 0.15
+  hunterSignalMaxAlpha: 0.85
+  hunterSignalFlashSpeed: 5
 --- !u!1 &1760156781
 GameObject:
   m_ObjectHideFlags: 0
@@ -33924,6 +33946,12 @@ MonoBehaviour:
   roleSwitchController: {fileID: 1139914418}
   hideWhenCompleted: 1
   hideWhenHunterActive: 1
+  survivorOutlineColor: {r: 0, g: 1, b: 1, a: 0.28}
+  showHunterRepairSignal: 1
+  hunterRepairSignalColor: {r: 1, g: 0.35, b: 0, a: 0.75}
+  hunterSignalMinAlpha: 0.15
+  hunterSignalMaxAlpha: 0.85
+  hunterSignalFlashSpeed: 5
 --- !u!1 &1912636708
 GameObject:
   m_ObjectHideFlags: 0
@@ -34099,6 +34127,12 @@ MonoBehaviour:
   roleSwitchController: {fileID: 1139914418}
   hideWhenCompleted: 1
   hideWhenHunterActive: 1
+  survivorOutlineColor: {r: 0, g: 1, b: 1, a: 0.28}
+  showHunterRepairSignal: 1
+  hunterRepairSignalColor: {r: 1, g: 0.35, b: 0, a: 0.75}
+  hunterSignalMinAlpha: 0.15
+  hunterSignalMaxAlpha: 0.85
+  hunterSignalFlashSpeed: 5
 --- !u!1 &1917787498
 GameObject:
   m_ObjectHideFlags: 0
@@ -34794,6 +34828,7 @@ RectTransform:
   - {fileID: 1106142266}
   - {fileID: 792609306}
   - {fileID: 1492778433}
+  - {fileID: 2017476307}
   m_Father: {fileID: 1391987737}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -35672,6 +35707,143 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!1 &2017476306
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2017476307}
+  - component: {fileID: 2017476308}
+  - component: {fileID: 2017476309}
+  m_Layer: 5
+  m_Name: HunterRepairInfoText
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &2017476307
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2017476306}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1941881074}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 0, y: -145}
+  m_SizeDelta: {x: 900, y: 70}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &2017476308
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2017476306}
+  m_CullTransparentMesh: 1
+--- !u!114 &2017476309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2017476306}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: 'L1 Repair Signal: No active repair'
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 18
+  m_fontSizeBase: 18
+  m_fontWeight: 400
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 18
+  m_fontSizeMax: 72
+  m_fontStyle: 0
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 256
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_characterHorizontalScale: 1
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_TextWrappingMode: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 0
+  m_ActiveFontFeatures: 6e72656b
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_EmojiFallbackSupport: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!1001 &2019297118
 PrefabInstance:
   m_ObjectHideFlags: 0

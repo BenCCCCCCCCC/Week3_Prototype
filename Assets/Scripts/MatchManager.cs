@@ -44,6 +44,7 @@ public class MatchManager : MonoBehaviour
 
     [Header("UI")]
     public ResultPanelUI resultPanelUI;
+    public GameHUDManager gameHUDManager;
 
     [Header("Debug")]
     public bool logMatchEvents = true;
@@ -345,6 +346,19 @@ public class MatchManager : MonoBehaviour
 
         UpdateEndgameCountdownUI();
         FreezeGameplay();
+
+        if (gameHUDManager == null)
+        {
+            gameHUDManager = FindFirstObjectByType<GameHUDManager>();
+        }
+
+        if (gameHUDManager != null)
+        {
+            gameHUDManager.SetHUDVisible(false);
+        }
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
 
         if (MatchStatsManager.Instance != null)
         {

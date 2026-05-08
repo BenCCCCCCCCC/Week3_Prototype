@@ -5,10 +5,17 @@ public class SurvivorAutoRepairTest : MonoBehaviour
     [Header("Auto Repair Settings")]
     public bool autoRepairEnabled = true;
     public CipherMachine targetCipher;
-    public float startDelay = 1f;
+    public float startDelay = 0.5f;
+
+    [Header("Safety Checks")]
+    public bool onlyWorkWhenHUDVisible = true;
+    public bool requireNearCipher = true;
+    public float maxRepairDistance = 4f;
 
     [Header("References")]
     public InteractionUI repairerUI;
+    public GameHUDManager gameHUDManager;
+    public CharacterStatus selfStatus;
 
     [Header("Debug")]
     public bool showDebugLog = true;
@@ -22,6 +29,16 @@ public class SurvivorAutoRepairTest : MonoBehaviour
         {
             repairerUI = GetComponent<InteractionUI>();
         }
+
+        if (selfStatus == null)
+        {
+            selfStatus = GetComponent<CharacterStatus>();
+        }
+
+        if (gameHUDManager == null)
+        {
+            gameHUDManager = FindFirstObjectByType<GameHUDManager>();
+        }
     }
 
     void OnEnable()
@@ -32,25 +49,7 @@ public class SurvivorAutoRepairTest : MonoBehaviour
 
     void Update()
     {
-        if (!autoRepairEnabled)
-        {
-            StopRepair();
-            return;
-        }
-
-        if (targetCipher == null)
-        {
-            StopRepair();
-            return;
-        }
-
-        if (repairerUI == null)
-        {
-            StopRepair();
-            return;
-        }
-
-        if (targetCipher.isCompleted)
+        if (!CanAutoRepair())
         {
             StopRepair();
             return;
@@ -69,6 +68,65 @@ public class SurvivorAutoRepairTest : MonoBehaviour
         }
 
         targetCipher.BeginRepair(repairerUI);
+    }
+
+    bool CanAutoRepair()
+    {
+        if (!autoRepairEnabled)
+        {
+            return false;
+        }
+
+        if (onlyWorkWhenHUDVisible)
+        {
+            if (gameHUDManager == null)
+            {
+                gameHUDManager = FindFirstObjectByType<GameHUDManager>();
+            }
+
+            if (gameHUDManager == null || !gameHUDManager.showHUD)
+            {
+                return false;
+            }
+        }
+
+        if (targetCipher == null)
+        {
+            return false;
+        }
+
+        if (repairerUI == null)
+        {
+            return false;
+        }
+
+        if (targetCipher.isCompleted)
+        {
+            return false;
+        }
+
+        if (selfStatus != null)
+        {
+            if (selfStatus.IsDowned) return false;
+            if (selfStatus.IsCarried) return false;
+            if (selfStatus.IsChaired) return false;
+            if (selfStatus.IsEliminated) return false;
+            if (selfStatus.IsEscaped) return false;
+            if (selfStatus.IsHitStunned) return false;
+        }
+
+        if (requireNearCipher)
+        {
+            float distance = Vector3.Distance(transform.position, targetCipher.transform.position);
+
+            if (distance > maxRepairDistance)
+            {
+                timer = 0f;
+                return false;
+            }
+        }
+
+        return true;
     }
 
     void StartRepair()
