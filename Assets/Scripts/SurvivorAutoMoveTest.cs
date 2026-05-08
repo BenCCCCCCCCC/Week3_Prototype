@@ -1,145 +1,145 @@
 using UnityEngine;
 
-public class SurvivorAutoMoveTest : MonoBehaviour
+public class SurvivorAutoRepairTest : MonoBehaviour
 {
-    [Header("References")]
-    public PlayerController controller;
-    public CharacterStatus status;
+    [Header("Auto Repair Settings")]
+    public bool autoRepairEnabled = true;
+    public CipherMachine targetCipher;
+    public float startDelay = 0.5f;
 
-    [Header("Auto Move")]
-    public float moveDistance = 4f;
-    public float pauseAtEnds = 0.3f;
+    [Header("Safety Checks")]
+    public bool onlyWorkWhenHUDVisible = true;
+    public bool requireNearCipher = true;
+    public float maxRepairDistance = 4f;
+
+    [Header("References")]
+    public InteractionUI repairerUI;
+    public GameHUDManager gameHUDManager;
 
     [Header("Debug")]
-    public bool showDebugLog = false;
+    public bool showDebugLog = true;
 
-    private Vector3 startPosition;
-    private Vector3 moveAxis;
-    private bool moveToPositive = true;
-    private float pauseTimer = 0f;
-    private bool initialized = false;
+    private float timer = 0f;
+    private bool isRepairing = false;
 
     void Awake()
     {
-        if (controller == null)
+        if (repairerUI == null)
         {
-            controller = GetComponent<PlayerController>();
+            repairerUI = GetComponent<InteractionUI>();
         }
 
-        if (status == null)
+        if (gameHUDManager == null)
         {
-            status = GetComponent<CharacterStatus>();
+            gameHUDManager = FindFirstObjectByType<GameHUDManager>();
         }
     }
 
     void OnEnable()
     {
-        if (!initialized)
-        {
-            startPosition = transform.position;
-            moveAxis = transform.right.normalized;
-
-            if (moveAxis.sqrMagnitude < 0.001f)
-            {
-                moveAxis = Vector3.right;
-            }
-
-            initialized = true;
-        }
-
-        pauseTimer = 0f;
-    }
-
-    void OnDisable()
-    {
-        StopAutoMove();
+        timer = 0f;
+        isRepairing = false;
     }
 
     void Update()
     {
-        if (controller == null)
+        if (!autoRepairEnabled)
         {
+            StopRepair();
             return;
         }
 
-        if (!CanAutoMove())
+        if (onlyWorkWhenHUDVisible)
         {
-            StopAutoMove();
-            return;
-        }
-
-        if (pauseTimer > 0f)
-        {
-            pauseTimer -= Time.deltaTime;
-            StopAutoMove();
-            return;
-        }
-
-        Vector3 targetOffset = moveToPositive ? moveAxis * moveDistance : -moveAxis * moveDistance;
-        Vector3 targetPosition = startPosition + targetOffset;
-
-        Vector3 toTarget = targetPosition - transform.position;
-        toTarget.y = 0f;
-
-        if (toTarget.magnitude <= 0.15f)
-        {
-            moveToPositive = !moveToPositive;
-            pauseTimer = pauseAtEnds;
-            StopAutoMove();
-
-            if (showDebugLog)
+            if (gameHUDManager == null)
             {
-                Debug.Log("SurvivorAutoMoveTest: reached end point, turning around.");
+                gameHUDManager = FindFirstObjectByType<GameHUDManager>();
             }
 
+            if (gameHUDManager == null || !gameHUDManager.showHUD)
+            {
+                StopRepair();
+                return;
+            }
+        }
+
+        if (targetCipher == null)
+        {
+            StopRepair();
             return;
         }
 
-        float autoSpeed = controller.GetDefaultMoveSpeed();
-        controller.StartForcedMove(toTarget.normalized, autoSpeed);
+        if (repairerUI == null)
+        {
+            StopRepair();
+            return;
+        }
+
+        if (targetCipher.isCompleted)
+        {
+            StopRepair();
+            return;
+        }
+
+        if (requireNearCipher)
+        {
+            float distance = Vector3.Distance(transform.position, targetCipher.transform.position);
+
+            if (distance > maxRepairDistance)
+            {
+                StopRepair();
+                timer = 0f;
+                return;
+            }
+        }
+
+        timer += Time.deltaTime;
+
+        if (timer < startDelay)
+        {
+            return;
+        }
+
+        if (!isRepairing)
+        {
+            StartRepair();
+        }
+
+        targetCipher.BeginRepair(repairerUI);
     }
 
-    bool CanAutoMove()
+    void StartRepair()
     {
-        if (!enabled)
-        {
-            return false;
-        }
+        isRepairing = true;
 
-        if (controller == null)
+        if (showDebugLog && targetCipher != null)
         {
-            return false;
+            Debug.Log(gameObject.name + " starts auto repairing " + targetCipher.name);
         }
-
-        CharacterController cc = controller.GetComponent<CharacterController>();
-        if (cc == null)
-        {
-            return false;
-        }
-
-        if (!cc.enabled)
-        {
-            return false;
-        }
-
-        if (status != null)
-        {
-            if (status.IsDowned) return false;
-            if (status.IsCarried) return false;
-            if (status.IsChaired) return false;
-            if (status.IsEliminated) return false;
-            if (status.IsEscaped) return false;
-            if (status.IsHitStunned) return false;
-        }
-
-        return true;
     }
 
-    void StopAutoMove()
+    void StopRepair()
     {
-        if (controller != null)
+        if (targetCipher != null && repairerUI != null)
         {
-            controller.StopForcedMove();
+            targetCipher.EndRepair(repairerUI);
         }
+
+        if (isRepairing && showDebugLog)
+        {
+            Debug.Log(gameObject.name + " stops auto repairing.");
+        }
+
+        isRepairing = false;
+    }
+
+    void OnDisable()
+    {
+        StopRepair();
+    }
+
+    void OnDestroy()
+    {
+        StopRepair();
     }
 }
