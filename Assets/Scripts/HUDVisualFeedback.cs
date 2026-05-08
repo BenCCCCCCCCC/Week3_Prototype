@@ -11,11 +11,19 @@ public class HUDVisualFeedback : MonoBehaviour
     [Header("Tracked Survivors")]
     public CharacterStatus[] trackedSurvivorStatuses;
 
-    [Header("Survivor Visual Feedback")]
+    [Header("Survivor Downed Visual Feedback")]
     public Image survivorRedOverlay;
+    public float downedOverlayAlpha = 0.45f;
+
+    [Header("Survivor Injured Border Feedback")]
+    public Image[] injuredBorderImages;
+    public float injuredBorderMinAlpha = 0.12f;
+    public float injuredBorderMaxAlpha = 0.28f;
+    public float injuredBorderPulseSpeed = 3f;
+
+    [Header("Survivor Hit Flash")]
     public float hitFlashAlpha = 0.28f;
     public float hitFlashDuration = 0.45f;
-    public float downedOverlayAlpha = 0.45f;
 
     [Header("Hunter Visual Feedback")]
     public TMP_Text crosshairText;
@@ -39,6 +47,7 @@ public class HUDVisualFeedback : MonoBehaviour
         AutoFindMissingReferences();
         SaveCurrentHPState();
         HideSurvivorOverlay();
+        HideInjuredBorders();
         RestoreCrosshair();
     }
 
@@ -50,7 +59,7 @@ public class HUDVisualFeedback : MonoBehaviour
         }
 
         DetectHPChanges();
-        UpdateSurvivorOverlay();
+        UpdateSurvivorVisuals();
         UpdateHunterHitMarker();
     }
 
@@ -164,39 +173,95 @@ public class HUDVisualFeedback : MonoBehaviour
         }
     }
 
-    void UpdateSurvivorOverlay()
+    void UpdateSurvivorVisuals()
     {
-        if (survivorRedOverlay == null)
-        {
-            return;
-        }
-
         bool survivorViewActive = roleSwitchController == null || roleSwitchController.IsSurvivorActive();
 
         if (!survivorViewActive)
         {
             HideSurvivorOverlay();
+            HideInjuredBorders();
             return;
         }
 
-        float targetAlpha = 0f;
+        bool isDownedLikeState = false;
+        bool isInjuredState = false;
 
-        if (playerSurvivorStatus != null &&
-            (playerSurvivorStatus.IsDowned ||
-             playerSurvivorStatus.IsCarried ||
-             playerSurvivorStatus.IsChaired))
+        if (playerSurvivorStatus != null)
         {
-            targetAlpha = downedOverlayAlpha;
+            isDownedLikeState =
+                playerSurvivorStatus.IsDowned ||
+                playerSurvivorStatus.IsCarried ||
+                playerSurvivorStatus.IsChaired;
+
+            isInjuredState =
+                playerSurvivorStatus.IsInjured &&
+                !isDownedLikeState;
+        }
+
+        if (isDownedLikeState)
+        {
+            SetSurvivorOverlayAlpha(downedOverlayAlpha);
+            HideInjuredBorders();
+            return;
+        }
+
+        HideSurvivorOverlay();
+
+        if (isInjuredState)
+        {
+            UpdateInjuredBorders();
         }
         else if (hitFlashTimer > 0f)
         {
             hitFlashTimer -= Time.deltaTime;
 
             float flashProgress = Mathf.Clamp01(hitFlashTimer / hitFlashDuration);
-            targetAlpha = hitFlashAlpha * flashProgress;
+            float alpha = hitFlashAlpha * flashProgress;
+
+            SetInjuredBorderAlpha(alpha);
+        }
+        else
+        {
+            HideInjuredBorders();
+        }
+    }
+
+    void UpdateInjuredBorders()
+    {
+        float pulse01 = (Mathf.Sin(Time.time * injuredBorderPulseSpeed) + 1f) * 0.5f;
+        float alpha = Mathf.Lerp(injuredBorderMinAlpha, injuredBorderMaxAlpha, pulse01);
+
+        SetInjuredBorderAlpha(alpha);
+    }
+
+    void SetInjuredBorderAlpha(float alpha)
+    {
+        if (injuredBorderImages == null)
+        {
+            return;
         }
 
-        SetSurvivorOverlayAlpha(targetAlpha);
+        for (int i = 0; i < injuredBorderImages.Length; i++)
+        {
+            Image image = injuredBorderImages[i];
+
+            if (image == null)
+            {
+                continue;
+            }
+
+            image.gameObject.SetActive(alpha > 0.01f);
+
+            Color color = image.color;
+            color.a = alpha;
+            image.color = color;
+        }
+    }
+
+    void HideInjuredBorders()
+    {
+        SetInjuredBorderAlpha(0f);
     }
 
     void UpdateHunterHitMarker()

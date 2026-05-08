@@ -31,8 +31,10 @@ public class GameHUDManager : MonoBehaviour
     public TMP_Text survivorCipherText;
     public TMP_Text survivorSelfStatusText;
     public TMP_Text survivorTeamStatusText;
+    public TMP_Text survivorTeamIconText;
     public TMP_Text survivorDashText;
     public TMP_Text survivorStateHintText;
+    public TMP_Text survivorRescueStatusText;
     public TMP_Text survivorEventFeedbackText;
 
     [Header("Hunter HUD Texts")]
@@ -204,7 +206,12 @@ public class GameHUDManager : MonoBehaviour
 
         if (survivorTeamStatusText != null)
         {
-            survivorTeamStatusText.text = "L1 Team Status:\n" + GetTeamStatusText();
+            survivorTeamStatusText.text = "L1 Team Icons:\n" + GetTeamIconText();
+        }
+
+        if (survivorTeamIconText != null)
+        {
+            survivorTeamIconText.text = GetTeamIconText();
         }
 
         if (survivorDashText != null)
@@ -215,6 +222,23 @@ public class GameHUDManager : MonoBehaviour
         if (survivorStateHintText != null)
         {
             survivorStateHintText.text = GetSurvivorHintText();
+        }
+
+        if (survivorRescueStatusText != null)
+        {
+            bool isBeingRescued = false;
+
+            if (playerSurvivorStatus != null)
+            {
+                isBeingRescued = GetStatusKey(playerSurvivorStatus) == "BeingRescued";
+            }
+
+            survivorRescueStatusText.gameObject.SetActive(isBeingRescued);
+
+            if (isBeingRescued)
+            {
+                survivorRescueStatusText.text = "BEING RESCUED...";
+            }
         }
     }
 
@@ -402,6 +426,132 @@ public class GameHUDManager : MonoBehaviour
     }
 
 
+    string GetTeamIconText()
+    {
+        if (trackedSurvivorStatuses == null || trackedSurvivorStatuses.Length == 0)
+        {
+            return "[?] No survivor data";
+        }
+
+        StringBuilder builder = new StringBuilder();
+
+        for (int i = 0; i < trackedSurvivorStatuses.Length; i++)
+        {
+            CharacterStatus status = trackedSurvivorStatuses[i];
+
+            string label = "S" + (i + 1);
+            string iconText = GetSurvivorIconText(status);
+            string shortState = GetSurvivorShortStateText(status);
+
+            builder.Append(iconText);
+            builder.Append(" ");
+            builder.Append(label);
+            builder.Append(" ");
+            builder.Append(shortState);
+
+            if (i < trackedSurvivorStatuses.Length - 1)
+            {
+                builder.Append("\n");
+            }
+        }
+
+        return builder.ToString();
+    }
+
+    string GetSurvivorIconText(CharacterStatus status)
+    {
+        if (status == null)
+        {
+            return "[?]";
+        }
+
+        string stateKey = GetStatusKey(status);
+
+        if (stateKey == "Escaped")
+        {
+            return "[ESC]";
+        }
+
+        if (stateKey == "Eliminated")
+        {
+            return "[X]";
+        }
+
+        if (stateKey == "BeingRescued")
+        {
+            return "[HELP]";
+        }
+
+        if (stateKey == "OnChair")
+        {
+            return "[CHAIR]";
+        }
+
+        if (stateKey == "Carried")
+        {
+            return "[CARRY]";
+        }
+
+        if (stateKey == "Downed")
+        {
+            return "[DOWN]";
+        }
+
+        if (stateKey == "Injured")
+        {
+            return "[!]";
+        }
+
+        return "[OK]";
+    }
+
+    string GetSurvivorShortStateText(CharacterStatus status)
+    {
+        if (status == null)
+        {
+            return "Unknown";
+        }
+
+        string stateKey = GetStatusKey(status);
+
+        if (stateKey == "Escaped")
+        {
+            return "Escaped";
+        }
+
+        if (stateKey == "Eliminated")
+        {
+            return "Eliminated";
+        }
+
+        if (stateKey == "BeingRescued")
+        {
+            return "Being Rescued";
+        }
+
+        if (stateKey == "OnChair")
+        {
+            return "On Chair";
+        }
+
+        if (stateKey == "Carried")
+        {
+            return "Carried";
+        }
+
+        if (stateKey == "Downed")
+        {
+            int seconds = Mathf.CeilToInt(status.DownedRecoveryRemaining);
+            return "Downed " + seconds + "s";
+        }
+
+        if (stateKey == "Injured")
+        {
+            return "Injured";
+        }
+
+        return "Alive";
+    }
 
     string GetStatusText(CharacterStatus status)
     {
@@ -439,7 +589,8 @@ public class GameHUDManager : MonoBehaviour
 
         if (stateKey == "Downed")
         {
-            return "Downed";
+            int seconds = Mathf.CeilToInt(status.DownedRecoveryRemaining);
+            return "Downed - Recover in " + seconds + "s";
         }
 
         if (stateKey == "HitStun")
@@ -626,7 +777,8 @@ public class GameHUDManager : MonoBehaviour
 
         if (stateKey == "Downed")
         {
-            return "L1 Critical: You are downed. Wait for rescue.";
+            int seconds = Mathf.CeilToInt(playerSurvivorStatus.DownedRecoveryRemaining);
+            return "L1 Critical: You are downed. Recovering in " + seconds + "s unless Hunter picks you up.";
         }
 
         if (stateKey == "BeingRescued")

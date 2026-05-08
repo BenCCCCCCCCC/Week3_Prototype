@@ -7,10 +7,19 @@ public class ArchivePanelUI : MonoBehaviour
     [Header("References")]
     public ArchiveProgress archiveProgress;
     public LobbyUIManager lobbyUIManager;
+
+    [Header("Archive Texts")]
     public TMP_Text archiveLevelText;
     public TMP_Text archiveCostText;
+    public TMP_Text archiveStatusText;
     public TMP_Text archiveDescText;
+
+    [Header("Upgrade Button")]
     public Button upgradeButton;
+    public TMP_Text upgradeButtonText;
+
+    [Header("Debug")]
+    public bool showDebugLog = true;
 
     private void OnEnable()
     {
@@ -35,6 +44,14 @@ public class ArchivePanelUI : MonoBehaviour
         }
 
         int cost = archiveProgress.GetUpgradeCost();
+        int currentMaterial = 0;
+
+        if (PlayerProfile.Instance != null)
+        {
+            currentMaterial = PlayerProfile.Instance.archiveMaterial;
+        }
+
+        bool canUpgrade = PlayerProfile.Instance != null && currentMaterial >= cost;
 
         if (archiveLevelText != null)
         {
@@ -43,20 +60,45 @@ public class ArchivePanelUI : MonoBehaviour
 
         if (archiveCostText != null)
         {
-            archiveCostText.text = "Upgrade Cost: " + cost + " Material";
+            archiveCostText.text = "Material: " + currentMaterial + " / " + cost;
+        }
+
+        if (archiveStatusText != null)
+        {
+            if (canUpgrade)
+            {
+                archiveStatusText.text = "Status: Ready to upgrade";
+            }
+            else
+            {
+                int missing = Mathf.Max(0, cost - currentMaterial);
+                archiveStatusText.text = "Status: Not enough Archive Material\nNeed " + missing + " more material";
+            }
         }
 
         if (archiveDescText != null)
         {
             archiveDescText.text =
-                "Archive collection is the light progression line of Week 8.\n" +
+                "Archive collection is the light progression line of Week 9.\n" +
                 "Spend archive materials to increase archive level.\n" +
-                "This can later unlock story entries, profile nodes, or small passive progression.";
+                "Higher archive level can later unlock story entries, profile nodes, or small passive progression.";
         }
 
-        if (upgradeButton != null && PlayerProfile.Instance != null)
+        if (upgradeButton != null)
         {
-            upgradeButton.interactable = PlayerProfile.Instance.archiveMaterial >= cost;
+            upgradeButton.interactable = canUpgrade;
+        }
+
+        if (upgradeButtonText != null)
+        {
+            if (canUpgrade)
+            {
+                upgradeButtonText.text = "Upgrade Archive";
+            }
+            else
+            {
+                upgradeButtonText.text = "Need Material";
+            }
         }
     }
 
@@ -74,13 +116,16 @@ public class ArchivePanelUI : MonoBehaviour
             success = archiveProgress.TryUpgrade();
         }
 
-        if (success)
+        if (showDebugLog)
         {
-            Debug.Log("Archive upgraded. Current level = " + archiveProgress.archiveLevel);
-        }
-        else
-        {
-            Debug.Log("Archive upgrade failed. Not enough material or missing profile.");
+            if (success)
+            {
+                Debug.Log("Archive upgraded. Current level = " + archiveProgress.archiveLevel);
+            }
+            else
+            {
+                Debug.Log("Archive upgrade failed. Not enough material or missing profile.");
+            }
         }
 
         Refresh();

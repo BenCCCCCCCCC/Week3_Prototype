@@ -85,12 +85,21 @@ public class MatchFlowUIManager : MonoBehaviour
             return;
         }
 
+        StartCoroutine(OpenCharacterSelectRoutine());
+    }
+
+    IEnumerator OpenCharacterSelectRoutine()
+    {
+        isFlowRunning = true;
+
         AutoFindReferences();
 
         if (logFlow)
         {
-            Debug.Log("MatchFlowUIManager: Open Character Select");
+            Debug.Log("MatchFlowUIManager: Open Character Select with fade");
         }
+
+        yield return FadeToBlack();
 
         if (lobbyRoot != null)
         {
@@ -114,6 +123,10 @@ public class MatchFlowUIManager : MonoBehaviour
 
         SetSelectedRole(selectedRole);
         UnlockCursorForUI();
+
+        yield return FadeFromBlack();
+
+        isFlowRunning = false;
     }
 
     public void BackToLobbyFromCharacterSelect()
@@ -123,10 +136,19 @@ public class MatchFlowUIManager : MonoBehaviour
             return;
         }
 
+        StartCoroutine(BackToLobbyFromCharacterSelectRoutine());
+    }
+
+    IEnumerator BackToLobbyFromCharacterSelectRoutine()
+    {
+        isFlowRunning = true;
+
         if (logFlow)
         {
-            Debug.Log("MatchFlowUIManager: Back To Lobby");
+            Debug.Log("MatchFlowUIManager: Back To Lobby with fade");
         }
+
+        yield return FadeToBlack();
 
         HideFlowPanels();
 
@@ -146,6 +168,10 @@ public class MatchFlowUIManager : MonoBehaviour
         }
 
         UnlockCursorForUI();
+
+        yield return FadeFromBlack();
+
+        isFlowRunning = false;
     }
 
     public void SelectHunterRole()

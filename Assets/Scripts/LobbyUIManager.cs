@@ -1,6 +1,8 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class LobbyUIManager : MonoBehaviour
 {
@@ -19,6 +21,13 @@ public class LobbyUIManager : MonoBehaviour
 
     [Header("Home Info")]
     public TMP_Text recentMatchText;
+
+    [Header("Fade")]
+    public GameObject fadePanel;
+    public Image fadeImage;
+    public float fadeDuration = 0.25f;
+
+    private bool isReturningToLobby = false;
 
     [Header("Other References")]
     public MatchSettlement matchSettlement;
@@ -102,13 +111,7 @@ public class LobbyUIManager : MonoBehaviour
 
     public void OpenLobbyAfterMatch()
     {
-        if (resultPanelUI != null)
-        {
-            resultPanelUI.HidePanel();
-        }
-
-        ShowHome();
-        EnterLobbyMode();
+        ReturnToLobbyWithoutReload();
     }
 
     public void StartMatchFromLobby()
@@ -127,6 +130,20 @@ public class LobbyUIManager : MonoBehaviour
 
     public void ReturnToLobbyWithoutReload()
     {
+        if (isReturningToLobby)
+        {
+            return;
+        }
+
+        StartCoroutine(ReturnToLobbyRoutine());
+    }
+
+    IEnumerator ReturnToLobbyRoutine()
+    {
+        isReturningToLobby = true;
+
+        yield return FadeToBlack();
+
         if (resultPanelUI != null)
         {
             resultPanelUI.HidePanel();
@@ -134,6 +151,69 @@ public class LobbyUIManager : MonoBehaviour
 
         ShowHome();
         EnterLobbyMode();
+
+        yield return FadeFromBlack();
+
+        isReturningToLobby = false;
+    }
+
+    IEnumerator FadeToBlack()
+    {
+        if (fadePanel == null || fadeImage == null)
+        {
+            yield break;
+        }
+
+        fadePanel.SetActive(true);
+        fadePanel.transform.SetAsLastSibling();
+
+        float timer = 0f;
+
+        while (timer < fadeDuration)
+        {
+            timer += Time.deltaTime;
+            float alpha = Mathf.Clamp01(timer / fadeDuration);
+            SetFadeAlpha(alpha);
+            yield return null;
+        }
+
+        SetFadeAlpha(1f);
+    }
+
+    IEnumerator FadeFromBlack()
+    {
+        if (fadePanel == null || fadeImage == null)
+        {
+            yield break;
+        }
+
+        fadePanel.SetActive(true);
+        fadePanel.transform.SetAsLastSibling();
+
+        float timer = 0f;
+
+        while (timer < fadeDuration)
+        {
+            timer += Time.deltaTime;
+            float alpha = 1f - Mathf.Clamp01(timer / fadeDuration);
+            SetFadeAlpha(alpha);
+            yield return null;
+        }
+
+        SetFadeAlpha(0f);
+        fadePanel.SetActive(false);
+    }
+
+    void SetFadeAlpha(float alpha)
+    {
+        if (fadeImage == null)
+        {
+            return;
+        }
+
+        Color color = fadeImage.color;
+        color.a = alpha;
+        fadeImage.color = color;
     }
 
     void StartGameplayMode()

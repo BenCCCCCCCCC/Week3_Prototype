@@ -13,6 +13,10 @@ public class CharacterStatus : MonoBehaviour
     [Header("Runtime State")]
     public int currentHP = 2;
 
+    [Header("Downed Recovery")]
+    public bool enableDownedAutoRecovery = true;
+    public float downedRecoveryDuration = 25f;
+
     [Header("Debug")]
     public bool logStateChanges = true;
 
@@ -27,6 +31,8 @@ public class CharacterStatus : MonoBehaviour
     private bool isEliminated = false;
     private bool isEscaped = false;
     private bool downCountReported = false;
+
+    private float downedRecoveryTimer = 0f;
 
     private Transform carryAnchor;
     private ChairController currentChair;
@@ -45,6 +51,27 @@ public class CharacterStatus : MonoBehaviour
     public bool IsEliminated => isEliminated;
     public bool IsEscaped => isEscaped;
     public ChairController CurrentChair => currentChair;
+
+    public float DownedRecoveryRemaining
+    {
+        get
+        {
+            if (!isDowned) return 0f;
+            return Mathf.Max(0f, downedRecoveryTimer);
+        }
+    }
+
+    public float DownedRecovery01
+    {
+        get
+        {
+            if (!isDowned) return 0f;
+            if (downedRecoveryDuration <= 0f) return 1f;
+
+            float elapsed = downedRecoveryDuration - downedRecoveryTimer;
+            return Mathf.Clamp01(elapsed / downedRecoveryDuration);
+        }
+    }
 
     public bool IsInjured
     {
@@ -95,6 +122,11 @@ public class CharacterStatus : MonoBehaviour
         RefreshMoveSpeedFromState();
     }
 
+    void Update()
+    {
+        UpdateDownedRecoveryTimer();
+    }
+
     void LateUpdate()
     {
         if (isCarried && carryAnchor != null)
@@ -108,6 +140,64 @@ public class CharacterStatus : MonoBehaviour
             transform.position = currentChair.seatAnchor.position;
             transform.rotation = currentChair.seatAnchor.rotation;
         }
+    }
+
+    void UpdateDownedRecoveryTimer()
+    {
+        if (!enableDownedAutoRecovery)
+        {
+            return;
+        }
+
+        if (!isDowned)
+        {
+            return;
+        }
+
+        if (isCarried || isChaired || isEliminated || isEscaped)
+        {
+            return;
+        }
+
+        downedRecoveryTimer -= Time.deltaTime;
+
+        if (downedRecoveryTimer <= 0f)
+        {
+            downedRecoveryTimer = 0f;
+            AutoRecoverFromDowned();
+        }
+    }
+
+    void StartDownedRecoveryTimer()
+    {
+        if (!enableDownedAutoRecovery)
+        {
+            downedRecoveryTimer = 0f;
+            return;
+        }
+
+        downedRecoveryTimer = Mathf.Max(0.1f, downedRecoveryDuration);
+    }
+
+    void CancelDownedRecoveryTimer()
+    {
+        downedRecoveryTimer = 0f;
+    }
+
+    void AutoRecoverFromDowned()
+    {
+        if (!isDowned) return;
+        if (isCarried) return;
+        if (isChaired) return;
+        if (isEliminated) return;
+        if (isEscaped) return;
+
+        if (logStateChanges)
+        {
+            Debug.Log(gameObject.name + " auto recovered from Downed to Injured.");
+        }
+
+        ReviveToInjured();
     }
 
     public bool ApplySlow(float slowMultiplier, float duration)
@@ -236,12 +326,17 @@ public class CharacterStatus : MonoBehaviour
         isChaired = false;
         isEliminated = false;
         isEscaped = false;
+        isHitStunned = false;
 
         currentChair = null;
         carryAnchor = null;
         currentHP = 0;
 
         CancelInvoke(nameof(RecoverOriginalSpeed));
+        isSlowed = false;
+        currentSlowMultiplier = 1f;
+
+        StartDownedRecoveryTimer();
 
         if (controller != null)
         {
@@ -261,7 +356,7 @@ public class CharacterStatus : MonoBehaviour
 
         if (logStateChanges)
         {
-            Debug.Log(gameObject.name + " is Downed.");
+            Debug.Log(gameObject.name + " is Downed. Auto recovery in " + downedRecoveryDuration + " seconds.");
         }
     }
 
@@ -284,6 +379,8 @@ public class CharacterStatus : MonoBehaviour
         isChaired = false;
         isEliminated = false;
         isEscaped = false;
+
+        CancelDownedRecoveryTimer();
 
         currentChair = null;
         carryAnchor = newCarryAnchor;
@@ -318,6 +415,9 @@ public class CharacterStatus : MonoBehaviour
 
         carryAnchor = null;
         currentChair = null;
+        currentHP = 0;
+
+        StartDownedRecoveryTimer();
 
         if (controller != null)
         {
@@ -344,6 +444,8 @@ public class CharacterStatus : MonoBehaviour
         isChaired = true;
         isEliminated = false;
         isEscaped = false;
+
+        CancelDownedRecoveryTimer();
 
         carryAnchor = null;
         currentChair = chair;
@@ -375,6 +477,8 @@ public class CharacterStatus : MonoBehaviour
         isCarried = false;
         isEliminated = false;
         isEscaped = false;
+
+        CancelDownedRecoveryTimer();
 
         currentChair = null;
         carryAnchor = null;
@@ -411,6 +515,8 @@ public class CharacterStatus : MonoBehaviour
         isCarried = false;
         isChaired = false;
 
+        CancelDownedRecoveryTimer();
+
         currentChair = null;
         carryAnchor = null;
 
@@ -439,6 +545,8 @@ public class CharacterStatus : MonoBehaviour
         isDowned = false;
         isCarried = false;
         isChaired = false;
+
+        CancelDownedRecoveryTimer();
 
         currentChair = null;
         carryAnchor = null;
@@ -469,6 +577,8 @@ public class CharacterStatus : MonoBehaviour
         isEliminated = false;
         isEscaped = false;
 
+        CancelDownedRecoveryTimer();
+
         currentChair = null;
         carryAnchor = null;
         currentHP = 1;
@@ -478,6 +588,7 @@ public class CharacterStatus : MonoBehaviour
 
         if (controller != null)
         {
+            controller.StopForcedMove();
             controller.enablePlayerInput = true;
             RefreshMoveSpeedFromState();
         }
@@ -499,6 +610,8 @@ public class CharacterStatus : MonoBehaviour
         isChaired = false;
         isEliminated = false;
         isEscaped = false;
+
+        CancelDownedRecoveryTimer();
 
         currentChair = null;
         carryAnchor = null;
