@@ -22,6 +22,19 @@ public class HunterCarryController : MonoBehaviour
     private InputAction carryAction;
     private CharacterStatus carriedTarget;
 
+    public void ResetCarryForNewMatch()
+    {
+        carriedTarget = null;
+        HideCarryHint();
+
+        enabled = true;
+
+        if (showDebugLog)
+        {
+            Debug.Log("HunterCarryController: reset carry state for new match.");
+        }
+    }
+
     void Awake()
     {
         if (controller == null)

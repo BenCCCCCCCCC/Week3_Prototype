@@ -25,6 +25,7 @@ public class GameHUDManager : MonoBehaviour
     [Header("Tracked Survivors")]
     public CharacterStatus[] trackedSurvivorStatuses;
     public InteractionUI[] trackedSurvivorInteractionUIs;
+    public RescueAutoTest[] trackedRescueAutoTests;
 
     [Header("Survivor HUD Texts")]
     public TMP_Text survivorObjectiveText;
@@ -628,7 +629,7 @@ public class GameHUDManager : MonoBehaviour
             return "Eliminated";
         }
 
-        if (status.IsChaired && AnyRescueInteractionInProgress())
+        if (status.IsChaired && IsStatusBeingRescued(status))
         {
             return "BeingRescued";
         }
@@ -685,6 +686,45 @@ public class GameHUDManager : MonoBehaviour
 
         return false;
     }
+
+    bool IsStatusBeingRescued(CharacterStatus status)
+    {
+        if (status == null)
+        {
+            return false;
+        }
+
+        if (trackedRescueAutoTests != null)
+        {
+            for (int i = 0; i < trackedRescueAutoTests.Length; i++)
+            {
+                RescueAutoTest rescueAuto = trackedRescueAutoTests[i];
+
+                if (rescueAuto == null)
+                {
+                    continue;
+                }
+
+                if (!rescueAuto.IsAutoRescuing)
+                {
+                    continue;
+                }
+
+                if (rescueAuto.CurrentRescueTarget == status)
+                {
+                    return true;
+                }
+            }
+        }
+
+        if (AnyRescueInteractionInProgress())
+        {
+            return true;
+        }
+
+        return false;
+    }
+
 
     string GetDashText()
     {
@@ -1085,6 +1125,11 @@ public class GameHUDManager : MonoBehaviour
         if (trackedSurvivorInteractionUIs == null || trackedSurvivorInteractionUIs.Length == 0)
         {
             trackedSurvivorInteractionUIs = FindObjectsByType<InteractionUI>(FindObjectsSortMode.None);
+        }
+
+        if (trackedRescueAutoTests == null || trackedRescueAutoTests.Length == 0)
+        {
+            trackedRescueAutoTests = FindObjectsByType<RescueAutoTest>(FindObjectsSortMode.None);
         }
     }
 }

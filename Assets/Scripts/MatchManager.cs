@@ -56,6 +56,9 @@ public class MatchManager : MonoBehaviour
     private float matchStartTime;
     private float matchEndTime;
     private float endgameRemainingTime = 0f;
+    private Vector3 hunterStartPosition;
+    private Quaternion hunterStartRotation;
+    private bool hunterSpawnRecorded = false;
 
     public int CompletedCipherCount => completedCipherSet.Count;
     public int EscapedSurvivorCount => escapedSurvivorSet.Count;
@@ -70,6 +73,7 @@ public class MatchManager : MonoBehaviour
 
     void Start()
     {
+        RecordHunterSpawnPoint();
         if (requiredCompletedCiphers < 1) requiredCompletedCiphers = 1;
         if (survivorWinEscapeCount < 1) survivorWinEscapeCount = 1;
         if (hunterWinEliminationCount < 1) hunterWinEliminationCount = 1;
@@ -111,6 +115,168 @@ public class MatchManager : MonoBehaviour
         if (logMatchEvents)
         {
             Debug.Log("MatchManager: Started. Required completed ciphers = " + requiredCompletedCiphers);
+        }
+    }
+
+    public void ResetMatchForNewRun()
+    {
+        ResetHunterForNewMatch();
+        matchStartTime = Time.time;
+        matchEndTime = 0f;
+        endgameRemainingTime = 0f;
+
+        IsMatchEnded = false;
+        IsEndgameActive = false;
+        GatesUnlocked = false;
+        FinalResult = MatchResult.None;
+        DownedCount = 0;
+
+        completedCipherSet.Clear();
+        escapedSurvivorSet.Clear();
+        eliminatedSurvivorSet.Clear();
+
+        if (resultPanelUI != null)
+        {
+            resultPanelUI.HidePanel();
+        }
+
+        CharacterStatus[] allStatuses = FindObjectsByType<CharacterStatus>(FindObjectsSortMode.None);
+        for (int i = 0; i < allStatuses.Length; i++)
+        {
+            if (allStatuses[i] != null)
+            {
+                allStatuses[i].ResetForNewMatch();
+            }
+        }
+
+        CipherMachine[] allCiphers = FindObjectsByType<CipherMachine>(FindObjectsSortMode.None);
+        for (int i = 0; i < allCiphers.Length; i++)
+        {
+            if (allCiphers[i] != null)
+            {
+                allCiphers[i].ResetCipherForNewMatch();
+            }
+        }
+
+        GateController[] allGates = FindObjectsByType<GateController>(FindObjectsSortMode.None);
+        for (int i = 0; i < allGates.Length; i++)
+        {
+            if (allGates[i] != null)
+            {
+                allGates[i].ResetGateForNewMatch();
+            }
+        }
+
+        ChairController[] allChairs = FindObjectsByType<ChairController>(FindObjectsSortMode.None);
+        for (int i = 0; i < allChairs.Length; i++)
+        {
+            if (allChairs[i] != null)
+            {
+                allChairs[i].ResetChairForNewMatch();
+            }
+        }
+
+        if (hunterCarryController == null)
+        {
+            hunterCarryController = FindFirstObjectByType<HunterCarryController>();
+        }
+
+        if (hunterCarryController != null)
+        {
+            hunterCarryController.ResetCarryForNewMatch();
+        }
+
+        if (MatchStatsManager.Instance != null)
+        {
+            MatchStatsManager.Instance.StartMatch();
+        }
+
+        UpdateEndgameCountdownUI();
+
+        if (gameHUDManager != null)
+        {
+            gameHUDManager.SetHUDVisible(false);
+        }
+
+        if (logMatchEvents)
+        {
+            Debug.Log("MatchManager: reset match for new run.");
+        }
+    }
+
+    void RecordHunterSpawnPoint()
+    {
+        if (hunterSpawnRecorded)
+        {
+            return;
+        }
+
+        if (hunterController == null)
+        {
+            hunterController = FindFirstObjectByType<HunterCarryController>()?.GetComponent<PlayerController>();
+        }
+
+        if (hunterController == null)
+        {
+            GameObject hunterObject = GameObject.FindGameObjectWithTag("Hunter");
+
+            if (hunterObject != null)
+            {
+                hunterController = hunterObject.GetComponent<PlayerController>();
+            }
+        }
+
+        if (hunterController == null)
+        {
+            return;
+        }
+
+        hunterStartPosition = hunterController.transform.position;
+        hunterStartRotation = hunterController.transform.rotation;
+        hunterSpawnRecorded = true;
+    }
+
+    void ResetHunterForNewMatch()
+    {
+        RecordHunterSpawnPoint();
+
+        if (hunterController == null)
+        {
+            return;
+        }
+
+        CharacterController hunterCharacterController = hunterController.GetComponent<CharacterController>();
+
+        if (hunterCharacterController != null)
+        {
+            hunterCharacterController.enabled = false;
+        }
+
+        hunterController.transform.position = hunterStartPosition;
+        hunterController.transform.rotation = hunterStartRotation;
+
+        if (hunterCharacterController != null)
+        {
+            hunterCharacterController.enabled = true;
+        }
+
+        hunterController.StopForcedMove();
+        hunterController.IsInvincible = false;
+        hunterController.SetPlayerInputEnabled(false);
+
+        if (hunterCarryController == null)
+        {
+            hunterCarryController = hunterController.GetComponent<HunterCarryController>();
+        }
+
+        if (hunterCarryController != null)
+        {
+            hunterCarryController.ResetCarryForNewMatch();
+        }
+
+        if (logMatchEvents)
+        {
+            Debug.Log("MatchManager: Hunter reset to spawn point.");
         }
     }
 

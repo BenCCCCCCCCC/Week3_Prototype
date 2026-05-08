@@ -36,6 +36,7 @@ public class LobbyUIManager : MonoBehaviour
     public LoadoutPanelUI loadoutPanelUI;
     public ArchivePanelUI archivePanelUI;
     public GameHUDManager gameHUDManager;
+    public MatchManager matchManager;
 
     [Header("Gameplay References")]
     public RoleSwitchController roleSwitchController;
@@ -218,12 +219,37 @@ public class LobbyUIManager : MonoBehaviour
 
     void StartGameplayMode()
     {
+        if (matchManager == null)
+        {
+            matchManager = FindFirstObjectByType<MatchManager>();
+        }
+
+        if (matchManager != null)
+        {
+            matchManager.ResetMatchForNewRun();
+        }
+
         if (lobbyRoot != null)
         {
             lobbyRoot.SetActive(false);
         }
 
         SetGameplayEnabled(true);
+
+        if (roleSwitchController != null)
+        {
+            roleSwitchController.enabled = true;
+
+            if (roleSwitchController.currentRole == PlayableRole.Hunter)
+            {
+                roleSwitchController.SelectHunter();
+            }
+            else
+            {
+                roleSwitchController.SelectSurvivor();
+            }
+        }
+
         LockCursorForGameplay();
 
         if (resultPanelUI != null)

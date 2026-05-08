@@ -139,6 +139,27 @@ public class ChairController : MonoBehaviour
         return true;
     }
 
+    public void ResetChairForNewMatch()
+    {
+        occupant = null;
+        remainingTime = 0f;
+        eliminationResolved = false;
+        rescueLockTimer = 0f;
+
+        if (interactionTarget != null)
+        {
+            interactionTarget.isCompleted = false;
+            interactionTarget.gameObject.SetActive(true);
+        }
+
+        enabled = true;
+
+        if (logChairEvents)
+        {
+            Debug.Log("ChairController: reset chair for new match = " + gameObject.name);
+        }
+    }
+
     void EliminateOccupant()
     {
         if (occupant == null) return;

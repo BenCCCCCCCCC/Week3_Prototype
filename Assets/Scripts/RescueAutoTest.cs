@@ -19,6 +19,8 @@ public class RescueAutoTest : MonoBehaviour
     private float restartLockTimer = 0f;
 
     public bool IsAutoRescuing => currentChair != null && progress01 > 0f;
+    public ChairController CurrentChair => currentChair;
+    public CharacterStatus CurrentRescueTarget => currentChair != null ? currentChair.Occupant : null;
 
     void Awake()
     {

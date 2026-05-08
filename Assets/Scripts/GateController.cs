@@ -27,6 +27,32 @@ public class GateController : MonoBehaviour
         }
     }
 
+    public void ResetGateForNewMatch()
+    {
+        isUnlocked = false;
+        isOpened = false;
+        progress01 = 0f;
+        activeOpeners.Clear();
+
+        if (interactionTarget != null)
+        {
+            interactionTarget.isCompleted = false;
+            interactionTarget.gameObject.SetActive(true);
+        }
+
+        if (escapeZone != null)
+        {
+            escapeZone.SetEscapeEnabled(false);
+        }
+
+        enabled = true;
+
+        if (logGateEvents)
+        {
+            Debug.Log("GateController: reset for new match = " + gameObject.name);
+        }
+    }
+
     void Start()
     {
         if (escapeZone != null)

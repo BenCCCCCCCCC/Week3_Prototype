@@ -19,6 +19,25 @@ public class CipherMachine : MonoBehaviour
 
     public int ActiveRepairerCount => activeRepairers.Count;
 
+    public void ResetCipherForNewMatch()
+    {
+        progress01 = 0f;
+        isCompleted = false;
+        activeRepairers.Clear();
+
+        if (interactionTarget != null)
+        {
+            interactionTarget.isCompleted = false;
+            interactionTarget.gameObject.SetActive(true);
+        }
+
+        enabled = true;
+
+        if (logCipherEvents)
+        {
+            Debug.Log("CipherMachine: reset for new match = " + gameObject.name);
+        }
+    }
     void Awake()
     {
         if (interactionTarget == null)

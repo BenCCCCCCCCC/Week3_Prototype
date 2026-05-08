@@ -33,6 +33,8 @@ public class CharacterStatus : MonoBehaviour
     private bool downCountReported = false;
 
     private float downedRecoveryTimer = 0f;
+    private Vector3 startPosition;
+    private Quaternion startRotation;
 
     private Transform carryAnchor;
     private ChairController currentChair;
@@ -103,6 +105,8 @@ public class CharacterStatus : MonoBehaviour
         matchManager = FindFirstObjectByType<MatchManager>();
         interactionUI = GetComponent<InteractionUI>();
         rescueAutoTest = GetComponent<RescueAutoTest>();
+        startPosition = transform.position;
+        startRotation = transform.rotation;
     }
 
     void Start()
@@ -635,6 +639,70 @@ public class CharacterStatus : MonoBehaviour
         if (logStateChanges)
         {
             Debug.Log(gameObject.name + " reset to Healthy.");
+        }
+    }
+
+    public void ResetForNewMatch()
+    {
+        CancelInvoke();
+        StopAllCoroutines();
+
+        isDowned = false;
+        isHitStunned = false;
+        isSlowed = false;
+        isCarried = false;
+        isChaired = false;
+        isEliminated = false;
+        isEscaped = false;
+
+        downedRecoveryTimer = 0f;
+        currentSlowMultiplier = 1f;
+        currentHP = GetMaxHP();
+        downCountReported = false;
+
+        currentChair = null;
+        carryAnchor = null;
+
+        SetSlowWarning(false);
+        SetCloseDetectMarker(false);
+
+        // Temporarily disable CharacterController before teleporting.
+        if (characterController != null)
+        {
+            characterController.enabled = false;
+        }
+
+        transform.position = startPosition;
+        transform.rotation = startRotation;
+
+        if (characterController != null)
+        {
+            characterController.enabled = true;
+        }
+
+        SetCarryCollisionEnabled(true);
+
+        if (controller != null)
+        {
+            controller.IsInvincible = false;
+            controller.StopForcedMove();
+            controller.enablePlayerInput = false;
+            RefreshMoveSpeedFromState();
+        }
+
+        if (interactionUI != null)
+        {
+            interactionUI.ForceInterruptInteraction("New match reset");
+        }
+
+        if (rescueAutoTest != null)
+        {
+            rescueAutoTest.ForceInterruptAutoRescue("New match reset");
+        }
+
+        if (logStateChanges)
+        {
+            Debug.Log(gameObject.name + " reset for new match.");
         }
     }
 
