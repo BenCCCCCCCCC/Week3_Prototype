@@ -12,6 +12,7 @@ public class LobbyUIManager : MonoBehaviour
     public GameObject taskPanel;
     public GameObject loadoutPanel;
     public GameObject archivePanel;
+    public GameObject eventPanel;
 
     [Header("Header Texts")]
     public TMP_Text softCurrencyText;
@@ -21,6 +22,9 @@ public class LobbyUIManager : MonoBehaviour
 
     [Header("Home Info")]
     public TMP_Text recentMatchText;
+
+    [Header("7 Day Event UI")]
+    public TMP_Text sevenDayEventText;
 
     [Header("Fade")]
     public GameObject fadePanel;
@@ -107,6 +111,17 @@ public class LobbyUIManager : MonoBehaviour
         }
 
         SetOnlyActive(archivePanel);
+        RefreshAll();
+    }
+
+    public void ShowEvent()
+    {
+        if (lobbyRoot != null)
+        {
+            lobbyRoot.SetActive(true);
+        }
+
+        SetOnlyActive(eventPanel);
         RefreshAll();
     }
 
@@ -348,6 +363,7 @@ public class LobbyUIManager : MonoBehaviour
     {
         RefreshHeaderTexts();
         RefreshRecentMatchText();
+        RefreshSevenDayEventText();
 
         if (taskPanelUI != null)
         {
@@ -408,17 +424,77 @@ public class LobbyUIManager : MonoBehaviour
 
         recentMatchText.text =
             "Recent Match\n" +
-            "Soft +" + s.totalSoft +
-            " | Material +" + s.totalMaterial + "\n" +
+            "Soft +" + s.totalSoft + " | Material +" + s.totalMaterial + "\n" +
             "Tasks: " + s.completedTaskText + "\n" +
             "Loadout Extra: Soft +" + s.loadoutSoft + ", Material +" + s.loadoutMaterial;
     }
 
+    void RefreshSevenDayEventText()
+    {
+        if (sevenDayEventText == null)
+        {
+            return;
+        }
+
+        sevenDayEventText.text =
+            "7-Day Operation: Nightfile Initiation\n" +
+            "Entry Rule: Archive Lv. >= 2\n" +
+            "Duration: 7 natural days, starts at 04:00\n" +
+            "Weekly Bonus Rule: Complete at least 5 days out of 7\n\n" +
+
+            "Day 1 - Newcomer Day\n" +
+            "Goal: Complete matches. Rewards at 1 / 2 / 3 matches.\n\n" +
+
+            "Day 2 - Rescue / Intercept Day\n" +
+            "Survivor: Rescue 2 / 4 / 5 times.\n" +
+            "Hunter: Interrupt or stop rescue 2 / 4 / 5 times.\n\n" +
+
+            "Day 3 - Repair / Patrol Day\n" +
+            "Survivor: Repair contribution 60% / 140% / 200%.\n" +
+            "Hunter: Trigger patrol signal 3 / 7 / 10 times.\n\n" +
+
+            "Day 4 - Skill Day\n" +
+            "Goal: Use role skills 5 / 10 / 15 times.\n\n" +
+
+            "Day 5 - Limit Day\n" +
+            "Survivor: Escape while not downed 1 time.\n" +
+            "Hunter: Eliminate all active Survivors 1 time.\n\n" +
+
+            "Day 6 - Team / Pressure Day\n" +
+            "Survivor: Finish 1 match with 3 Survivors alive.\n" +
+            "Hunter: Down 2 Survivors within 30 seconds.\n\n" +
+
+            "Day 7 - Final Day\n" +
+            "Goal: Complete any one Day 1-6 objective again.\n\n" +
+
+            "Prototype Note: This Week 10 version is a static activity preview.";
+    }
+
     void SetOnlyActive(GameObject target)
     {
-        if (lobbyHomePanel != null) lobbyHomePanel.SetActive(lobbyHomePanel == target);
-        if (taskPanel != null) taskPanel.SetActive(taskPanel == target);
-        if (loadoutPanel != null) loadoutPanel.SetActive(loadoutPanel == target);
-        if (archivePanel != null) archivePanel.SetActive(archivePanel == target);
+        if (lobbyHomePanel != null)
+        {
+            lobbyHomePanel.SetActive(lobbyHomePanel == target);
+        }
+
+        if (taskPanel != null)
+        {
+            taskPanel.SetActive(taskPanel == target);
+        }
+
+        if (loadoutPanel != null)
+        {
+            loadoutPanel.SetActive(loadoutPanel == target);
+        }
+
+        if (archivePanel != null)
+        {
+            archivePanel.SetActive(archivePanel == target);
+        }
+
+        if (eventPanel != null)
+        {
+            eventPanel.SetActive(eventPanel == target);
+        }
     }
 }

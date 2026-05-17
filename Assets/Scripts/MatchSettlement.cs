@@ -37,8 +37,28 @@ public class MatchSettlement : MonoBehaviour
     [Header("Debug")]
     public bool logSettlement = true;
 
+    [Header("Week 10 Debug")]
+    public bool enableWeek10DebugSettleKey = true;
+    public KeyCode debugSettleKey = KeyCode.F9;
+
     public SettlementSummary lastSummary = new SettlementSummary();
-    public SettlementSummary LastSummary => lastSummary;
+
+    public SettlementSummary LastSummary
+    {
+        get
+        {
+            return lastSummary;
+        }
+    }
+
+    private void Update()
+    {
+        if (enableWeek10DebugSettleKey && Input.GetKeyDown(debugSettleKey))
+        {
+            Debug.Log("[Week10Demo] Force settlement triggered.");
+            SettleMatch();
+        }
+    }
 
     public void SettleMatch()
     {
@@ -57,6 +77,7 @@ public class MatchSettlement : MonoBehaviour
         MatchStats stats = MatchStatsManager.Instance.currentStats;
 
         lastSummary = new SettlementSummary();
+
         lastSummary.baseSoft = baseSoftReward;
         lastSummary.baseMaterial = baseMaterialReward;
 
@@ -65,33 +86,67 @@ public class MatchSettlement : MonoBehaviour
             lastSummary.winSoft = winSoftReward;
         }
 
+        bool abnormalMatch = IsAbnormalMatch();
+
+        if (abnormalMatch)
+        {
+            if (logSettlement)
+            {
+                Debug.Log("[RiskControl] Abnormal match detected. Task progress and task rewards are ignored.");
+            }
+        }
+
         List<string> completedTaskNames = new List<string>();
 
-        if (activeTasks != null && TaskChecker.Instance != null)
+        if (!abnormalMatch && activeTasks != null && TaskChecker.Instance != null)
         {
             for (int i = 0; i < activeTasks.Length; i++)
             {
                 TaskDefinition task = activeTasks[i];
-                if (task == null) continue;
+
+                if (task == null)
+                {
+                    continue;
+                }
+
+                if (!task.rewardEnabledInPrototype)
+                {
+                    continue;
+                }
 
                 bool completed = TaskChecker.Instance.IsTaskCompleted(task, stats);
-                if (!completed) continue;
+
+                if (!completed)
+                {
+                    continue;
+                }
 
                 completedTaskNames.Add(task.taskName);
+
                 lastSummary.taskSoft += task.softCurrencyReward;
                 lastSummary.totalPremium += task.premiumCurrencyReward;
                 lastSummary.taskMaterial += task.materialReward;
 
                 if (logSettlement)
                 {
-                    Debug.Log("Task completed: " + task.taskName);
+                    Debug.Log(
+                        "[TaskReward] task_id=" + task.taskId +
+                        ", BP=+" + task.softCurrencyReward +
+                        ", Ticket=+" + task.premiumCurrencyReward +
+                        ", Material=+" + task.materialReward
+                    );
                 }
             }
         }
 
-        lastSummary.completedTaskText = completedTaskNames.Count > 0
-            ? string.Join(", ", completedTaskNames)
-            : "None";
+        if (completedTaskNames.Count > 0)
+        {
+            lastSummary.completedTaskText = string.Join(", ", completedTaskNames);
+        }
+        else
+        {
+            lastSummary.completedTaskText = "None";
+        }
 
         if (settlementLoadout != null)
         {
@@ -139,5 +194,13 @@ public class MatchSettlement : MonoBehaviour
                 ", Material = " + lastSummary.totalMaterial
             );
         }
+    }
+
+    public bool IsAbnormalMatch()
+    {
+        // Week 10 prototype stub:
+        // This week only uses a client-side placeholder.
+        // The final version should validate abnormal matches on the server.
+        return false;
     }
 }
