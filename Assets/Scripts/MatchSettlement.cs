@@ -41,6 +41,8 @@ public class MatchSettlement : MonoBehaviour
     public bool enableWeek10DebugSettleKey = true;
     public KeyCode debugSettleKey = KeyCode.F9;
 
+    private bool hasSettledThisMatch = false;
+
     public SettlementSummary lastSummary = new SettlementSummary();
 
     public SettlementSummary LastSummary
@@ -60,8 +62,21 @@ public class MatchSettlement : MonoBehaviour
         }
     }
 
+    public void ResetSettlementLock()
+    {
+        hasSettledThisMatch = false;
+    }
+
     public void SettleMatch()
     {
+        if (hasSettledThisMatch)
+        {
+            Debug.LogWarning("MatchSettlement: This match has already been settled.");
+            return;
+        }
+
+        hasSettledThisMatch = true;
+
         if (MatchStatsManager.Instance == null)
         {
             Debug.LogWarning("MatchSettlement: MatchStatsManager not found.");
@@ -114,6 +129,19 @@ public class MatchSettlement : MonoBehaviour
                     continue;
                 }
 
+                int progress = TaskChecker.Instance.GetCurrentProgress(task, stats);
+
+                if (logSettlement)
+                {
+                    Debug.Log(
+                        "[TaskCheck] task_id=" + task.taskId +
+                        ", type=" + task.taskType +
+                        ", progress=" + progress +
+                        ", target=" + task.targetValue +
+                        ", rewardEnabled=" + task.rewardEnabledInPrototype
+                    );
+                }
+
                 bool completed = TaskChecker.Instance.IsTaskCompleted(task, stats);
 
                 if (!completed)
@@ -136,6 +164,13 @@ public class MatchSettlement : MonoBehaviour
                         ", Material=+" + task.materialReward
                     );
                 }
+            }
+        }
+        else
+        {
+            if (TaskChecker.Instance == null)
+            {
+                Debug.LogWarning("MatchSettlement: TaskChecker.Instance is null. Task rewards will not be checked.");
             }
         }
 
@@ -198,7 +233,7 @@ public class MatchSettlement : MonoBehaviour
 
     public bool IsAbnormalMatch()
     {
-        // Week 10 prototype stub:
+        // Week 10 prototype stub.
         // This week only uses a client-side placeholder.
         // The final version should validate abnormal matches on the server.
         return false;

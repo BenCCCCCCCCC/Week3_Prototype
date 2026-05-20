@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d0c57d25431fd4419dbcefaeec6692a, type: 3}
+  m_Name: MissionA
+  m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
+  taskId: D-S-01
+  taskName: Daily Repair Check
+  description: As Survivor, reach 50% total repair progress in one valid match.
+  taskLayer: 0
+  perspective: 1
+  counterpartTaskId: D-H-01
+  taskType: 2
+  targetValue: 50
+  triggerCondition: Survivor contributes repair progress to cipher machines in a
+    valid match.
+  completionRule: Complete when total repair progress reaches 50%. In Map2, completing
+    2 out of 4 cipher machines equals 50%.
+  progressReportFrequency: On match settlement
+  softCurrencyReward: 30
+  premiumCurrencyReward: 0
+  materialReward: 0
+  extraRewardText: 
+  rewardTiming: 0
+  canReset: 1
+  rewardEnabledInPrototype: 1
+  implementationNote: Runtime implemented in Week 10. Repair progress is checked
+    through TaskChecker and MatchStats totalRepairProgress.

@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d0c57d25431fd4419dbcefaeec6692a, type: 3}
+  m_Name: S-H-04
+  m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
+  taskId: 'S-H-04 '
+  taskName: 'Season Exit Defender '
+  description: 'As Hunter, prevent escape after gate unlock 15 times this season.
+
+'
+  taskLayer: 2
+  perspective: 2
+  counterpartTaskId: 'S-S-04 '
+  taskType: 16
+  targetValue: 50
+  triggerCondition: Survivor repairs cipher machines during a match.
+  completionRule: Complete when total repair progress reaches 50%.
+  progressReportFrequency: On match settlement
+  softCurrencyReward: 900
+  premiumCurrencyReward: 0
+  materialReward: 5
+  extraRewardText: 
+  rewardTiming: 2
+  canReset: 0
+  rewardEnabledInPrototype: 0
+  implementationNote: Displayed in Unity TaskPanel. Exit-defense counter needs a
+    later endgame event hook.

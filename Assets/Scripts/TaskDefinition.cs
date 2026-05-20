@@ -10,9 +10,7 @@ public enum TaskType
     GateOpenCountReach,
     EnvironmentInteractReach,
 
-    // Week 10 extended design-only task types.
-    // These can be displayed in TaskPanel now.
-    // They can be connected to real statistics in later weeks.
+    // Week 10 design-only / future-hook task types.
     MatchCompleteCountReach,
     SkillUseCountReach,
     PatrolSignalReach,
@@ -42,6 +40,8 @@ public enum TaskPerspective
 public enum TaskRewardTiming
 {
     OnMatchSettlement,
+    OnDailyClaim,
+    OnWeeklyClaim,
     OnActivityClaim,
     OnSeasonClaim
 }
@@ -81,7 +81,7 @@ public class TaskDefinition : ScriptableObject
     public int premiumCurrencyReward = 0;
     public int materialReward = 0;
 
-    [Tooltip("Used for title / appearance notes. It does not create a new currency or material.")]
+    [Tooltip("Text only. This does not create a new currency or material.")]
     public string extraRewardText = "";
 
     [Header("Reward Rule")]
@@ -93,7 +93,7 @@ public class TaskDefinition : ScriptableObject
     public bool rewardEnabledInPrototype = false;
 
     [TextArea]
-    public string implementationNote = "Documented and displayed in Unity. Runtime progress logic not fully connected in Week 10.";
+    public string implementationNote = "Displayed in Unity. Runtime progress logic is not fully connected in Week 10.";
 
     public string GetLayerText()
     {

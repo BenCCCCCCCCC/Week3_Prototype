@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d0c57d25431fd4419dbcefaeec6692a, type: 3}
+  m_Name: S-S-01
+  m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
+  taskId: 'S-S-01 '
+  taskName: 'Season Repair Specialist '
+  description: 'As Survivor, reach 2500% repair contribution this season.
+
+'
+  taskLayer: 2
+  perspective: 1
+  counterpartTaskId: 'S-H-01 '
+  taskType: 2
+  targetValue: 2500
+  triggerCondition: 'Survivor contributes repair progress to cipher machines in valid
+    season matches. Progress is added to the season total through ArchiveProgress-related
+    season tracking.
+
+'
+  completionRule: 'Complete when season repair contribution reaches 2500%.
+
+'
+  progressReportFrequency: 'On season profile update through ArchiveProgress.cs '
+  softCurrencyReward: 900
+  premiumCurrencyReward: 0
+  materialReward: 6
+  extraRewardText: 
+  rewardTiming: 2
+  canReset: 0
+  rewardEnabledInPrototype: 0
+  implementationNote: Displayed in Unity TaskPanel. Season aggregation is not fully
+    connected in Week 10. Season tab should show ArchiveProgress as the progress
+    source.

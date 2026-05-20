@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d0c57d25431fd4419dbcefaeec6692a, type: 3}
+  m_Name: W-X-01
+  m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
+  taskId: 'W-X-01 '
+  taskName: 'Weekly Participation '
+  description: 'Complete 10 valid matches across the week.
+
+'
+  taskLayer: 1
+  perspective: 0
+  counterpartTaskId: '-'
+  taskType: 7
+  targetValue: 10
+  triggerCondition: 'Player reaches match settlement in a valid match that is not
+    marked as abnormal.
+
+'
+  completionRule: 'Complete when weekly valid match count reaches 10.
+
+'
+  progressReportFrequency: 'On weekly profile update '
+  softCurrencyReward: 180
+  premiumCurrencyReward: 0
+  materialReward: 1
+  extraRewardText: 
+  rewardTiming: 2
+  canReset: 1
+  rewardEnabledInPrototype: 0
+  implementationNote: Displayed in Unity TaskPanel. Weekly match completion counter
+    is not fully connected in Week 10.

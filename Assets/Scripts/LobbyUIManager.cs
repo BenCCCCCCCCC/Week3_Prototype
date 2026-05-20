@@ -14,6 +14,10 @@ public class LobbyUIManager : MonoBehaviour
     public GameObject archivePanel;
     public GameObject eventPanel;
 
+    [Header("Optional Header Root")]
+    [Tooltip("Use this only if HeaderBar is outside LobbyRoot. If HeaderBar is inside LobbyRoot, this can be empty.")]
+    public GameObject headerBar;
+
     [Header("Header Texts")]
     public TMP_Text softCurrencyText;
     public TMP_Text premiumCurrencyText;
@@ -25,6 +29,9 @@ public class LobbyUIManager : MonoBehaviour
 
     [Header("7 Day Event UI")]
     public TMP_Text sevenDayEventText;
+
+    [TextArea(20, 80)]
+    public string sevenDayEventContent;
 
     [Header("Fade")]
     public GameObject fadePanel;
@@ -77,6 +84,11 @@ public class LobbyUIManager : MonoBehaviour
             lobbyRoot.SetActive(true);
         }
 
+        if (headerBar != null)
+        {
+            headerBar.SetActive(true);
+        }
+
         SetOnlyActive(lobbyHomePanel);
         RefreshAll();
     }
@@ -86,6 +98,11 @@ public class LobbyUIManager : MonoBehaviour
         if (lobbyRoot != null)
         {
             lobbyRoot.SetActive(true);
+        }
+
+        if (headerBar != null)
+        {
+            headerBar.SetActive(true);
         }
 
         SetOnlyActive(taskPanel);
@@ -99,6 +116,11 @@ public class LobbyUIManager : MonoBehaviour
             lobbyRoot.SetActive(true);
         }
 
+        if (headerBar != null)
+        {
+            headerBar.SetActive(true);
+        }
+
         SetOnlyActive(loadoutPanel);
         RefreshAll();
     }
@@ -110,6 +132,11 @@ public class LobbyUIManager : MonoBehaviour
             lobbyRoot.SetActive(true);
         }
 
+        if (headerBar != null)
+        {
+            headerBar.SetActive(true);
+        }
+
         SetOnlyActive(archivePanel);
         RefreshAll();
     }
@@ -119,6 +146,11 @@ public class LobbyUIManager : MonoBehaviour
         if (lobbyRoot != null)
         {
             lobbyRoot.SetActive(true);
+        }
+
+        if (headerBar != null)
+        {
+            headerBar.SetActive(true);
         }
 
         SetOnlyActive(eventPanel);
@@ -244,9 +276,19 @@ public class LobbyUIManager : MonoBehaviour
             matchManager.ResetMatchForNewRun();
         }
 
+        if (matchSettlement != null)
+        {
+            matchSettlement.ResetSettlementLock();
+        }
+
         if (lobbyRoot != null)
         {
             lobbyRoot.SetActive(false);
+        }
+
+        if (headerBar != null)
+        {
+            headerBar.SetActive(false);
         }
 
         SetGameplayEnabled(true);
@@ -283,6 +325,11 @@ public class LobbyUIManager : MonoBehaviour
         if (lobbyRoot != null)
         {
             lobbyRoot.SetActive(true);
+        }
+
+        if (headerBar != null)
+        {
+            headerBar.SetActive(true);
         }
 
         SetGameplayEnabled(false);
@@ -436,38 +483,10 @@ public class LobbyUIManager : MonoBehaviour
             return;
         }
 
-        sevenDayEventText.text =
-            "7-Day Operation: Nightfile Initiation\n" +
-            "Entry Rule: Archive Lv. >= 2\n" +
-            "Duration: 7 natural days, starts at 04:00\n" +
-            "Weekly Bonus Rule: Complete at least 5 days out of 7\n\n" +
-
-            "Day 1 - Newcomer Day\n" +
-            "Goal: Complete matches. Rewards at 1 / 2 / 3 matches.\n\n" +
-
-            "Day 2 - Rescue / Intercept Day\n" +
-            "Survivor: Rescue 2 / 4 / 5 times.\n" +
-            "Hunter: Interrupt or stop rescue 2 / 4 / 5 times.\n\n" +
-
-            "Day 3 - Repair / Patrol Day\n" +
-            "Survivor: Repair contribution 60% / 140% / 200%.\n" +
-            "Hunter: Trigger patrol signal 3 / 7 / 10 times.\n\n" +
-
-            "Day 4 - Skill Day\n" +
-            "Goal: Use role skills 5 / 10 / 15 times.\n\n" +
-
-            "Day 5 - Limit Day\n" +
-            "Survivor: Escape while not downed 1 time.\n" +
-            "Hunter: Eliminate all active Survivors 1 time.\n\n" +
-
-            "Day 6 - Team / Pressure Day\n" +
-            "Survivor: Finish 1 match with 3 Survivors alive.\n" +
-            "Hunter: Down 2 Survivors within 30 seconds.\n\n" +
-
-            "Day 7 - Final Day\n" +
-            "Goal: Complete any one Day 1-6 objective again.\n\n" +
-
-            "Prototype Note: This Week 10 version is a static activity preview.";
+        if (!string.IsNullOrWhiteSpace(sevenDayEventContent))
+        {
+            sevenDayEventText.text = sevenDayEventContent;
+        }
     }
 
     void SetOnlyActive(GameObject target)

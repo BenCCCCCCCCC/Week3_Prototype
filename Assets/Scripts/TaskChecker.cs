@@ -61,9 +61,9 @@ public class TaskChecker : MonoBehaviour
             case TaskType.EnvironmentInteractReach:
                 return stats.environmentInteractCount;
 
-            // These are Week 10 full design tasks.
-            // They are displayed in Unity now.
-            // Their real statistics should be connected in later implementation.
+            // Week 10 design-only task types.
+            // They can be shown in TaskPanelUI now.
+            // Their real counters should be connected later.
             case TaskType.MatchCompleteCountReach:
                 return 0;
 

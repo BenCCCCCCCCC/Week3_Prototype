@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d0c57d25431fd4419dbcefaeec6692a, type: 3}
+  m_Name: D-H-02
+  m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
+  taskId: 'D-H-02 '
+  taskName: 'Rescue Interruption '
+  description: 'As Hunter, stop 1 rescue attempt in one valid match.
+
+'
+  taskLayer: 0
+  perspective: 2
+  counterpartTaskId: 'D-S-02 '
+  taskType: 10
+  targetValue: 1
+  triggerCondition: 'Hunter interrupts a rescue attempt by hitting, downing, carrying,
+    or re-securing a Survivor during the rescue window in a valid match.
+
+'
+  completionRule: 'Complete when prevented rescue count reaches 1.
+
+'
+  progressReportFrequency: On match settlement
+  softCurrencyReward: 40
+  premiumCurrencyReward: 0
+  materialReward: 0
+  extraRewardText: 
+  rewardTiming: 0
+  canReset: 1
+  rewardEnabledInPrototype: 0
+  implementationNote: Displayed in Unity TaskPanel. Prevent-rescue event counting
+    needs a later event hook.

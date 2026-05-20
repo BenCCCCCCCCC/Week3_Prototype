@@ -10,18 +10,25 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4d0c57d25431fd4419dbcefaeec6692a, type: 3}
-  m_Name: MissionA
+  m_Name: D-X-02
   m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
-  taskId: D-S-01
-  taskName: Daily Repair Check
-  description: As Survivor, reach 50% total repair progress in one match.
+  taskId: 'D-X-02 '
+  taskName: 'Skill Familiarity '
+  description: 'Use role skills 3 times in one valid match.
+
+'
   taskLayer: 0
-  perspective: 1
-  counterpartTaskId: D-H-01
-  taskType: 2
-  targetValue: 50
-  triggerCondition: Survivor repairs cipher machines during a match.
-  completionRule: Complete when total repair progress reaches 50%.
+  perspective: 0
+  counterpartTaskId: '-'
+  taskType: 8
+  targetValue: 3
+  triggerCondition: 'Player activates a role skill in a valid match, including Survivor
+    dash, Hunter slow ray, or Hunter detection skill.
+
+'
+  completionRule: 'Complete when skill use count reaches 3.
+
+'
   progressReportFrequency: On match settlement
   softCurrencyReward: 30
   premiumCurrencyReward: 0
@@ -29,6 +36,6 @@ MonoBehaviour:
   extraRewardText: 
   rewardTiming: 0
   canReset: 1
-  rewardEnabledInPrototype: 1
-  implementationNote: Documented and displayed in Unity. Runtime progress logic not
-    fully connected in Week 10.
+  rewardEnabledInPrototype: 0
+  implementationNote: Displayed in Unity TaskPanel. Skill-use counter needs a later
+    shared event hook.

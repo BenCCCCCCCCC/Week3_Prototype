@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d0c57d25431fd4419dbcefaeec6692a, type: 3}
+  m_Name: D-S-02
+  m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
+  taskId: 'D-S-02 '
+  taskName: 'Emergency Rescue '
+  description: 'As Survivor, rescue 1 teammate from chair in one valid match.
+
+'
+  taskLayer: 0
+  perspective: 1
+  counterpartTaskId: 'D-H-02 '
+  taskType: 1
+  targetValue: 1
+  triggerCondition: 'Survivor completes a rescue interaction on a chaired teammate
+    in a valid match.
+
+'
+  completionRule: 'Complete when rescue count reaches 1. Rescuing the same teammate
+    multiple times in one match should only count once in the formal anti-farming
+    rule.
+
+'
+  progressReportFrequency: On match settlement
+  softCurrencyReward: 40
+  premiumCurrencyReward: 0
+  materialReward: 0
+  extraRewardText: 
+  rewardTiming: 0
+  canReset: 1
+  rewardEnabledInPrototype: 1
+  implementationNote: Displayed in Unity TaskPanel. Runtime reward is disabled in
+    Week 10 because rescue counting is not fully connected to the daily task reward
+    flow.

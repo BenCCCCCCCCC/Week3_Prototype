@@ -14,18 +14,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
   taskId: D-H-01
   taskName: Daily Hunter Pressure
-  description: As Hunter, hit Survivors 2 times in one match.
+  description: As Hunter, down Survivors 2 times in one valid match.
   taskLayer: 0
   perspective: 2
   counterpartTaskId: D-S-01
-  taskType: 3
+  taskType: 4
   targetValue: 2
-  triggerCondition: Hunter hits Survivors with basic attack.
-  completionRule: Complete when Hunter hit count reaches 2.
+  triggerCondition: 'Hunter downs Survivors in a valid match.
+
+'
+  completionRule: Complete when Hunter down count reaches 2. The same Survivor should
+    only count once per match in the formal anti-farming rule.
   progressReportFrequency: On match settlement
   softCurrencyReward: 30
   premiumCurrencyReward: 0
   materialReward: 0
+  extraRewardText: 
   rewardTiming: 0
   canReset: 1
   rewardEnabledInPrototype: 1
+  implementationNote: Runtime task for Week 10. If current prototype uses HunterHitCountReach
+    instead of DownCountReach for demonstration, record this difference in the document-implementation
+    self-check table.

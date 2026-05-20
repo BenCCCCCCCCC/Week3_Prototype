@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d0c57d25431fd4419dbcefaeec6692a, type: 3}
+  m_Name: W-S-01
+  m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
+  taskId: 'W-S-01 '
+  taskName: 'Season Repair Specialist '
+  description: 'As Survivor, reach 2500% repair contribution this season.
+
+'
+  taskLayer: 1
+  perspective: 1
+  counterpartTaskId: 'W-H-01 '
+  taskType: 1
+  targetValue: 5
+  triggerCondition: 'Survivor completes a rescue interaction on a chaired teammate
+    in a valid match. The rescued teammate ID is recorded for weekly aggregation.
+
+'
+  completionRule: 'Complete when weekly rescue count reaches 5. Rescuing the same
+    teammate multiple times in one match only counts once.
+
+'
+  progressReportFrequency: 'On weekly profile update '
+  softCurrencyReward: 200
+  premiumCurrencyReward: 0
+  materialReward: 2
+  extraRewardText: 
+  rewardTiming: 2
+  canReset: 1
+  rewardEnabledInPrototype: 0
+  implementationNote: Displayed in Unity TaskPanel. Weekly aggregation is not fully
+    connected in Week 10.

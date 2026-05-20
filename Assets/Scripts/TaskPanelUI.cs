@@ -6,6 +6,7 @@ public class TaskPanelUI : MonoBehaviour
 {
     [Header("References")]
     public MatchSettlement matchSettlement;
+    public ArchiveProgress archiveProgress;
     public TMP_Text activeTasksText;
     public TMP_Text lastCompletedTasksText;
 
@@ -34,6 +35,7 @@ public class TaskPanelUI : MonoBehaviour
         currentLayer = TaskLayer.Season;
         Refresh();
     }
+
     public void Refresh()
     {
         if (activeTasksText != null)
@@ -56,11 +58,31 @@ public class TaskPanelUI : MonoBehaviour
 
     string BuildTaskListText()
     {
+        StringBuilder sb = new StringBuilder();
+
+        sb.AppendLine("TASK LAYER: " + GetCurrentLayerTitle().ToUpper());
+
+        if (currentLayer == TaskLayer.Daily)
+        {
+            sb.AppendLine("Refresh: Daily 04:00 | Active: 3 per day | Pool shown: 6");
+        }
+        else if (currentLayer == TaskLayer.Weekly)
+        {
+            sb.AppendLine("Refresh: Monday 04:00 | Active: 5 per week | Pool shown: 6");
+        }
+        else
+        {
+            int level = GetArchiveLevel();
+            sb.AppendLine("Season Progress Source: ArchiveProgress.cs");
+            sb.AppendLine("Archive Level: " + level + " | Entry Rule: Archive Lv. >= 2 | Pool shown: 10");
+        }
+
+        sb.AppendLine("────────────────────────────────────────────");
+
         if (matchSettlement == null || matchSettlement.activeTasks == null || matchSettlement.activeTasks.Length == 0)
         {
-            return "Task Layer: " + GetCurrentLayerTitle() + "\n" +
-                   "--------------------------------\n" +
-                   "No active tasks.";
+            sb.AppendLine("No active tasks assigned.");
+            return sb.ToString();
         }
 
         MatchStats stats = null;
@@ -69,11 +91,6 @@ public class TaskPanelUI : MonoBehaviour
         {
             stats = MatchStatsManager.Instance.currentStats;
         }
-
-        StringBuilder sb = new StringBuilder();
-
-        sb.AppendLine("Task Layer: " + GetCurrentLayerTitle());
-        sb.AppendLine("--------------------------------");
 
         int shownCount = 0;
 
@@ -95,9 +112,8 @@ public class TaskPanelUI : MonoBehaviour
 
             sb.AppendLine();
             sb.AppendLine(shownCount + ". [" + task.taskId + "] " + task.taskName);
-            sb.AppendLine("Perspective: " + task.GetPerspectiveText());
-            sb.AppendLine("Counterpart: " + task.counterpartTaskId);
-            sb.AppendLine("Condition: " + task.completionRule);
+            sb.AppendLine("Role: " + task.GetPerspectiveText() + "    Pair: " + task.counterpartTaskId);
+            sb.AppendLine("Target: " + BuildCompactTargetText(task));
 
             if (TaskChecker.Instance != null && stats != null)
             {
@@ -108,17 +124,15 @@ public class TaskPanelUI : MonoBehaviour
                 sb.AppendLine("Progress: 0 / " + task.targetValue);
             }
 
-            sb.AppendLine("Reward: " + task.GetRewardText());
-            sb.AppendLine("Report: " + task.progressReportFrequency);
+            sb.AppendLine("Reward: " + task.GetRewardText() + "    Claim: " + task.rewardTiming);
+            sb.AppendLine("Reset: " + task.canReset + "    Status: " + BuildRuntimeStatusText(task));
 
-            if (!task.rewardEnabledInPrototype)
+            if (!string.IsNullOrWhiteSpace(task.implementationNote))
             {
-                sb.AppendLine("Prototype Status: Display only, no runtime reward.");
+                sb.AppendLine("Note: " + BuildShortNote(task.implementationNote));
             }
-            else
-            {
-                sb.AppendLine("Prototype Status: Runtime reward enabled.");
-            }
+
+            sb.AppendLine("────────────────────────────────────────────");
         }
 
         if (shownCount == 0)
@@ -128,6 +142,101 @@ public class TaskPanelUI : MonoBehaviour
         }
 
         return sb.ToString();
+    }
+
+    string BuildCompactTargetText(TaskDefinition task)
+    {
+        if (task == null)
+        {
+            return "-";
+        }
+
+        switch (task.taskType)
+        {
+            case TaskType.RepairProgressReach:
+                return "Repair contribution >= " + task.targetValue + "%";
+
+            case TaskType.HunterHitCountReach:
+                return "Hunter hits >= " + task.targetValue;
+
+            case TaskType.DownCountReach:
+                return "Hunter downs >= " + task.targetValue;
+
+            case TaskType.RescueCountReach:
+                return "Rescues >= " + task.targetValue;
+
+            case TaskType.PreventRescueReach:
+                return "Prevent rescues >= " + task.targetValue;
+
+            case TaskType.MatchCompleteCountReach:
+                return "Valid matches >= " + task.targetValue;
+
+            case TaskType.SkillUseCountReach:
+                return "Skill uses >= " + task.targetValue;
+
+            case TaskType.PatrolSignalReach:
+                return "Patrol signals >= " + task.targetValue;
+
+            case TaskType.GateOpenCountReach:
+                return "Gate opens >= " + task.targetValue;
+
+            case TaskType.EscapeOnce:
+                return "Escapes >= " + task.targetValue;
+
+            case TaskType.SeasonWinCountReach:
+                return "Season wins >= " + task.targetValue;
+
+            case TaskType.CustomDesignOnly:
+                return "Custom objective >= " + task.targetValue;
+
+            default:
+                return task.completionRule;
+        }
+    }
+
+    string BuildRuntimeStatusText(TaskDefinition task)
+    {
+        if (task == null)
+        {
+            return "Unknown";
+        }
+
+        if (task.rewardEnabledInPrototype)
+        {
+            return "Runtime reward enabled";
+        }
+
+        return "Displayed only";
+    }
+
+    string BuildShortNote(string note)
+    {
+        if (string.IsNullOrWhiteSpace(note))
+        {
+            return "";
+        }
+
+        if (note.Length <= 90)
+        {
+            return note;
+        }
+
+        return note.Substring(0, 90) + "...";
+    }
+
+    int GetArchiveLevel()
+    {
+        if (archiveProgress != null)
+        {
+            return archiveProgress.archiveLevel;
+        }
+
+        if (ArchiveProgress.Instance != null)
+        {
+            return ArchiveProgress.Instance.archiveLevel;
+        }
+
+        return 0;
     }
 
     string GetCurrentLayerTitle()

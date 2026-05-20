@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d0c57d25431fd4419dbcefaeec6692a, type: 3}
+  m_Name: W-H-01
+  m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
+  taskId: 'W-H-01 '
+  taskName: 'Weekly Rescue Lockdown '
+  description: 'As Hunter, stop 5 rescue attempts across the week.
+
+'
+  taskLayer: 1
+  perspective: 2
+  counterpartTaskId: 'W-S-01 '
+  taskType: 10
+  targetValue: 5
+  triggerCondition: 'Hunter interrupts a rescue attempt by hitting, downing, carrying,
+    or re-securing a Survivor during the rescue window in a valid match.
+
+'
+  completionRule: 'Complete when weekly prevented rescue count reaches 5.
+
+'
+  progressReportFrequency: 'On weekly profile update '
+  softCurrencyReward: 200
+  premiumCurrencyReward: 0
+  materialReward: 2
+  extraRewardText: 
+  rewardTiming: 2
+  canReset: 1
+  rewardEnabledInPrototype: 0
+  implementationNote: Displayed in Unity TaskPanel. Prevent-rescue counting and weekly
+    aggregation need later hooks.
