@@ -22,9 +22,10 @@ MonoBehaviour:
   counterpartTaskId: S-S-04
   taskType: 16
   targetValue: 15
-  triggerCondition: Survivor repairs cipher machines during a match.
-  completionRule: Complete when total repair progress reaches 50%.
-  progressReportFrequency: On match settlement
+  triggerCondition: Hunter downs, chairs, or eliminates a Survivor after the gate
+    has been unlocked in a valid season match.
+  completionRule: Complete when season exit defense count reaches 15.
+  progressReportFrequency: On season profile update through ArchiveProgress.cs
   softCurrencyReward: 900
   premiumCurrencyReward: 0
   materialReward: 5

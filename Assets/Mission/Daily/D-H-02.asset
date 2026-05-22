@@ -26,7 +26,7 @@ MonoBehaviour:
     or re-securing a Survivor during the rescue window in a valid match.
   completionRule: Complete when prevented rescue count reaches 1.
   progressReportFrequency: On match settlement
-  softCurrencyReward: 40
+  softCurrencyReward: 30
   premiumCurrencyReward: 0
   materialReward: 0
   extraRewardText: 

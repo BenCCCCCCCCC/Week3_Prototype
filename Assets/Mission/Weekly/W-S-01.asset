@@ -13,10 +13,8 @@ MonoBehaviour:
   m_Name: W-S-01
   m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
   taskId: W-S-01
-  taskName: Season Repair Specialist
-  description: 'As Survivor, reach 2500% repair contribution this season.
-
-'
+  taskName: Weekly Rescue Route
+  description: As Survivor, rescue 5 different teammates across the week.
   taskLayer: 1
   perspective: 1
   counterpartTaskId: W-H-01

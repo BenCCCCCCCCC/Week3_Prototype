@@ -28,13 +28,13 @@ MonoBehaviour:
     multiple times in one match should only count once in the formal anti-farming
     rule.
   progressReportFrequency: On match settlement
-  softCurrencyReward: 40
+  softCurrencyReward: 30
   premiumCurrencyReward: 0
   materialReward: 0
   extraRewardText: 
   rewardTiming: 0
   canReset: 1
-  rewardEnabledInPrototype: 1
+  rewardEnabledInPrototype: 0
   implementationNote: Displayed in Unity TaskPanel. Runtime reward is disabled in
     Week 10 because rescue counting is not fully connected to the daily task reward
     flow.

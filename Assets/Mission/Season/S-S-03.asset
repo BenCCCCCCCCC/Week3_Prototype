@@ -28,7 +28,7 @@ MonoBehaviour:
   progressReportFrequency: On season profile update through ArchiveProgress.cs
   softCurrencyReward: 1200
   premiumCurrencyReward: 0
-  materialReward: 0
+  materialReward: 8
   extraRewardText: 'Limited title: Night Runner '
   rewardTiming: 4
   canReset: 0

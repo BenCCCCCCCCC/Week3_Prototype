@@ -25,7 +25,7 @@ MonoBehaviour:
   triggerCondition: Player activates any role skill in a valid match, including Survivor
     dash, Hunter slow ray, or Hunter detection skill.
   completionRule: Complete when weekly skill use count reaches 30.
-  progressReportFrequency: On match settlement
+  progressReportFrequency: On weekly profile update
   softCurrencyReward: 180
   premiumCurrencyReward: 0
   materialReward: 1
