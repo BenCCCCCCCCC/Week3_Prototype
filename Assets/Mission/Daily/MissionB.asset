@@ -20,9 +20,7 @@ MonoBehaviour:
   counterpartTaskId: D-S-01
   taskType: 4
   targetValue: 2
-  triggerCondition: 'Hunter downs Survivors in a valid match.
-
-'
+  triggerCondition: Hunter downs Survivors in a valid match.
   completionRule: Complete when Hunter down count reaches 2. The same Survivor should
     only count once per match in the formal anti-farming rule.
   progressReportFrequency: On match settlement

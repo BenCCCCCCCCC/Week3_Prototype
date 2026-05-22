@@ -12,16 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d0c57d25431fd4419dbcefaeec6692a, type: 3}
   m_Name: S-H-04
   m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
-  taskId: 'S-H-04 '
-  taskName: 'Season Exit Defender '
+  taskId: S-H-04
+  taskName: Season Exit Defender
   description: 'As Hunter, prevent escape after gate unlock 15 times this season.
 
 '
   taskLayer: 2
   perspective: 2
-  counterpartTaskId: 'S-S-04 '
+  counterpartTaskId: S-S-04
   taskType: 16
-  targetValue: 50
+  targetValue: 15
   triggerCondition: Survivor repairs cipher machines during a match.
   completionRule: Complete when total repair progress reaches 50%.
   progressReportFrequency: On match settlement
@@ -29,7 +29,7 @@ MonoBehaviour:
   premiumCurrencyReward: 0
   materialReward: 5
   extraRewardText: 
-  rewardTiming: 2
+  rewardTiming: 4
   canReset: 0
   rewardEnabledInPrototype: 0
   implementationNote: Displayed in Unity TaskPanel. Exit-defense counter needs a

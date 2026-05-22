@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d0c57d25431fd4419dbcefaeec6692a, type: 3}
   m_Name: S-X-01
   m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
-  taskId: 'S-X-01 '
-  taskName: 'Season Participation '
+  taskId: S-X-01
+  taskName: Season Participation
   description: 'Complete 50 valid matches this season.
 
 '
@@ -22,19 +22,15 @@ MonoBehaviour:
   counterpartTaskId: '-'
   taskType: 7
   targetValue: 50
-  triggerCondition: 'Player reaches match settlement in a valid season match that
+  triggerCondition: Player reaches match settlement in a valid season match that
     is not marked as abnormal.
-
-'
-  completionRule: 'Complete when season valid match count reaches 50.
-
-'
-  progressReportFrequency: 'On season profile update through ArchiveProgress.cs '
+  completionRule: Complete when season valid match count reaches 50.
+  progressReportFrequency: On season profile update through ArchiveProgress.cs
   softCurrencyReward: 1500
   premiumCurrencyReward: 0
   materialReward: 10
   extraRewardText: 'Limited title: Archive Regular '
-  rewardTiming: 2
+  rewardTiming: 4
   canReset: 0
   rewardEnabledInPrototype: 0
   implementationNote: Displayed in Unity TaskPanel. Season participation count is

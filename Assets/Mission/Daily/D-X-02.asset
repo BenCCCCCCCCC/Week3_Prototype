@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d0c57d25431fd4419dbcefaeec6692a, type: 3}
   m_Name: D-X-02
   m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
-  taskId: 'D-X-02 '
-  taskName: 'Skill Familiarity '
+  taskId: D-X-02
+  taskName: Skill Familiarity
   description: 'Use role skills 3 times in one valid match.
 
 '
@@ -22,13 +22,9 @@ MonoBehaviour:
   counterpartTaskId: '-'
   taskType: 8
   targetValue: 3
-  triggerCondition: 'Player activates a role skill in a valid match, including Survivor
+  triggerCondition: Player activates a role skill in a valid match, including Survivor
     dash, Hunter slow ray, or Hunter detection skill.
-
-'
-  completionRule: 'Complete when skill use count reaches 3.
-
-'
+  completionRule: Complete when skill use count reaches 3.
   progressReportFrequency: On match settlement
   softCurrencyReward: 30
   premiumCurrencyReward: 0

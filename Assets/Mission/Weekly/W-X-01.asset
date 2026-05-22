@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d0c57d25431fd4419dbcefaeec6692a, type: 3}
   m_Name: W-X-01
   m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
-  taskId: 'W-X-01 '
-  taskName: 'Weekly Participation '
+  taskId: W-X-01
+  taskName: Weekly Participation
   description: 'Complete 10 valid matches across the week.
 
 '
@@ -22,14 +22,10 @@ MonoBehaviour:
   counterpartTaskId: '-'
   taskType: 7
   targetValue: 10
-  triggerCondition: 'Player reaches match settlement in a valid match that is not
+  triggerCondition: Player reaches match settlement in a valid match that is not
     marked as abnormal.
-
-'
-  completionRule: 'Complete when weekly valid match count reaches 10.
-
-'
-  progressReportFrequency: 'On weekly profile update '
+  completionRule: Complete when weekly valid match count reaches 10.
+  progressReportFrequency: On weekly profile update
   softCurrencyReward: 180
   premiumCurrencyReward: 0
   materialReward: 1

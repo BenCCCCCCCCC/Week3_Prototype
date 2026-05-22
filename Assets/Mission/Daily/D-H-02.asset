@@ -12,23 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d0c57d25431fd4419dbcefaeec6692a, type: 3}
   m_Name: D-H-02
   m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
-  taskId: 'D-H-02 '
-  taskName: 'Rescue Interruption '
+  taskId: D-H-02
+  taskName: Rescue Interruption
   description: 'As Hunter, stop 1 rescue attempt in one valid match.
 
 '
   taskLayer: 0
   perspective: 2
-  counterpartTaskId: 'D-S-02 '
+  counterpartTaskId: D-S-02
   taskType: 10
   targetValue: 1
-  triggerCondition: 'Hunter interrupts a rescue attempt by hitting, downing, carrying,
+  triggerCondition: Hunter interrupts a rescue attempt by hitting, downing, carrying,
     or re-securing a Survivor during the rescue window in a valid match.
-
-'
-  completionRule: 'Complete when prevented rescue count reaches 1.
-
-'
+  completionRule: Complete when prevented rescue count reaches 1.
   progressReportFrequency: On match settlement
   softCurrencyReward: 40
   premiumCurrencyReward: 0

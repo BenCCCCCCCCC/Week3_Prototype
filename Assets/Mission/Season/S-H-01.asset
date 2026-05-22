@@ -12,29 +12,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d0c57d25431fd4419dbcefaeec6692a, type: 3}
   m_Name: S-H-01
   m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
-  taskId: 'S-H-01 '
-  taskName: 'Season Hunt Specialist '
+  taskId: S-H-01
+  taskName: Season Hunt Specialist
   description: 'As Hunter, down 40 different Survivor instances this season.
 
 '
   taskLayer: 2
   perspective: 2
-  counterpartTaskId: 'S-S-01 '
+  counterpartTaskId: S-S-01
   taskType: 4
   targetValue: 40
-  triggerCondition: 'Hunter downs a Survivor in a valid season match. Each Survivor
+  triggerCondition: Hunter downs a Survivor in a valid season match. Each Survivor
     ID can only count once per match for this season task.
-
-'
-  completionRule: 'Complete when season down count reaches 40.
-
-'
-  progressReportFrequency: 'On season profile update through ArchiveProgress.cs '
+  completionRule: Complete when season down count reaches 40.
+  progressReportFrequency: On season profile update through ArchiveProgress.cs
   softCurrencyReward: 900
   premiumCurrencyReward: 0
   materialReward: 6
   extraRewardText: 
-  rewardTiming: 2
+  rewardTiming: 4
   canReset: 0
   rewardEnabledInPrototype: 0
   implementationNote: Displayed in Unity TaskPanel. Season down-count aggregation

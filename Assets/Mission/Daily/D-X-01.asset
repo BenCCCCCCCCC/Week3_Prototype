@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d0c57d25431fd4419dbcefaeec6692a, type: 3}
   m_Name: D-X-01
   m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
-  taskId: 'D-X-01 '
-  taskName: 'One Match Warm-Up '
+  taskId: D-X-01
+  taskName: One Match Warm-Up
   description: 'Complete 1 valid match regardless of win or loss.
 
 '
@@ -22,13 +22,9 @@ MonoBehaviour:
   counterpartTaskId: '-'
   taskType: 7
   targetValue: 1
-  triggerCondition: 'Player reaches match settlement in a valid match that is not
+  triggerCondition: Player reaches match settlement in a valid match that is not
     marked as abnormal.
-
-'
-  completionRule: 'Complete when valid match completion count reaches 1.
-
-'
+  completionRule: Complete when valid match completion count reaches 1.
   progressReportFrequency: On match settlement
   softCurrencyReward: 20
   premiumCurrencyReward: 0

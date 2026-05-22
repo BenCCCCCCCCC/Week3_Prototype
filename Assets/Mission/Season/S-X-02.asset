@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d0c57d25431fd4419dbcefaeec6692a, type: 3}
   m_Name: S-X-02
   m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
-  taskId: 'S-X-02 '
-  taskName: 'Season Skill Mastery '
+  taskId: S-X-02
+  taskName: Season Skill Mastery
   description: 'Use role skills 150 times this season.
 
 '
@@ -22,19 +22,15 @@ MonoBehaviour:
   counterpartTaskId: '-'
   taskType: 8
   targetValue: 150
-  triggerCondition: 'Player activates any role skill in a valid season match, including
+  triggerCondition: Player activates any role skill in a valid season match, including
     Survivor dash, Hunter slow ray, or Hunter detection skill.
-
-'
-  completionRule: 'Complete when season skill use count reaches 150.
-
-'
-  progressReportFrequency: 'On season profile update through ArchiveProgress.cs '
+  completionRule: Complete when season skill use count reaches 150.
+  progressReportFrequency: On season profile update through ArchiveProgress.cs
   softCurrencyReward: 1000
   premiumCurrencyReward: 0
   materialReward: 5
   extraRewardText: 
-  rewardTiming: 2
+  rewardTiming: 4
   canReset: 0
   rewardEnabledInPrototype: 0
   implementationNote: Displayed in Unity TaskPanel. Season skill-use aggregation

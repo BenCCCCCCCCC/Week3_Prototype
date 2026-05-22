@@ -12,29 +12,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d0c57d25431fd4419dbcefaeec6692a, type: 3}
   m_Name: S-S-04
   m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
-  taskId: 'S-S-04 '
-  taskName: 'Season Gate Opener '
+  taskId: S-S-04
+  taskName: Season Gate Opener
   description: 'As Survivor, open 15 gates this season.
 
 '
   taskLayer: 2
   perspective: 1
-  counterpartTaskId: 'S-H-04 '
+  counterpartTaskId: S-H-04
   taskType: 5
   targetValue: 15
-  triggerCondition: 'Survivor completes a gate-opening interaction after the required
+  triggerCondition: Survivor completes a gate-opening interaction after the required
     number of cipher machines has been completed in a valid season match.
-
-'
-  completionRule: 'Complete when season gate open count reaches 15.
-
-'
-  progressReportFrequency: 'On season profile update through ArchiveProgress.cs '
+  completionRule: Complete when season gate open count reaches 15.
+  progressReportFrequency: On season profile update through ArchiveProgress.cs
   softCurrencyReward: 900
   premiumCurrencyReward: 0
   materialReward: 5
   extraRewardText: 
-  rewardTiming: 2
+  rewardTiming: 4
   canReset: 0
   rewardEnabledInPrototype: 0
   implementationNote: Displayed in Unity TaskPanel. Season gate-open count is not

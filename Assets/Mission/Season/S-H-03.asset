@@ -12,29 +12,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d0c57d25431fd4419dbcefaeec6692a, type: 3}
   m_Name: S-H-03
   m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
-  taskId: 'S-H-03 '
-  taskName: 'Season Lockdown Route '
+  taskId: S-H-03
+  taskName: Season Lockdown Route
   description: 'As Hunter, win 20 valid matches this season.
 
 '
   taskLayer: 2
   perspective: 2
-  counterpartTaskId: 'S-S-03 '
+  counterpartTaskId: S-S-03
   taskType: 15
   targetValue: 20
-  triggerCondition: 'Hunter reaches match settlement with a Hunter win result in
-    a valid season match.
-
-'
-  completionRule: 'Complete when season Hunter win count reaches 20.
-
-'
-  progressReportFrequency: 'On season profile update through ArchiveProgress.cs '
+  triggerCondition: Hunter reaches match settlement with a Hunter win result in a
+    valid season match.
+  completionRule: Complete when season Hunter win count reaches 20.
+  progressReportFrequency: On season profile update through ArchiveProgress.cs
   softCurrencyReward: 1200
   premiumCurrencyReward: 0
   materialReward: 8
   extraRewardText: 'Limited title: Night Warden '
-  rewardTiming: 2
+  rewardTiming: 4
   canReset: 0
   rewardEnabledInPrototype: 0
   implementationNote: Displayed in Unity TaskPanel. Season Hunter win count is not

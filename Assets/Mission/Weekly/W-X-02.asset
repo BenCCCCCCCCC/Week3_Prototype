@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d0c57d25431fd4419dbcefaeec6692a, type: 3}
   m_Name: W-X-02
   m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
-  taskId: 'W-X-02 '
-  taskName: 'Weekly Skill Practice '
+  taskId: W-X-02
+  taskName: Weekly Skill Practice
   description: 'Use role skills 30 times across the week.
 
 '
@@ -22,13 +22,9 @@ MonoBehaviour:
   counterpartTaskId: '-'
   taskType: 8
   targetValue: 30
-  triggerCondition: 'Player activates any role skill in a valid match, including
-    Survivor dash, Hunter slow ray, or Hunter detection skill.
-
-'
-  completionRule: 'Complete when weekly skill use count reaches 30.
-
-'
+  triggerCondition: Player activates any role skill in a valid match, including Survivor
+    dash, Hunter slow ray, or Hunter detection skill.
+  completionRule: Complete when weekly skill use count reaches 30.
   progressReportFrequency: On match settlement
   softCurrencyReward: 180
   premiumCurrencyReward: 0

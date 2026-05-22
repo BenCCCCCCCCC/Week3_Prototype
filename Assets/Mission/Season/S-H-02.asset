@@ -12,29 +12,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d0c57d25431fd4419dbcefaeec6692a, type: 3}
   m_Name: S-H-02
   m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
-  taskId: 'S-H-02 '
-  taskName: 'Season Rescue Denial '
+  taskId: S-H-02
+  taskName: Season Rescue Denial
   description: 'As Hunter, stop 30 rescue attempts this season.
 
 '
   taskLayer: 2
   perspective: 2
-  counterpartTaskId: 'S-S-02 '
+  counterpartTaskId: S-S-02
   taskType: 10
   targetValue: 30
-  triggerCondition: 'Hunter prevents a rescue attempt during the rescue window in
+  triggerCondition: Hunter prevents a rescue attempt during the rescue window in
     a valid season match by hitting, downing, carrying, or re-securing the target.
-
-'
-  completionRule: 'Complete when season prevented rescue count reaches 30.
-
-'
-  progressReportFrequency: 'On season profile update through ArchiveProgress.cs '
+  completionRule: Complete when season prevented rescue count reaches 30.
+  progressReportFrequency: On season profile update through ArchiveProgress.cs
   softCurrencyReward: 1000
   premiumCurrencyReward: 0
   materialReward: 8
   extraRewardText: 
-  rewardTiming: 2
+  rewardTiming: 4
   canReset: 0
   rewardEnabledInPrototype: 0
   implementationNote: Displayed in Unity TaskPanel. Prevent-rescue aggregation needs

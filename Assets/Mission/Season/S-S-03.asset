@@ -12,29 +12,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d0c57d25431fd4419dbcefaeec6692a, type: 3}
   m_Name: S-S-03
   m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
-  taskId: 'S-S-03 '
-  taskName: 'Season Escape Route '
+  taskId: S-S-03
+  taskName: Season Escape Route
   description: 'As Survivor, escape 20 valid matches this season.
 
 '
   taskLayer: 2
   perspective: 1
-  counterpartTaskId: 'S-H-03 '
+  counterpartTaskId: S-H-03
   taskType: 0
   targetValue: 20
-  triggerCondition: 'Survivor reaches the escape zone and is marked as escaped in
+  triggerCondition: Survivor reaches the escape zone and is marked as escaped in
     a valid season match.
-
-'
-  completionRule: 'Complete when season escape count reaches 20.
-
-'
-  progressReportFrequency: 'On season profile update through ArchiveProgress.cs '
+  completionRule: Complete when season escape count reaches 20.
+  progressReportFrequency: On season profile update through ArchiveProgress.cs
   softCurrencyReward: 1200
   premiumCurrencyReward: 0
   materialReward: 0
   extraRewardText: 'Limited title: Night Runner '
-  rewardTiming: 2
+  rewardTiming: 4
   canReset: 0
   rewardEnabledInPrototype: 0
   implementationNote: Displayed in Unity TaskPanel. Season escape count is not fully

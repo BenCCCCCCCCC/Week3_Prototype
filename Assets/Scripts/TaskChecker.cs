@@ -47,7 +47,7 @@ public class TaskChecker : MonoBehaviour
                 return stats.rescueCount;
 
             case TaskType.RepairProgressReach:
-                return Mathf.FloorToInt(stats.totalRepairProgress);
+                return Mathf.RoundToInt(stats.totalRepairProgress);
 
             case TaskType.HunterHitCountReach:
                 return stats.hunterHitCount;

@@ -12,24 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d0c57d25431fd4419dbcefaeec6692a, type: 3}
   m_Name: W-S-02
   m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
-  taskId: 'W-S-02 '
-  taskName: 'Weekly Repair Contribution '
+  taskId: W-S-02
+  taskName: Weekly Repair Contribution
   description: 'As Survivor, reach 500% total repair contribution across the week.
 
 '
   taskLayer: 1
   perspective: 1
-  counterpartTaskId: 'W-H-02 '
+  counterpartTaskId: W-H-02
   taskType: 2
   targetValue: 500
-  triggerCondition: 'Survivor contributes repair progress to any cipher machine in
+  triggerCondition: Survivor contributes repair progress to any cipher machine in
     a valid match. Each cipher machine can contribute up to 100% progress.
-
-'
-  completionRule: 'Complete when weekly repair contribution reaches 500%.
-
-'
-  progressReportFrequency: 'On weekly profile update '
+  completionRule: Complete when weekly repair contribution reaches 500%.
+  progressReportFrequency: On weekly profile update
   softCurrencyReward: 250
   premiumCurrencyReward: 0
   materialReward: 2

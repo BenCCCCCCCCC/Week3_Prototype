@@ -12,24 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d0c57d25431fd4419dbcefaeec6692a, type: 3}
   m_Name: W-H-01
   m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
-  taskId: 'W-H-01 '
-  taskName: 'Weekly Rescue Lockdown '
+  taskId: W-H-01
+  taskName: Weekly Rescue Lockdown
   description: 'As Hunter, stop 5 rescue attempts across the week.
 
 '
   taskLayer: 1
   perspective: 2
-  counterpartTaskId: 'W-S-01 '
+  counterpartTaskId: W-S-01
   taskType: 10
   targetValue: 5
-  triggerCondition: 'Hunter interrupts a rescue attempt by hitting, downing, carrying,
+  triggerCondition: Hunter interrupts a rescue attempt by hitting, downing, carrying,
     or re-securing a Survivor during the rescue window in a valid match.
-
-'
-  completionRule: 'Complete when weekly prevented rescue count reaches 5.
-
-'
-  progressReportFrequency: 'On weekly profile update '
+  completionRule: Complete when weekly prevented rescue count reaches 5.
+  progressReportFrequency: On weekly profile update
   softCurrencyReward: 200
   premiumCurrencyReward: 0
   materialReward: 2

@@ -12,30 +12,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d0c57d25431fd4419dbcefaeec6692a, type: 3}
   m_Name: S-S-02
   m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
-  taskId: 'S-S-02 '
-  taskName: 'Season Rescue Specialist '
+  taskId: S-S-02
+  taskName: Season Rescue Specialist
   description: 'As Survivor, rescue 30 teammates this season.
 
 '
   taskLayer: 2
   perspective: 1
-  counterpartTaskId: 'S-H-02 '
+  counterpartTaskId: S-H-02
   taskType: 1
   targetValue: 30
-  triggerCondition: 'Survivor completes a rescue interaction on a chaired teammate
+  triggerCondition: Survivor completes a rescue interaction on a chaired teammate
     in a valid season match. The rescued teammate ID is recorded for season aggregation.
-
-'
-  completionRule: 'Complete when season rescue count reaches 30. Rescuing the same
+  completionRule: Complete when season rescue count reaches 30. Rescuing the same
     teammate multiple times in one match only counts once.
-
-'
-  progressReportFrequency: 'On season profile update through ArchiveProgress.cs '
+  progressReportFrequency: On season profile update through ArchiveProgress.cs
   softCurrencyReward: 1000
   premiumCurrencyReward: 0
   materialReward: 8
   extraRewardText: 
-  rewardTiming: 2
+  rewardTiming: 4
   canReset: 0
   rewardEnabledInPrototype: 0
   implementationNote: Displayed in Unity TaskPanel. Season rescue aggregation is
