@@ -28,7 +28,7 @@ MonoBehaviour:
     multiple times in one match should only count once in the formal anti-farming
     rule.
   progressReportFrequency: On match settlement
-  softCurrencyReward: 30
+  softCurrencyReward: 40
   premiumCurrencyReward: 0
   materialReward: 0
   extraRewardText: 

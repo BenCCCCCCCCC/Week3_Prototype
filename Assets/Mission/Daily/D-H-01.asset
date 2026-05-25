@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4d0c57d25431fd4419dbcefaeec6692a, type: 3}
-  m_Name: MissionB
+  m_Name: D-H-01
   m_EditorClassIdentifier: Assembly-CSharp::TaskDefinition
   taskId: D-H-01
   taskName: Daily Hunter Pressure
