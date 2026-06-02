@@ -9,10 +9,12 @@ public class MatchStats
     public int completedCipherCount;
     public int gateOpenCount;
     public int rescueCount;
+    public int rescueAttemptCount;
 
     public int hunterHitCount;
     public int survivorHitTakenCount;
     public int downCount;
+    public float firstDownTime;
 
     public int environmentInteractCount;
 

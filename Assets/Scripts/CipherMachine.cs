@@ -16,6 +16,12 @@ public class CipherMachine : MonoBehaviour
     public bool logCipherEvents = true;
 
     private HashSet<InteractionUI> activeRepairers = new HashSet<InteractionUI>();
+    private bool hasEmittedRepairStartTelemetry = false;
+    private bool hasEmittedRepairProgress25Telemetry = false;
+    private bool hasEmittedRepairProgress50Telemetry = false;
+    private bool hasEmittedRepairProgress75Telemetry = false;
+    private float repairStartTime = 0f;
+    private int maxRepairerCount = 0;
 
     public int ActiveRepairerCount => activeRepairers.Count;
 
@@ -24,6 +30,12 @@ public class CipherMachine : MonoBehaviour
         progress01 = 0f;
         isCompleted = false;
         activeRepairers.Clear();
+        hasEmittedRepairStartTelemetry = false;
+        hasEmittedRepairProgress25Telemetry = false;
+        hasEmittedRepairProgress50Telemetry = false;
+        hasEmittedRepairProgress75Telemetry = false;
+        repairStartTime = 0f;
+        maxRepairerCount = 0;
 
         if (interactionTarget != null)
         {
@@ -94,10 +106,65 @@ public class CipherMachine : MonoBehaviour
             MatchStatsManager.Instance.AddRepairProgress(normalizedProgress);
         }
 
+        EmitRepairProgressTelemetryIfCrossed(
+            beforeProgress,
+            progress01,
+            0.25f,
+            "machine_repair_progress_25",
+            25,
+            repairerCount,
+            ref hasEmittedRepairProgress25Telemetry
+        );
+
+        EmitRepairProgressTelemetryIfCrossed(
+            beforeProgress,
+            progress01,
+            0.50f,
+            "machine_repair_progress_50",
+            50,
+            repairerCount,
+            ref hasEmittedRepairProgress50Telemetry
+        );
+
+        EmitRepairProgressTelemetryIfCrossed(
+            beforeProgress,
+            progress01,
+            0.75f,
+            "machine_repair_progress_75",
+            75,
+            repairerCount,
+            ref hasEmittedRepairProgress75Telemetry
+        );
+
         if (progress01 >= 1f)
         {
             CompleteCipher();
         }
+    }
+
+    void EmitRepairProgressTelemetryIfCrossed(
+        float beforeProgress,
+        float currentProgress,
+        float threshold,
+        string eventName,
+        int progressPercent,
+        int repairerCount,
+        ref bool hasEmitted
+    )
+    {
+        if (hasEmitted) return;
+        if (beforeProgress >= threshold) return;
+        if (currentProgress < threshold) return;
+
+        hasEmitted = true;
+
+        TelemetryLogger.Emit(eventName, new Dictionary<string, object>
+        {
+            { "machine_id", TelemetryLogger.GetObjectId(gameObject) },
+            { "progress_percent", progressPercent },
+            { "repairer_count", repairerCount },
+            { "elapsed_seconds", Mathf.Max(0f, Time.time - repairStartTime) }
+        });
     }
 
     float GetAverageRepairSpeedMultiplier()
@@ -136,17 +203,33 @@ public class CipherMachine : MonoBehaviour
         if (ui == null) return;
         if (isCompleted) return;
 
-        activeRepairers.Add(ui);
+        bool added = activeRepairers.Add(ui);
+        if (!added) return;
+
+        if (!hasEmittedRepairStartTelemetry)
+        {
+            hasEmittedRepairStartTelemetry = true;
+
+            if (repairStartTime <= 0f)
+            {
+                repairStartTime = Time.time;
+            }
+
+            TelemetryLogger.Emit("machine_repair_start", new Dictionary<string, object>
+            {
+                { "machine_id", TelemetryLogger.GetObjectId(gameObject) },
+                { "repairer_id", TelemetryLogger.GetObjectId(ui.gameObject) }
+            });
+        }
+
+        maxRepairerCount = Mathf.Max(maxRepairerCount, activeRepairers.Count);
     }
 
     public void EndRepair(InteractionUI ui)
     {
         if (ui == null) return;
 
-        if (activeRepairers.Contains(ui))
-        {
-            activeRepairers.Remove(ui);
-        }
+        activeRepairers.Remove(ui);
     }
 
     public bool CanRepair()
@@ -161,6 +244,17 @@ public class CipherMachine : MonoBehaviour
         isCompleted = true;
         progress01 = 1f;
         activeRepairers.Clear();
+        hasEmittedRepairStartTelemetry = false;
+        hasEmittedRepairProgress25Telemetry = false;
+        hasEmittedRepairProgress50Telemetry = false;
+        hasEmittedRepairProgress75Telemetry = false;
+
+        TelemetryLogger.Emit("machine_repair_complete", new Dictionary<string, object>
+        {
+            { "machine_id", TelemetryLogger.GetObjectId(gameObject) },
+            { "repair_seconds", Mathf.Max(0f, Time.time - repairStartTime) },
+            { "max_repairer_count", maxRepairerCount }
+        });
 
         if (interactionTarget != null)
         {

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class RescueAutoTest : MonoBehaviour
@@ -17,6 +18,7 @@ public class RescueAutoTest : MonoBehaviour
     private ChairController currentChair;
     private float progress01 = 0f;
     private float restartLockTimer = 0f;
+    private float rescueAttemptStartTime = 0f;
 
     public bool IsAutoRescuing => currentChair != null && progress01 > 0f;
     public ChairController CurrentChair => currentChair;
@@ -65,6 +67,19 @@ public class RescueAutoTest : MonoBehaviour
         {
             currentChair = targetChair;
             progress01 = 0f;
+            rescueAttemptStartTime = Time.time;
+
+            if (MatchStatsManager.Instance != null)
+            {
+                MatchStatsManager.Instance.AddRescueAttempt();
+            }
+
+            TelemetryLogger.Emit("rescue_attempt_start", new Dictionary<string, object>
+            {
+                { "chair_id", TelemetryLogger.GetObjectId(currentChair.gameObject) },
+                { "rescuer_id", TelemetryLogger.GetObjectId(gameObject) },
+                { "target_id", TelemetryLogger.GetObjectId(currentChair.Occupant) }
+            });
 
             if (showDebugLog)
             {
@@ -82,7 +97,10 @@ public class RescueAutoTest : MonoBehaviour
 
         if (progress01 >= 1f)
         {
-            bool success = currentChair.RescueOccupant();
+            bool success = currentChair.RescueOccupant(
+                TelemetryLogger.GetObjectId(gameObject),
+                Mathf.Max(0f, Time.time - rescueAttemptStartTime)
+            );
 
             if (success && MatchStatsManager.Instance != null)
             {
@@ -149,6 +167,15 @@ public class RescueAutoTest : MonoBehaviour
     {
         if (currentChair == null && progress01 <= 0f) return;
 
+        TelemetryLogger.Emit("rescue_attempt_interrupt", new Dictionary<string, object>
+        {
+            { "chair_id", TelemetryLogger.GetObjectId(currentChair != null ? currentChair.gameObject : null) },
+            { "rescuer_id", TelemetryLogger.GetObjectId(gameObject) },
+            { "target_id", TelemetryLogger.GetObjectId(currentChair != null ? currentChair.Occupant : null) },
+            { "progress_at_interrupt", progress01 },
+            { "interrupt_reason", string.IsNullOrEmpty(reason) ? "unknown" : reason }
+        });
+
         if (showDebugLog)
         {
             if (string.IsNullOrEmpty(reason))
@@ -168,6 +195,7 @@ public class RescueAutoTest : MonoBehaviour
     {
         currentChair = null;
         progress01 = 0f;
+        rescueAttemptStartTime = 0f;
 
         if (applyRestartLock)
         {

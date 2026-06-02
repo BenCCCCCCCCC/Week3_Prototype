@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -84,6 +85,16 @@ public class HunterDetectSkill : MonoBehaviour
             hasBeenUsed = true;
             readyShownThisCycle = false;
             readyTimer = 0f;
+
+            Vector3 skillPosition = transform.position;
+
+            TelemetryLogger.Emit("hunter_skill_used", new Dictionary<string, object>
+            {
+                { "hunter_id", TelemetryLogger.GetObjectId(gameObject) },
+                { "skill_name", "detect" },
+                { "position", new float[] { skillPosition.x, skillPosition.y, skillPosition.z } }
+            });
+
             StartCoroutine(DetectRoutine());
         }
     }

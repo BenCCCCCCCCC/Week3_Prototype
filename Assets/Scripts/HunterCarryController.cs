@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -127,6 +128,12 @@ public class HunterCarryController : MonoBehaviour
         if (success)
         {
             carriedTarget = target;
+
+            TelemetryLogger.Emit("survivor_carried", new Dictionary<string, object>
+            {
+                { "hunter_id", TelemetryLogger.GetObjectId(gameObject) },
+                { "survivor_id", TelemetryLogger.GetObjectId(target.gameObject) }
+            });
 
             if (showDebugLog)
             {

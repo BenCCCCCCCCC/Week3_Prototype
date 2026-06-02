@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -86,6 +87,16 @@ public class HunterSlowSkill : MonoBehaviour
             isAiming = true;
             aimTimer = skillStats.slowAimWindow;
             ShowAimHintText();
+
+            Vector3 skillPosition = transform.position;
+
+            TelemetryLogger.Emit("hunter_skill_used", new Dictionary<string, object>
+            {
+                { "hunter_id", TelemetryLogger.GetObjectId(gameObject) },
+                { "skill_name", "slow" },
+                { "position", new float[] { skillPosition.x, skillPosition.y, skillPosition.z } }
+            });
+
             Debug.Log("Hunter Slow Skill: Aim mode started.");
         }
 

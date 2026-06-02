@@ -103,7 +103,7 @@ public class MatchManager : MonoBehaviour
 
         if (MatchStatsManager.Instance != null)
         {
-            MatchStatsManager.Instance.StartMatch();
+            MatchStatsManager.Instance.StartMatch(this, false);
         }
         else if (logMatchEvents)
         {
@@ -188,7 +188,7 @@ public class MatchManager : MonoBehaviour
 
         if (MatchStatsManager.Instance != null)
         {
-            MatchStatsManager.Instance.StartMatch();
+            MatchStatsManager.Instance.StartMatch(this);
         }
 
         UpdateEndgameCountdownUI();
@@ -409,7 +409,15 @@ public class MatchManager : MonoBehaviour
 
         if (MatchStatsManager.Instance != null)
         {
-            MatchStatsManager.Instance.AddDown();
+            bool isFirstDown = MatchStatsManager.Instance.AddDown();
+
+            TelemetryLogger.Emit("survivor_downed", new Dictionary<string, object>
+            {
+                { "hunter_id", TelemetryLogger.GetObjectId(hunterController) },
+                { "survivor_id", TelemetryLogger.GetObjectId(survivor) },
+                { "time_since_match_start", MatchStatsManager.Instance.GetElapsedTime() },
+                { "is_first_down", isFirstDown }
+            });
         }
 
         if (logMatchEvents)
@@ -429,6 +437,14 @@ public class MatchManager : MonoBehaviour
         }
 
         escapedSurvivorSet.Add(survivor);
+
+        TelemetryLogger.Emit("survivor_escaped", new Dictionary<string, object>
+        {
+            { "survivor_id", TelemetryLogger.GetObjectId(survivor) },
+            { "time_since_match_start", MatchStatsManager.Instance != null
+                ? MatchStatsManager.Instance.GetElapsedTime()
+                : Mathf.Max(0f, Time.time - matchStartTime) }
+        });
 
         CharacterStatus status = survivor.GetComponent<CharacterStatus>();
         if (status != null)
@@ -530,17 +546,14 @@ public class MatchManager : MonoBehaviour
         {
             MatchStatsManager.Instance.SetCompletedCipherCount(CompletedCipherCount);
 
-            bool escaped = EscapedSurvivorCount > 0;
-            bool eliminated = EliminatedSurvivorCount > 0;
-
-            MatchStatsManager.Instance.EndMatch(escaped, eliminated);
+            MatchStatsManager.Instance.EndMatch(EscapedSurvivorCount, EliminatedSurvivorCount);
         }
 
         SettlementSummary summary = null;
 
         if (matchSettlement != null)
         {
-            matchSettlement.SettleMatch();
+            matchSettlement.SettleMatch("natural");
             summary = matchSettlement.LastSummary;
         }
 

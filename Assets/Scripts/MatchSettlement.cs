@@ -58,7 +58,12 @@ public class MatchSettlement : MonoBehaviour
         if (enableWeek10DebugSettleKey && Input.GetKeyDown(debugSettleKey))
         {
             Debug.Log("[Week10Demo] Force settlement triggered.");
-            SettleMatch();
+            SettleMatch("debug_f9");
+        }
+
+        if (Input.GetKeyDown(KeyCode.F8))
+        {
+            PrintMatchMetrics();
         }
     }
 
@@ -67,7 +72,7 @@ public class MatchSettlement : MonoBehaviour
         hasSettledThisMatch = false;
     }
 
-    public void SettleMatch()
+    public void SettleMatch(string triggerSource = "natural")
     {
         if (hasSettledThisMatch)
         {
@@ -105,6 +110,14 @@ public class MatchSettlement : MonoBehaviour
 
         if (abnormalMatch)
         {
+            TelemetryLogger.SetAbnormal(true);
+            triggerSource = "abnormal_match";
+
+            TelemetryLogger.Emit("match_abnormal_flagged", new Dictionary<string, object>
+            {
+                { "abnormal_reason", "risk_control" }
+            });
+
             if (logSettlement)
             {
                 Debug.Log("[RiskControl] Abnormal match detected. Task progress and task rewards are ignored.");
@@ -229,6 +242,35 @@ public class MatchSettlement : MonoBehaviour
                 ", Material = " + lastSummary.totalMaterial
             );
         }
+
+        TelemetryLogger.Emit("settlement_complete", new Dictionary<string, object>
+        {
+            { "total_soft", lastSummary.totalSoft },
+            { "total_material", lastSummary.totalMaterial },
+            { "total_premium", lastSummary.totalPremium },
+            { "task_count_completed", completedTaskNames.Count },
+            { "trigger_source", triggerSource }
+        });
+    }
+
+    void PrintMatchMetrics()
+    {
+        if (MatchStatsManager.Instance == null)
+        {
+            Debug.LogWarning("[Metrics] MatchStatsManager not found.");
+            return;
+        }
+
+        MatchStats stats = MatchStatsManager.Instance.currentStats;
+        float rescueSuccessRate = stats.rescueAttemptCount > 0
+            ? (float)stats.rescueCount / stats.rescueAttemptCount
+            : 0f;
+
+        Debug.Log("[Metrics] match_duration_seconds=" + MatchStatsManager.Instance.GetElapsedTime().ToString("F1"));
+        Debug.Log("[Metrics] escape_status=" + stats.escaped);
+        Debug.Log("[Metrics] first_down_time_seconds=" + stats.firstDownTime.ToString("F1"));
+        Debug.Log("[Metrics] rescue_success_rate=" + rescueSuccessRate.ToString("P1"));
+        Debug.Log("[Metrics] repair_completion_rate=" + (stats.totalRepairProgress / 100f).ToString("P1"));
     }
 
     public bool IsAbnormalMatch()
