@@ -222,6 +222,7 @@ public class GameHUDManager : MonoBehaviour
 
         if (survivorStateHintText != null)
         {
+            survivorStateHintText.gameObject.SetActive(!IsContextualInteractionPromptVisible());
             survivorStateHintText.text = GetSurvivorHintText();
         }
 
@@ -280,8 +281,50 @@ public class GameHUDManager : MonoBehaviour
 
         if (hunterHintText != null)
         {
+            hunterHintText.gameObject.SetActive(
+                !IsContextualInteractionPromptVisible() &&
+                !IsHunterStatusTextVisible()
+            );
             hunterHintText.text = GetHunterHintText();
         }
+    }
+
+    bool IsHunterStatusTextVisible()
+    {
+        if (HasVisibleText(hunterRepairInfoText) ||
+            HasVisibleText(hunterEventFeedbackText))
+        {
+            return true;
+        }
+
+        if (roleSwitchController == null ||
+            roleSwitchController.hunterCarryController == null)
+        {
+            return false;
+        }
+
+        return HasVisibleText(roleSwitchController.hunterCarryController.carryHintText);
+    }
+
+    bool HasVisibleText(TMP_Text text)
+    {
+        return text != null &&
+            text.gameObject.activeInHierarchy &&
+            !string.IsNullOrEmpty(text.text);
+    }
+
+    bool IsContextualInteractionPromptVisible()
+    {
+        if (roleSwitchController == null)
+        {
+            return false;
+        }
+
+        InteractionUI interactionUI = roleSwitchController.IsSurvivorActive()
+            ? roleSwitchController.survivorInteractionUI
+            : roleSwitchController.hunterInteractionUI;
+
+        return interactionUI != null && interactionUI.IsContextualPromptVisible;
     }
 
     string GetCipherProgressText()

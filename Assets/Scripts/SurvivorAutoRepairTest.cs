@@ -141,6 +141,8 @@ public class SurvivorAutoRepairTest : MonoBehaviour
 
     void StopRepair()
     {
+        if (!isRepairing) return;
+
         if (targetCipher != null && repairerUI != null)
         {
             targetCipher.EndRepair(repairerUI);

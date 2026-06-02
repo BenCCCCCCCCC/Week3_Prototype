@@ -16,6 +16,9 @@ public class CipherMachine : MonoBehaviour
     public bool logCipherEvents = true;
 
     private HashSet<InteractionUI> activeRepairers = new HashSet<InteractionUI>();
+    private bool hasEmittedRepairStartTelemetry = false;
+    private float repairStartTime = 0f;
+    private int maxRepairerCount = 0;
 
     public int ActiveRepairerCount => activeRepairers.Count;
 
@@ -24,6 +27,9 @@ public class CipherMachine : MonoBehaviour
         progress01 = 0f;
         isCompleted = false;
         activeRepairers.Clear();
+        hasEmittedRepairStartTelemetry = false;
+        repairStartTime = 0f;
+        maxRepairerCount = 0;
 
         if (interactionTarget != null)
         {
@@ -136,17 +142,33 @@ public class CipherMachine : MonoBehaviour
         if (ui == null) return;
         if (isCompleted) return;
 
-        activeRepairers.Add(ui);
+        bool added = activeRepairers.Add(ui);
+        if (!added) return;
+
+        if (!hasEmittedRepairStartTelemetry)
+        {
+            hasEmittedRepairStartTelemetry = true;
+
+            if (repairStartTime <= 0f)
+            {
+                repairStartTime = Time.time;
+            }
+
+            TelemetryLogger.Emit("machine_repair_start", new Dictionary<string, object>
+            {
+                { "machine_id", TelemetryLogger.GetObjectId(gameObject) },
+                { "repairer_id", TelemetryLogger.GetObjectId(ui.gameObject) }
+            });
+        }
+
+        maxRepairerCount = Mathf.Max(maxRepairerCount, activeRepairers.Count);
     }
 
     public void EndRepair(InteractionUI ui)
     {
         if (ui == null) return;
 
-        if (activeRepairers.Contains(ui))
-        {
-            activeRepairers.Remove(ui);
-        }
+        activeRepairers.Remove(ui);
     }
 
     public bool CanRepair()
@@ -161,6 +183,14 @@ public class CipherMachine : MonoBehaviour
         isCompleted = true;
         progress01 = 1f;
         activeRepairers.Clear();
+        hasEmittedRepairStartTelemetry = false;
+
+        TelemetryLogger.Emit("machine_repair_complete", new Dictionary<string, object>
+        {
+            { "machine_id", TelemetryLogger.GetObjectId(gameObject) },
+            { "repair_seconds", Mathf.Max(0f, Time.time - repairStartTime) },
+            { "max_repairer_count", maxRepairerCount }
+        });
 
         if (interactionTarget != null)
         {

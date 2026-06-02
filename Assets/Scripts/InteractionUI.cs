@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
@@ -28,6 +29,8 @@ public class InteractionUI : MonoBehaviour
     private ChairController currentChair;
 
     private bool isRepairInputHeld = false;
+    private bool rescueAttemptStarted = false;
+    private float rescueAttemptStartTime = 0f;
 
     private PlayerLoadout localLoadout;
 
@@ -44,6 +47,10 @@ public class InteractionUI : MonoBehaviour
         currentTarget.interactionType == InteractionType.Repair &&
         isRepairInputHeld &&
         !currentCipher.isCompleted;
+
+    public bool IsContextualPromptVisible =>
+        hintTextRoot != null &&
+        hintTextRoot.activeInHierarchy;
 
     public CipherMachine CurrentRepairCipher
     {
@@ -71,7 +78,7 @@ public class InteractionUI : MonoBehaviour
 
     void OnDisable()
     {
-        StopSpecialInteractions();
+        ResetInteractionState(false);
     }
 
     void Update()
@@ -201,6 +208,27 @@ public class InteractionUI : MonoBehaviour
     {
         float holdSeconds = GetModifiedDefaultHoldSeconds();
 
+        if (currentChair != null &&
+            currentTarget.interactionType == InteractionType.Rescue &&
+            eHeld &&
+            !rescueAttemptStarted)
+        {
+            rescueAttemptStarted = true;
+            rescueAttemptStartTime = Time.time;
+
+            if (MatchStatsManager.Instance != null)
+            {
+                MatchStatsManager.Instance.AddRescueAttempt();
+            }
+
+            TelemetryLogger.Emit("rescue_attempt_start", new Dictionary<string, object>
+            {
+                { "chair_id", TelemetryLogger.GetObjectId(currentChair.gameObject) },
+                { "rescuer_id", TelemetryLogger.GetObjectId(gameObject) },
+                { "target_id", TelemetryLogger.GetObjectId(currentChair.Occupant) }
+            });
+        }
+
         if (eHeld)
         {
             progress += Time.deltaTime / holdSeconds;
@@ -208,6 +236,13 @@ public class InteractionUI : MonoBehaviour
         else
         {
             progress = 0f;
+
+            if (currentChair != null &&
+                currentTarget.interactionType == InteractionType.Rescue)
+            {
+                rescueAttemptStarted = false;
+                rescueAttemptStartTime = 0f;
+            }
         }
 
         progress = Mathf.Clamp01(progress);
@@ -308,10 +343,6 @@ public class InteractionUI : MonoBehaviour
 
         if (!target.CanBeInteractedBy(gameObject))
         {
-            if (showDebugLog)
-            {
-                Debug.Log("InteractionUI: " + gameObject.name + " is not allowed to interact with " + other.name);
-            }
             return;
         }
 
@@ -377,7 +408,10 @@ public class InteractionUI : MonoBehaviour
 
         if (currentChair != null && currentTarget.interactionType == InteractionType.Rescue)
         {
-            bool rescueSuccess = currentChair.RescueOccupant();
+            bool rescueSuccess = currentChair.RescueOccupant(
+                TelemetryLogger.GetObjectId(gameObject),
+                Mathf.Max(0f, Time.time - rescueAttemptStartTime)
+            );
 
             if (rescueSuccess && MatchStatsManager.Instance != null)
             {
@@ -526,6 +560,8 @@ public class InteractionUI : MonoBehaviour
 
         SetUI(false);
         progress = 0f;
+        rescueAttemptStarted = false;
+        rescueAttemptStartTime = 0f;
         SetProgress(0f);
         inRange = false;
 

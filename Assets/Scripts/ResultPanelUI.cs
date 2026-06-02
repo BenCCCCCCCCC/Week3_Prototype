@@ -25,11 +25,6 @@ public class ResultPanelUI : MonoBehaviour
     [Header("Debug")]
     public bool logResultUI = true;
 
-    void Start()
-    {
-        HidePanel();
-    }
-
     public void ShowResults(
         MatchResult result,
         float matchDuration,

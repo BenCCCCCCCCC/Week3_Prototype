@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ChairController : MonoBehaviour
@@ -95,6 +96,14 @@ public class ChairController : MonoBehaviour
             Debug.Log("ChairController: survivor placed on chair = " + target.name + ", chair = " + gameObject.name);
         }
 
+        TelemetryLogger.Emit("survivor_chaired", new Dictionary<string, object>
+        {
+            { "chair_id", TelemetryLogger.GetObjectId(gameObject) },
+            { "survivor_id", TelemetryLogger.GetObjectId(target.gameObject) },
+            { "hunter_id", GetHunterId() },
+            { "time_since_match_start", GetTimeSinceMatchStart() }
+        });
+
         return true;
     }
 
@@ -107,7 +116,7 @@ public class ChairController : MonoBehaviour
         return true;
     }
 
-    public bool RescueOccupant()
+    public bool RescueOccupant(string rescuerId, float rescueDurationSeconds)
     {
         if (!CanRescue()) return false;
 
@@ -135,6 +144,14 @@ public class ChairController : MonoBehaviour
         {
             Debug.Log("ChairController: occupant rescued from chair = " + target.name);
         }
+
+        TelemetryLogger.Emit("rescue_attempt_complete", new Dictionary<string, object>
+        {
+            { "chair_id", TelemetryLogger.GetObjectId(gameObject) },
+            { "rescuer_id", rescuerId },
+            { "target_id", TelemetryLogger.GetObjectId(target.gameObject) },
+            { "rescue_duration_seconds", rescueDurationSeconds }
+        });
 
         return true;
     }
@@ -181,5 +198,17 @@ public class ChairController : MonoBehaviour
         {
             Debug.Log("ChairController: occupant eliminated from chair = " + target.name);
         }
+    }
+
+    float GetTimeSinceMatchStart()
+    {
+        if (MatchStatsManager.Instance == null) return 0f;
+        return MatchStatsManager.Instance.GetElapsedTime();
+    }
+
+    string GetHunterId()
+    {
+        if (matchManager == null) return "unknown";
+        return TelemetryLogger.GetObjectId(matchManager.hunterController);
     }
 }
