@@ -167,6 +167,15 @@ public class RescueAutoTest : MonoBehaviour
     {
         if (currentChair == null && progress01 <= 0f) return;
 
+        TelemetryLogger.Emit("rescue_attempt_interrupt", new Dictionary<string, object>
+        {
+            { "chair_id", TelemetryLogger.GetObjectId(currentChair != null ? currentChair.gameObject : null) },
+            { "rescuer_id", TelemetryLogger.GetObjectId(gameObject) },
+            { "target_id", TelemetryLogger.GetObjectId(currentChair != null ? currentChair.Occupant : null) },
+            { "progress_at_interrupt", progress01 },
+            { "interrupt_reason", string.IsNullOrEmpty(reason) ? "unknown" : reason }
+        });
+
         if (showDebugLog)
         {
             if (string.IsNullOrEmpty(reason))

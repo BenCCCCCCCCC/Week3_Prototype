@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -160,6 +161,15 @@ public class HunterBasicAttack : MonoBehaviour
                     MatchStatsManager.Instance.AddHunterHit();
                     MatchStatsManager.Instance.AddSurvivorHitTaken();
                 }
+
+                Vector3 hitPosition = bestTarget.transform.position;
+
+                TelemetryLogger.Emit("hunter_hit_landed", new Dictionary<string, object>
+                {
+                    { "hunter_id", TelemetryLogger.GetObjectId(gameObject) },
+                    { "target_id", TelemetryLogger.GetObjectId(bestTarget.gameObject) },
+                    { "hit_position", new float[] { hitPosition.x, hitPosition.y, hitPosition.z } }
+                });
 
                 if (visualFeedback == null)
                 {

@@ -189,6 +189,14 @@ public class ChairController : MonoBehaviour
 
         target.Eliminate();
 
+        TelemetryLogger.Emit("survivor_eliminated", new Dictionary<string, object>
+        {
+            { "chair_id", TelemetryLogger.GetObjectId(gameObject) },
+            { "survivor_id", TelemetryLogger.GetObjectId(target.gameObject) },
+            { "hunter_id", GetHunterId() },
+            { "chair_duration_at_elim", Mathf.Max(0f, chairDuration - remainingTime) }
+        });
+
         if (matchManager != null)
         {
             matchManager.OnSurvivorEliminated(target.gameObject);

@@ -438,6 +438,14 @@ public class MatchManager : MonoBehaviour
 
         escapedSurvivorSet.Add(survivor);
 
+        TelemetryLogger.Emit("survivor_escaped", new Dictionary<string, object>
+        {
+            { "survivor_id", TelemetryLogger.GetObjectId(survivor) },
+            { "time_since_match_start", MatchStatsManager.Instance != null
+                ? MatchStatsManager.Instance.GetElapsedTime()
+                : Mathf.Max(0f, Time.time - matchStartTime) }
+        });
+
         CharacterStatus status = survivor.GetComponent<CharacterStatus>();
         if (status != null)
         {
