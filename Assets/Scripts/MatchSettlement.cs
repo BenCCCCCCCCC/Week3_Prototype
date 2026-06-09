@@ -265,10 +265,11 @@ public class MatchSettlement : MonoBehaviour
         float rescueSuccessRate = stats.rescueAttemptCount > 0
             ? (float)stats.rescueCount / stats.rescueAttemptCount
             : 0f;
+        float firstDownTime = stats.firstDownTime < 0f ? -1f : stats.firstDownTime;
 
         Debug.Log("[Metrics] match_duration_seconds=" + MatchStatsManager.Instance.GetElapsedTime().ToString("F1"));
         Debug.Log("[Metrics] escape_status=" + stats.escaped);
-        Debug.Log("[Metrics] first_down_time_seconds=" + stats.firstDownTime.ToString("F1"));
+        Debug.Log("[Metrics] first_down_time_seconds=" + firstDownTime.ToString("F1"));
         Debug.Log("[Metrics] rescue_success_rate=" + rescueSuccessRate.ToString("P1"));
         Debug.Log("[Metrics] repair_completion_rate=" + (stats.totalRepairProgress / 100f).ToString("P1"));
     }

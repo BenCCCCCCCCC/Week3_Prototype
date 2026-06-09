@@ -28,6 +28,7 @@ public class MatchStatsManager : MonoBehaviour
     public void StartMatch(MatchManager matchManager, bool emitTelemetry = true)
     {
         currentStats = new MatchStats();
+        currentStats.firstDownTime = -1f;
         matchStartTime = Time.time;
         matchStarted = true;
 
@@ -111,7 +112,7 @@ public class MatchStatsManager : MonoBehaviour
 
     public bool AddDown()
     {
-        bool isFirstDown = currentStats.downCount == 0;
+        bool isFirstDown = currentStats.firstDownTime < 0f;
 
         if (isFirstDown)
         {

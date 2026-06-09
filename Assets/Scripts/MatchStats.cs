@@ -14,7 +14,8 @@ public class MatchStats
     public int hunterHitCount;
     public int survivorHitTakenCount;
     public int downCount;
-    public float firstDownTime;
+    // -1f means no first down recorded in this match.
+    public float firstDownTime = -1f;
 
     public int environmentInteractCount;
 
