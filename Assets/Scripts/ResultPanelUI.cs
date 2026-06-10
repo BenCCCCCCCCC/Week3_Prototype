@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class ResultPanelUI : MonoBehaviour
 {
+    private const string BuildVersionLabel = "v0.1";
+
     [Header("Panel References")]
     public GameObject panelRoot;
     public TMP_Text resultTitleText;
@@ -116,6 +118,7 @@ public class ResultPanelUI : MonoBehaviour
         }
 
         body += "Match Summary\n";
+        body += "Version: " + BuildVersionLabel + "\n";
         body += "Match Duration: " + matchDuration.ToString("F1") + " s\n";
         body += "Escaped Survivors: " + escapedCount + "\n";
         body += "Eliminated Survivors: " + eliminatedCount + "\n";
