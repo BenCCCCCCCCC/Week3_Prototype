@@ -17979,7 +17979,7 @@ MonoBehaviour:
   enablePlayerInput: 1
   gravity: -9.81
   pitchClamp: 80
-  externalSpeedMultiplier: 1
+  externalSpeedMultiplier: 0.93
 --- !u!143 &856565042
 CharacterController:
   m_ObjectHideFlags: 0
