@@ -22969,7 +22969,7 @@ MonoBehaviour:
   requiredCompletedCiphers: 4
   survivorWinEscapeCount: 1
   hunterWinEliminationCount: 2
-  endgameDuration: 15
+  endgameDuration: 30
   endgameCountdownText: {fileID: 1676186262}
   ciphers:
   - {fileID: 1239613402}
