@@ -17,5 +17,5 @@ MonoBehaviour:
   repairInterruptLoss: 0.06
   multiRepairEfficiency: 0.85
   gateOpenHoldSeconds: 2
-  rescueHoldSeconds: 3.5
+  rescueHoldSeconds: 2.8
   interactCancelLockSeconds: 0.4
