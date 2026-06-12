@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class ResultPanelUI : MonoBehaviour
 {
-    private const string BuildVersionLabel = "v0.1";
+    private const string BuildVersionLabel = "v0.2";
 
     [Header("Panel References")]
     public GameObject panelRoot;
