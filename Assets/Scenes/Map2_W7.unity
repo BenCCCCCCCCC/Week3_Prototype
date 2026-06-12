@@ -17979,7 +17979,7 @@ MonoBehaviour:
   enablePlayerInput: 1
   gravity: -9.81
   pitchClamp: 80
-  externalSpeedMultiplier: 0.93
+  externalSpeedMultiplier: 1
 --- !u!143 &856565042
 CharacterController:
   m_ObjectHideFlags: 0
@@ -22969,7 +22969,7 @@ MonoBehaviour:
   requiredCompletedCiphers: 4
   survivorWinEscapeCount: 1
   hunterWinEliminationCount: 2
-  endgameDuration: 30
+  endgameDuration: 15
   endgameCountdownText: {fileID: 1676186262}
   ciphers:
   - {fileID: 1239613402}
