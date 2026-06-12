@@ -1,17 +1,83 @@
 # PATCH-012-02 A/B Hypothesis
 
+## Patch Summary
+
 | Field | Content |
 | --- | --- |
 | Patch ID | PATCH-012-02 |
-| Patch name | 扩大救援反制窗口 |
-| Baseline problem | v0.1 本地双控测试中观察到，Survivor 进入救援交互时，椅上淘汰倒计时仍继续减少，该现象可能压缩救援完成机会。 |
-| Baseline evidence | v0.1 baseline commit: `c3c930f9e71aa25ecc406b9c8f506b9507605ab1`；baseline 文档 commit: `b60f5200839e7fcecd9e2835b2ffbf2b414d0e71`；有效局平均对局时长约 126.9 秒；逃生率为 4 名 Survivor 逃生 / 16 个 Survivor 席位 = 25%；救援成功率样本不足，仅作辅助观察。 |
-| Hypothesis | 如果扩大救援反制窗口，则 Hunter 不能过快通过挂椅流程结束对局，对局时长应增加，救援完成机会应增加。 |
-| Target metric | 对局时长；逃生率；救援观察记录。 |
-| Guardrail metric | 首倒时间；修机完成率；异常局数量。 |
-| Planned change | 可选实现方向包括降低救援交互时长、延长椅上淘汰时间、或实现救援中倒计时暂停。正式实现前必须选择一个最小、可回滚的改动，不在本 A/B 文档中写死具体代码实现或新数值。 |
-| Expected direction | v0.2 有效局平均对局时长高于 v0.1 baseline 的 126.9 秒；救援完成机会在观察记录中增加；逃生率可作为方向性参考，但救援成功率样本不足，不能作为唯一成功判据。 |
-| Risk | 如果救援窗口增加过多，Hunter 可能难以通过挂椅流程制造淘汰压力；如果只看救援成功率，可能因样本不足得到不可靠结论。 |
-| Rollback plan | 将本 Patch 实现时确认的救援交互、椅上淘汰倒计时或救援中倒计时机制恢复到 v0.1 baseline 行为；PatchRollback 只在具体字段、机制和值获批后补入真实回滚内容。 |
-| Validation method | 使用 `baseline_v0.1_log.csv` 作为 v0.1 对照；v0.2 使用同一异常规则，少于 90 秒的对局标记为 `is_abnormal=TRUE` 并从核心指标计算中剔除；记录对局时长、逃生率、救援观察记录、首倒时间和异常原因。 |
-| Decision rule | 若 v0.2 有效局平均对局时长高于 v0.1 baseline，且救援观察记录显示救援完成机会增加，同时首倒时间和修机完成率没有出现反向极端变化，则该方向可进入保留候选；若对局时长没有增加，或救援观察无法支持窗口变化，则该 Patch 方向不成立。 |
+| Patch type | Mechanism parameter patch |
+| Patch name | Rescue window parameter change |
+| Final file | `Assets/Configs/InteractionStats_Default.asset` |
+| Final field | `rescueHoldSeconds` |
+| v0.1 baseline value | `3.5` |
+| v0.2 final value | `2.8` |
+| Final implementation commit | `7c9011a96911e757a5ea6f9dae086644e302db57` |
+
+## Baseline Problem
+
+In v0.1 local dual-control testing, rescue opportunities were difficult to evaluate because chair pressure could close the match quickly after a down. The rescue success sample was insufficient, so rescue success rate cannot be the only success criterion for this patch.
+
+## Baseline Evidence
+
+- v0.1 valid sample mean match duration: `126.9` seconds.
+- v0.1 escape rate: `4 / 16` Survivor seats, or `25%`.
+- Rescue success rate sample size was insufficient for a primary metric.
+- Observed rescue attempts were constrained by local dual-control testing and limited coordination.
+
+## Hypothesis
+
+If `rescueHoldSeconds` is changed from `3.5` to `2.8`, Survivor rescue interaction should require less continuous hold time. This should create a wider rescue response window after a chair event without changing chair countdown logic.
+
+## Target Metric
+
+- Match duration.
+- Escape rate.
+- Rescue process observation records.
+
+## Guardrail Metric
+
+- First down time.
+- Repair completion rate.
+- Abnormal match count.
+
+## Planned Change
+
+Change only:
+
+- `Assets/Configs/InteractionStats_Default.asset`
+- `rescueHoldSeconds: 3.5 -> 2.8`
+
+This patch is a rescue window mechanism parameter change. It is not an implementation of rescue-time chair countdown pause.
+
+## Expected Direction
+
+- Valid mean match duration should increase if chair flow stops ending matches too quickly.
+- Escape rate may rise if additional rescue opportunities convert into continued play.
+- Rescue process notes should show whether Survivors can complete rescue interactions more often.
+
+## Risk
+
+- Because rescue success rate has insufficient v0.1 sample support, a single rescue outcome cannot prove the patch.
+- Shorter rescue hold time may interact with repair pacing and map routing, so attribution must be written as part of the v0.2 combined patch result when needed.
+- Local dual-control testing may underuse rescue coordination and skills.
+
+## Rollback Plan
+
+Set `rescueHoldSeconds` from `2.8` back to `3.5` in `Assets/Configs/InteractionStats_Default.asset`.
+
+## Validation Method
+
+- Run v0.2 post-patch matches using the same abnormal rule as v0.1.
+- Compare valid-sample match duration and escape rate.
+- Record chair and rescue process observations in match notes.
+- Do not use rescue success rate as the only pass/fail criterion.
+
+## Decision Rule
+
+PATCH-012-02 supports the Week 12 hypothesis if:
+
+- Valid mean match duration is higher than v0.1 baseline directionally.
+- Escape outcomes or rescue process notes show that chair events do not immediately close the match in most valid samples.
+- Guardrail metrics do not show a new failure pattern, such as first down time collapsing or abnormal matches dominating the sample.
+
+If rescue observations remain too sparse, the result should be documented as inconclusive for rescue-specific proof while still contributing to the combined v0.2 analysis.
