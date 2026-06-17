@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -8,7 +9,12 @@ public static class PatchRollback
 {
     private const string InteractionStatsPath = "Assets/Configs/InteractionStats_Default.asset";
     private const string Map2ScenePath = "Assets/Scenes/Map2_W7.unity";
+    private const string ResultPanelPath = "Assets/Scripts/ResultPanelUI.cs";
     private const string CoverObjectName = "Cover1";
+    private const string VersionCurrentText = "BuildVersionLabel = \"v0.2\"";
+    private const string VersionRollbackText = "BuildVersionLabel = \"v0.1\"";
+    private const string VersionCurrentValue = "v0.2";
+    private const string VersionRollbackValue = "v0.1";
 
     private const float RepairCurrentValue = 10f;
     private const float RepairRollbackValue = 2f;
@@ -59,6 +65,16 @@ public static class PatchRollback
         EditorSceneManager.MarkSceneDirty(mapScene);
         EditorSceneManager.SaveScene(mapScene);
 
+        if (!RollbackVersionLabel())
+        {
+            if (openedSceneForRollback)
+            {
+                EditorSceneManager.CloseScene(mapScene, true);
+            }
+
+            return;
+        }
+
         if (openedSceneForRollback)
         {
             EditorSceneManager.CloseScene(mapScene, true);
@@ -68,6 +84,7 @@ public static class PatchRollback
         Debug.Log($"repairHoldSeconds: {FormatNumber(RepairCurrentValue)} -> {FormatNumber(RepairRollbackValue)}");
         Debug.Log($"rescueHoldSeconds: {FormatNumber(RescueCurrentValue)} -> {FormatNumber(RescueRollbackValue)}");
         Debug.Log($"Cover1 localPosition: {FormatVector(CoverCurrentPosition)} -> {FormatVector(CoverRollbackPosition)}");
+        Debug.Log($"BuildVersionLabel: {VersionCurrentValue} -> {VersionRollbackValue}");
     }
 
     private static Scene GetLoadedScene(string scenePath)
@@ -115,6 +132,26 @@ public static class PatchRollback
         {
             FindByName(current.GetChild(i), objectName, ref match, ref matchCount);
         }
+    }
+
+    private static bool RollbackVersionLabel()
+    {
+        if (!File.Exists(ResultPanelPath))
+        {
+            Debug.LogError($"Patch rollback failed: missing result panel script at {ResultPanelPath}.");
+            return false;
+        }
+
+        string source = File.ReadAllText(ResultPanelPath);
+        if (!source.Contains(VersionCurrentText))
+        {
+            Debug.LogError($"Patch rollback failed: expected {VersionCurrentText} in {ResultPanelPath}.");
+            return false;
+        }
+
+        File.WriteAllText(ResultPanelPath, source.Replace(VersionCurrentText, VersionRollbackText));
+        AssetDatabase.ImportAsset(ResultPanelPath);
+        return true;
     }
 
     private static string FormatNumber(float value)
