@@ -1,54 +1,47 @@
-# Patch Note v0.2
+# v0.2 Patch Note (2026-06-17)
 
-## Build Scope
+## 改动 1 · [PATCH-012-01] 修机节奏数值改动
 
-v0.2 contains the final Week 12 PATCH-012 set:
+- 原因：v0.1 baseline 有效局平均对局时长为 `126.9s`，中位数为 `114.5s`，低于 Week 11 对局时长健康区间；同时修机完成率均值为 `78.1%`，说明主目标推进与短对局同时存在。
+- 改动：`Assets/Configs/InteractionStats_Default.asset : repairHoldSeconds`，`2 -> 10`。
+- 预期影响：有效局平均对局时长高于 `126.9s`；修机完成率不接近 `0%`。
+- 实测结果：v0.2 有效局平均对局时长为 `144.5s`，较 v0.1 增加 `17.6s`；修机完成率为 `87.5%`，较 v0.1 增加 `9.4pp`。
+- 判定：⚠ 部分达标。对局时长方向符合预期，修机没有进入不可推进状态；但平均对局时长仍低于长期目标区间。
+- 后续动作：保留，并在下版本继续观察目标节奏。
+- Rollback：将 `repairHoldSeconds` 从 `10` 恢复为 `2`；对应正式改动 commit 为 `9fb827ac698501fdd6ad28ee5bff24e47db4276c`。
 
-- PATCH-012-01: repair pacing numeric change.
-- PATCH-012-02: rescue window mechanism parameter change.
-- PATCH-012-03: Cover1 map routing position change.
+## 改动 2 · [PATCH-012-02] 救援窗口机制参数改动
 
-Formal v0.2 post-patch testing has not started. Measured results are placeholders until the post-patch CSV is filled.
+- 原因：v0.1 baseline 中救援成功率样本不足，不能作为主要触发理由；但对局时长为 `126.9s`，逃生率为 `4 / 16 = 25%`，挂椅后对局收束需要作为过程观察项记录。
+- 改动：`Assets/Configs/InteractionStats_Default.asset : rescueHoldSeconds`，`3.5 -> 2.8`。
+- 预期影响：有效局平均对局时长高于 `126.9s`；救援过程记录中出现更多可完成救援交互的机会。
+- 实测结果：v0.2 有效局平均对局时长为 `144.5s`，较 v0.1 增加 `17.6s`；逃生率为 `4 / 20 = 20%`，较 v0.1 下降 `5pp`；救援成功率仍然样本不足。
+- 判定：🚫 样本不足 / 继续观察。整体对局时长方向符合预期，但救援事件不足，不能单独证明 `rescueHoldSeconds` 改动有效。
+- 后续动作：保留为观察项；下版本记录救援尝试数、救援成功数与救援中断数。
+- Rollback：将 `rescueHoldSeconds` 从 `2.8` 恢复为 `3.5`；对应正式改动 commit 为 `7c9011a96911e757a5ea6f9dae086644e302db57`。
 
-## Change List
+## 改动 3 · [PATCH-012-03] Cover1 地图转点空间调整
 
-| Patch ID | Type | File | Change | Commit | Post-patch result |
-| --- | --- | --- | --- | --- | --- |
-| PATCH-012-01 | Numeric | `Assets/Configs/InteractionStats_Default.asset` | `repairHoldSeconds: 2 -> 10` | `9fb827ac698501fdd6ad28ee5bff24e47db4276c` | 待 v0.2 post-patch 测试填写 |
-| PATCH-012-02 | Mechanism parameter | `Assets/Configs/InteractionStats_Default.asset` | `rescueHoldSeconds: 3.5 -> 2.8` | `7c9011a96911e757a5ea6f9dae086644e302db57` | 待 v0.2 post-patch 测试填写 |
-| PATCH-012-03 | Map | `Assets/Scenes/Map2_W7.unity` | `Map2_W7 / Cover1` position `{ x: 6.99, y: 0.51, z: -4.97 } -> { x: 6.2, y: 0.51, z: -4.2 }` | `0b97e1466696240889f0b3e4400765f556d3bdd3` | 待 v0.2 post-patch 测试填写 |
+- 原因：v0.1 baseline 有效局首倒时间均值为 `50.9s`，不包含 `-1`；补充观察显示 Map2 局部追击路线和二次选择点较少。
+- 改动：`Assets/Scenes/Map2_W7.unity : Map2_W7 / Cover1 m_LocalPosition`，`{6.99, 0.51, -4.97} -> {6.2, 0.51, -4.2}`。
+- 预期影响：首倒时间高于 `50.9s`；有效局平均对局时长高于 `126.9s`；路线观察中记录 Survivor 是否出现更多转点选择。
+- 实测结果：v0.2 首倒时间均值为 `85.1s`，较 v0.1 延后 `34.2s`；有效局平均对局时长为 `144.5s`，较 v0.1 增加 `17.6s`。
+- 判定：⚠ 部分达标。首倒时间方向符合预期，但该变化与 PATCH-012-01 的 repair pacing 存在耦合，不能完全单独归因到 Cover1。
+- 后续动作：保留，并在下版本增加追击路线观察。
+- Rollback：将 `Map2_W7 / Cover1` position 从 `{6.2, 0.51, -4.2}` 恢复为 `{6.99, 0.51, -4.97}`；对应正式改动 commit 为 `0b97e1466696240889f0b3e4400765f556d3bdd3`。
 
-## Intended Measurement
+## 已知问题
 
-| Patch ID | Primary metric | Guardrail or auxiliary metric |
-| --- | --- | --- |
-| PATCH-012-01 | Match duration; repair completion rate | Escape rate; first down time; abnormal match count |
-| PATCH-012-02 | Match duration; escape rate; rescue process observations | First down time; repair completion rate; abnormal match count |
-| PATCH-012-03 | First down time; match duration | Repair completion rate; escape rate; route-choice observations; abnormal match count |
+- 本次 baseline 与 post-patch 均为同一测试者本地双控，无法稳定模拟真实多人协作、救援沟通、技能博弈和临场反应。
+- 救援成功率样本不足，不能作为 PATCH-012-02 的单独成功判据。
+- Survivor 位移技能在本地双控测试中较少被稳定使用，测试者观察到冲刺后路线修正成本较高；本轮没有记录技能触发次数、冲刺后碰撞次数或冲刺后被命中率，因此不能作为本次 PATCH-012 成功判据。
+- v0.1 baseline 正式测试前做过 Map2 可通行性修复：1F 在 2F 楼板下方，以及 `Cipher_H3`、`Cipher_M`、`Cipher_H2`、`Chair_R`、`Chair_L`、`Cover1`、右侧楼梯附近的卡边或 invisible collider 阻挡问题已处理。该处理不属于 PATCH-012。
+- v0.1 baseline 正式测试前做过 UI 可读性修复：Survivor 视角开门后 `Endgame` 倒计时与修机进度 UI 重叠的问题已处理。该处理不属于 PATCH-012。
+- `Hunter/PlayerController.externalSpeedMultiplier: 1 -> 0.93` 与 `MatchManager.endgameDuration: 15 -> 30` 是已移出正式组合的历史尝试，不进入 v0.2 指标解释。
 
-## Superseded Calibration Attempts
+## 下版本计划
 
-The following changes remain in git history as early calibration attempts, but they are not part of the final v0.2 patch note:
-
-- `Hunter/PlayerController.externalSpeedMultiplier: 1 -> 0.93`
-- `MatchManager.endgameDuration: 15 -> 30`
-
-They were removed before formal v0.2 post-patch testing and must not be used in v0.2 metric explanation.
-
-## Rollback Summary
-
-- PATCH-012-01: set `repairHoldSeconds` from `10` back to `2`. If reverting only the final commit, set `10` back to `6`.
-- PATCH-012-02: set `rescueHoldSeconds` from `2.8` back to `3.5`.
-- PATCH-012-03: set Cover1 position from `{ x: 6.2, y: 0.51, z: -4.2 }` back to `{ x: 6.99, y: 0.51, z: -4.97 }`.
-
-## Post-Patch Result Placeholder
-
-- Valid sample count: 待 v0.2 post-patch 测试填写
-- Abnormal sample count: 待 v0.2 post-patch 测试填写
-- Mean match duration: 待 v0.2 post-patch 测试填写
-- Mean first down time: 待 v0.2 post-patch 测试填写
-- Mean repair completion rate: 待 v0.2 post-patch 测试填写
-- Escape rate: 待 v0.2 post-patch 测试填写
-- Rescue process notes: 待 v0.2 post-patch 测试填写
-
-No post-patch success judgment should be written until testing is complete.
+- 在 CSV 或补充表中增加技能使用次数、救援尝试数、救援成功数与救援中断数。
+- 复核 Survivor 位移技能触发后的路线修正、碰撞结果与被命中情况。
+- 累积多人样本后再判断逃生率和救援成功率。
+- 继续保留五核心指标，不新增 Week 12 成功指标。
