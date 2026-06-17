@@ -64,11 +64,10 @@ public static class PatchRollback
             EditorSceneManager.CloseScene(mapScene, true);
         }
 
-        Debug.Log(
-            "Week 12 PATCH-012 rollback applied.\n" +
-            $"repairHoldSeconds: {FormatNumber(RepairCurrentValue)} -> {FormatNumber(RepairRollbackValue)}\n" +
-            $"rescueHoldSeconds: {FormatNumber(RescueCurrentValue)} -> {FormatNumber(RescueRollbackValue)}\n" +
-            $"Cover1 localPosition: {FormatVector(CoverCurrentPosition)} -> {FormatVector(CoverRollbackPosition)}");
+        Debug.Log("Week 12 PATCH-012 rollback applied.");
+        Debug.Log($"repairHoldSeconds: {FormatNumber(RepairCurrentValue)} -> {FormatNumber(RepairRollbackValue)}");
+        Debug.Log($"rescueHoldSeconds: {FormatNumber(RescueCurrentValue)} -> {FormatNumber(RescueRollbackValue)}");
+        Debug.Log($"Cover1 localPosition: {FormatVector(CoverCurrentPosition)} -> {FormatVector(CoverRollbackPosition)}");
     }
 
     private static Scene GetLoadedScene(string scenePath)
