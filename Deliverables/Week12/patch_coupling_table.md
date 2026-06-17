@@ -1,40 +1,40 @@
-# Week 12 Patch Coupling Table
+# Week 12 Patch 耦合表
 
-## Final PATCH-012 Set
+## 最终 PATCH-012 组合
 
-| Patch ID | Type | File | Field or object | v0.1 baseline | v0.2 final |
+| Patch ID | 类型 | 文件 | 字段或对象 | v0.1 baseline | v0.2 final |
 | --- | --- | --- | --- | --- | --- |
-| PATCH-012-01 | Numeric | `Assets/Configs/InteractionStats_Default.asset` | `repairHoldSeconds` | `2` | `10` |
-| PATCH-012-02 | Mechanism parameter | `Assets/Configs/InteractionStats_Default.asset` | `rescueHoldSeconds` | `3.5` | `2.8` |
-| PATCH-012-03 | Map | `Assets/Scenes/Map2_W7.unity` | `Map2_W7 / Cover1` position | `{ x: 6.99, y: 0.51, z: -4.97 }` | `{ x: 6.2, y: 0.51, z: -4.2 }` |
+| PATCH-012-01 | 数值改动 | `Assets/Configs/InteractionStats_Default.asset` | `repairHoldSeconds` | `2` | `10` |
+| PATCH-012-02 | 机制参数改动 | `Assets/Configs/InteractionStats_Default.asset` | `rescueHoldSeconds` | `3.5` | `2.8` |
+| PATCH-012-03 | 地图改动 | `Assets/Scenes/Map2_W7.unity` | `Map2_W7 / Cover1` position | `{ x: 6.99, y: 0.51, z: -4.97 }` | `{ x: 6.2, y: 0.51, z: -4.2 }` |
 
-## Coupling Matrix
+## 耦合矩阵
 
-| Patch pair | Coupling risk | Coupling mechanism | Metric attribution rule |
+| Patch 组合 | 耦合风险 | 耦合机制 | 归因策略 |
 | --- | --- | --- | --- |
-| PATCH-012-01 + PATCH-012-02 | Medium | Longer repair pacing can create more time for downs, chairs, and rescue opportunities. Shorter rescue hold time can then extend the match after a chair event. | If match duration rises, attribute the result to the combined v0.2 set unless rescue process notes isolate chair-stage impact. |
-| PATCH-012-01 + PATCH-012-03 | High | Longer repair pacing creates more patrol and chase time. Cover1 position can change chase routes and first down timing during that longer objective phase. | Use repair completion rate for PATCH-012-01 context and first down or route notes for PATCH-012-03 context. Do not assign all duration change to one patch. |
-| PATCH-012-02 + PATCH-012-03 | Medium | Cover1 can delay first down, while rescue hold time acts after a chair event. Both can reduce early match closure through different stages. | Separate pre-chair observations from post-chair rescue observations in notes. |
+| PATCH-012-01 + PATCH-012-02 | 中 | 更长的 repair pacing 会给倒地、挂椅与救援创造更多时间；更短的救援 hold time 可能让挂椅后对局继续延长。 | 如果对局时长上升，除非救援过程记录能单独隔离挂椅阶段影响，否则按 v0.2 组合结果解释。 |
+| PATCH-012-01 + PATCH-012-03 | 高 | 更长的 repair pacing 会创造更多巡逻与追击时间；Cover1 位置会影响追击路线和首倒时间。 | 使用修机完成率解释 PATCH-012-01 的上下文，使用首倒时间与路线记录解释 PATCH-012-03 的上下文；不要把全部时长变化归给单一 Patch。 |
+| PATCH-012-02 + PATCH-012-03 | 中 | Cover1 可能影响上椅前的追击与首倒；rescue hold time 作用于挂椅后的救援阶段。 | 在记录中区分上椅前追击观察和上椅后救援观察。 |
 
-## Metric Coupling Notes
+## 指标耦合说明
 
-- Repair pacing affects match duration, repair completion rate, and escape rate.
-- Rescue window affects post-chair match closure, escape rate, and rescue process observations.
-- Cover1 position affects chase route, first down time, and Survivor route-choice observations.
-- Escape rate is coupled across all three patches and should be interpreted as a combined v0.2 outcome unless notes clearly isolate a stage.
+- Repair pacing 会影响对局时长、修机完成率和逃生率。
+- Rescue window 会影响挂椅后的对局收束、逃生率和救援过程记录。
+- Cover1 position 会影响追击路线、首倒时间和 Survivor 路线选择记录。
+- 逃生率会同时受到三条 Patch 影响；除非单局记录能明确隔离阶段，否则应按 v0.2 组合结果解释。
 
-## Superseded Calibration Attempts
+## Superseded calibration attempts
 
-The following changes remain in git history as early calibration attempts, but they are not part of the final Week 12 PATCH-012 set:
+以下改动保留在 git 历史中作为早期 calibration attempt，但不属于最终 Week 12 PATCH-012 组合：
 
 - `Hunter/PlayerController.externalSpeedMultiplier: 1 -> 0.93`
 - `MatchManager.endgameDuration: 15 -> 30`
 
-These two changes were removed before formal v0.2 post-patch testing. They must not be used in v0.2 post-patch metric explanation or success judgment.
+这两项已在正式 v0.2 post-patch 测试前移出最终组合，不进入 v0.2 指标解释或成功判定。
 
-## Attribution Policy
+## 归因规则
 
-- Use PATCH-specific metrics when they are directly observable.
-- Use combined v0.2 wording when multiple patches plausibly affect the same metric.
-- Do not treat rescue success rate as the only PATCH-012-02 criterion because v0.1 rescue sample size was insufficient.
-- Do not treat map richness as an independent success metric; use route-choice notes only as auxiliary evidence for PATCH-012-03.
+- 当指标能直接对应某条 Patch 的行为阶段时，优先使用该 Patch 的专项解释。
+- 当多条 Patch 都可能影响同一指标时，使用 v0.2 组合结果表述。
+- v0.1 救援成功率样本不足，因此不能把救援成功率作为 PATCH-012-02 的唯一判据。
+- 地图丰富程度不作为独立成功指标；路线选择记录只作为 PATCH-012-03 的辅助证据。

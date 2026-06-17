@@ -1,83 +1,83 @@
-# PATCH-012-02 A/B Hypothesis
+# PATCH-012-02 A/B 假设
 
-## Patch Summary
+## Patch 摘要
 
-| Field | Content |
+| 字段 | 内容 |
 | --- | --- |
 | Patch ID | PATCH-012-02 |
-| Patch type | Mechanism parameter patch |
-| Patch name | Rescue window parameter change |
-| Final file | `Assets/Configs/InteractionStats_Default.asset` |
-| Final field | `rescueHoldSeconds` |
-| v0.1 baseline value | `3.5` |
-| v0.2 final value | `2.8` |
-| Final implementation commit | `7c9011a96911e757a5ea6f9dae086644e302db57` |
+| Patch 类型 | 机制参数改动 |
+| Patch 名称 | 救援窗口机制参数改动 |
+| 最终文件 | `Assets/Configs/InteractionStats_Default.asset` |
+| 最终字段 | `rescueHoldSeconds` |
+| v0.1 baseline 值 | `3.5` |
+| v0.2 final 值 | `2.8` |
+| 最终实现 commit | `7c9011a96911e757a5ea6f9dae086644e302db57` |
 
-## Baseline Problem
+## Baseline 问题
 
-In v0.1 local dual-control testing, rescue opportunities were difficult to evaluate because chair pressure could close the match quickly after a down. The rescue success sample was insufficient, so rescue success rate cannot be the only success criterion for this patch.
+v0.1 本地双控测试中，救援事件样本不足，无法把救援成功率作为主要判据。但挂椅后的流程仍可能影响对局收束速度，因此需要记录救援交互窗口是否给 Survivor 留出反制机会。
 
-## Baseline Evidence
+## Baseline 证据
 
-- v0.1 valid sample mean match duration: `126.9` seconds.
-- v0.1 escape rate: `4 / 16` Survivor seats, or `25%`.
-- Rescue success rate sample size was insufficient for a primary metric.
-- Observed rescue attempts were constrained by local dual-control testing and limited coordination.
+- v0.1 有效局平均对局时长：`126.9s`。
+- v0.1 逃生率：`4 / 16 = 25%`。
+- v0.1 救援成功率样本不足，不能作为主要成功判据。
+- 本地双控会限制救援沟通、协作和技能使用频率。
 
-## Hypothesis
+## 假设
 
-If `rescueHoldSeconds` is changed from `3.5` to `2.8`, Survivor rescue interaction should require less continuous hold time. This should create a wider rescue response window after a chair event without changing chair countdown logic.
+如果将 `rescueHoldSeconds` 从 `3.5` 调整为 `2.8`，Survivor 完成救援交互所需连续按住时间会减少。该改动应扩大挂椅后的救援反制窗口，但不改变椅上倒计时逻辑。
 
-## Target Metric
+## 目标指标
 
-- Match duration.
-- Escape rate.
-- Rescue process observation records.
+- 对局时长。
+- 逃生率。
+- 救援过程观察记录。
 
-## Guardrail Metric
+## 护栏指标
 
-- First down time.
-- Repair completion rate.
-- Abnormal match count.
+- 首倒时间。
+- 修机完成率。
+- 异常局数量。
 
-## Planned Change
+## 计划改动
 
-Change only:
+只改动：
 
 - `Assets/Configs/InteractionStats_Default.asset`
 - `rescueHoldSeconds: 3.5 -> 2.8`
 
-This patch is a rescue window mechanism parameter change. It is not an implementation of rescue-time chair countdown pause.
+该 Patch 是救援窗口机制参数改动，不是救援中暂停椅上倒计时。
 
-## Expected Direction
+## 预期方向
 
-- Valid mean match duration should increase if chair flow stops ending matches too quickly.
-- Escape rate may rise if additional rescue opportunities convert into continued play.
-- Rescue process notes should show whether Survivors can complete rescue interactions more often.
+- 如果挂椅流程不再过快结束对局，有效局平均对局时长应高于 v0.1 baseline。
+- 如果救援窗口带来更多可完成交互，逃生结果或救援过程记录应出现对应变化。
+- 救援过程记录应说明 Survivor 是否更容易完成救援交互。
 
-## Risk
+## 风险
 
-- Because rescue success rate has insufficient v0.1 sample support, a single rescue outcome cannot prove the patch.
-- Shorter rescue hold time may interact with repair pacing and map routing, so attribution must be written as part of the v0.2 combined patch result when needed.
-- Local dual-control testing may underuse rescue coordination and skills.
+- v0.1 救援成功率样本不足，单次救援结果不能证明该 Patch。
+- `rescueHoldSeconds` 与 `repairHoldSeconds`、`Cover1` 路线改动存在耦合，必要时只能写为 v0.2 组合效果。
+- 本地双控可能低估救援协作与技能使用。
 
-## Rollback Plan
+## Rollback 计划
 
-Set `rescueHoldSeconds` from `2.8` back to `3.5` in `Assets/Configs/InteractionStats_Default.asset`.
+将 `Assets/Configs/InteractionStats_Default.asset` 中的 `rescueHoldSeconds` 从 `2.8` 恢复为 `3.5`。
 
-## Validation Method
+## 验证方法
 
-- Run v0.2 post-patch matches using the same abnormal rule as v0.1.
-- Compare valid-sample match duration and escape rate.
-- Record chair and rescue process observations in match notes.
-- Do not use rescue success rate as the only pass/fail criterion.
+- v0.2 post-patch 测试沿用 v0.1 的异常剔除规则。
+- 对比有效样本的对局时长和逃生率。
+- 在单局记录中补充挂椅与救援过程观察。
+- 不把救援成功率作为唯一通过或失败判据。
 
-## Decision Rule
+## 判定规则
 
-PATCH-012-02 supports the Week 12 hypothesis if:
+PATCH-012-02 支持假设的条件：
 
-- Valid mean match duration is higher than v0.1 baseline directionally.
-- Escape outcomes or rescue process notes show that chair events do not immediately close the match in most valid samples.
-- Guardrail metrics do not show a new failure pattern, such as first down time collapsing or abnormal matches dominating the sample.
+- 有效局平均对局时长相对 v0.1 baseline 方向上升。
+- 逃生结果或救援过程记录显示挂椅事件没有在多数有效样本中立即结束对局。
+- 护栏指标没有出现新的失控模式，例如首倒时间过早或异常局占据样本主体。
 
-If rescue observations remain too sparse, the result should be documented as inconclusive for rescue-specific proof while still contributing to the combined v0.2 analysis.
+如果救援观察仍然过少，则该 Patch 应记录为救援专项证据不足，同时纳入 v0.2 组合分析。

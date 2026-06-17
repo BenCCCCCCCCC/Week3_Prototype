@@ -1,101 +1,101 @@
-# PATCH-012-03 A/B Hypothesis
+# PATCH-012-03 A/B 假设
 
-## Patch Summary
+## Patch 摘要
 
-| Field | Content |
+| 字段 | 内容 |
 | --- | --- |
 | Patch ID | PATCH-012-03 |
-| Patch type | Map patch |
-| Patch name | Cover1 chase routing position change |
-| Final file | `Assets/Scenes/Map2_W7.unity` |
-| Final object | `Map2_W7 / Cover1` |
-| Final field | `m_LocalPosition` |
-| v0.1 baseline value | `{ x: 6.99, y: 0.51, z: -4.97 }` |
-| v0.2 final value | `{ x: 6.2, y: 0.51, z: -4.2 }` |
-| Final implementation commit | `0b97e1466696240889f0b3e4400765f556d3bdd3` |
+| Patch 类型 | 地图改动 |
+| Patch 名称 | Cover1 追击路线位置调整 |
+| 最终文件 | `Assets/Scenes/Map2_W7.unity` |
+| 最终对象 | `Map2_W7 / Cover1` |
+| 最终字段 | `m_LocalPosition` |
+| v0.1 baseline 值 | `{ x: 6.99, y: 0.51, z: -4.97 }` |
+| v0.2 final 值 | `{ x: 6.2, y: 0.51, z: -4.2 }` |
+| 最终实现 commit | `0b97e1466696240889f0b3e4400765f556d3bdd3` |
 
-## Baseline Problem
+## Baseline 问题
 
-v0.1 qualitative observation showed limited route choices and short chase loops in parts of Map2. This can make Hunter pressure arrive early and can reduce Survivor second-choice routing during chase.
+v0.1 定性观察显示，Map2 局部路线选择较少，部分追击区域容易形成较短闭环。这会让 Hunter 压力较早进入对局，也会减少 Survivor 在追击中的二次选择空间。
 
-## Baseline Evidence
+## Baseline 证据
 
-- v0.1 valid sample mean match duration: `126.9` seconds.
-- v0.1 valid samples had first downs in `7 / 8` matches.
-- v0.1 valid first down mean, excluding `-1`: `50.9` seconds.
-- Qualitative notes describe limited cover, routing, and secondary choice points.
+- v0.1 有效局平均对局时长：`126.9s`。
+- v0.1 有效局中 `7 / 8` 局发生首倒。
+- v0.1 有效首倒时间均值：`50.9s`，不包含 `-1`。
+- 定性记录指出局部掩体、路线与二次选择点较少。
 
-## Hypothesis
+## 假设
 
-If `Cover1` is moved from `{ x: 6.99, y: 0.51, z: -4.97 }` to `{ x: 6.2, y: 0.51, z: -4.2 }`, the right-side local route should create more Survivor second-choice movement during chase. This may delay first down and increase match duration.
+如果将 `Cover1` 从 `{ x: 6.99, y: 0.51, z: -4.97 }` 移动到 `{ x: 6.2, y: 0.51, z: -4.2 }`，右侧局部路线应给 Survivor 提供更多二次选择空间。该变化可能延后首倒时间，并增加有效局对局时长。
 
-## Target Metric
+## 目标指标
 
-- First down time.
-- Match duration.
+- 首倒时间。
+- 对局时长。
 
-## Guardrail Metric
+## 护栏指标
 
-- Repair completion rate.
-- Escape rate.
-- Abnormal match count.
+- 修机完成率。
+- 逃生率。
+- 异常局数量。
 
-## Auxiliary Observation
+## 辅助观察
 
-- Whether Survivor shows more route choices around the Cover1 area during chase.
-- Whether the adjusted cover position creates any new collision snag.
+- Survivor 在 Cover1 附近追击时是否出现更多路线选择。
+- Cover1 位置是否引入新的卡边或碰撞阻挡。
 
-## Planned Change
+## 计划改动
 
-Change only:
+只改动：
 
 - `Assets/Scenes/Map2_W7.unity`
-- Object: `Map2_W7 / Cover1`
-- Field: `m_LocalPosition`
-- Old position: `{ x: 6.99, y: 0.51, z: -4.97 }`
-- New position: `{ x: 6.2, y: 0.51, z: -4.2 }`
+- 对象：`Map2_W7 / Cover1`
+- 字段：`m_LocalPosition`
+- 旧位置：`{ x: 6.99, y: 0.51, z: -4.97 }`
+- 新位置：`{ x: 6.2, y: 0.51, z: -4.2 }`
 
-Do not change:
+不改动：
 
-- Rotation.
-- Scale.
-- Collider.
-- Scripts.
-- Object count.
+- Rotation。
+- Scale。
+- Collider。
+- Scripts。
+- Object count。
 
-## Expected Direction
+## 预期方向
 
-- First down time should move later than v0.1 directionally.
-- Valid mean match duration should be higher than v0.1 baseline directionally.
-- Survivor route notes should show more second-choice movement near the right-side route.
+- 首倒时间应相对 v0.1 向后移动。
+- 有效局平均对局时长应高于 v0.1 baseline。
+- 路线观察中应记录到 Survivor 在右侧路线附近出现更多二次选择。
 
-## Risk
+## 风险
 
-- A single cover movement may have limited impact if repair pacing dominates match duration.
-- The map change can couple with repair pacing because longer repair time creates more chase opportunities.
-- The map change can couple with rescue timing because delayed first down changes chair timing.
+- 单个 Cover 位置改动可能影响有限，尤其当 repair pacing 对对局时长的影响更大时。
+- 地图改动与 repair pacing 存在耦合，因为更长修机时间会创造更多追击机会。
+- 地图改动与救援时间也存在耦合，因为延后首倒会改变挂椅时机。
 
-## Rollback Plan
+## Rollback 计划
 
-Set `Map2_W7 / Cover1` position from `{ x: 6.2, y: 0.51, z: -4.2 }` back to `{ x: 6.99, y: 0.51, z: -4.97 }`.
+将 `Map2_W7 / Cover1` position 从 `{ x: 6.2, y: 0.51, z: -4.2 }` 恢复为 `{ x: 6.99, y: 0.51, z: -4.97 }`。
 
-## Validation Method
+## 验证方法
 
-- Run v0.2 post-patch matches using the same abnormal rule as v0.1.
-- Compare first down time and match duration against v0.1 baseline.
-- Record route-choice observations near Cover1.
-- Watch for any new collision snag around Cover1.
+- v0.2 post-patch 测试沿用 v0.1 的异常剔除规则。
+- 对比首倒时间和对局时长。
+- 记录 Cover1 附近路线选择。
+- 观察 Cover1 附近是否出现新的卡边或碰撞阻挡。
 
-## Decision Rule
+## 判定规则
 
-PATCH-012-03 supports the Week 12 hypothesis if:
+PATCH-012-03 支持假设的条件：
 
-- Valid first down time moves later than the v0.1 mean of `50.9` seconds directionally.
-- Valid mean match duration is higher than `126.9` seconds.
-- Route notes show that Cover1 creates additional second-choice movement without introducing a new blocker.
+- 有效局首倒时间相对 v0.1 的 `50.9s` 向后移动。
+- 有效局平均对局时长高于 `126.9s`。
+- 路线记录显示 Cover1 附近出现更多二次选择，且未引入新的阻挡。
 
-If first down time does not move and no route-choice difference is observed, the map patch should be treated as low impact in the combined v0.2 result.
+如果首倒时间没有变化，且路线记录未出现差异，则该地图 Patch 在 v0.2 组合结果中应判定为影响有限。
 
-## Superseded Calibration Note
+## Superseded 记录
 
-`MatchManager.endgameDuration: 15 -> 30` remains in git history as an early calibration attempt. It is not the final PATCH-012-03 and must not be used in v0.2 post-patch metric attribution.
+`MatchManager.endgameDuration: 15 -> 30` 保留在 git 历史中作为早期 calibration attempt。它不是最终 PATCH-012-03，不进入 v0.2 post-patch 指标归因。

@@ -1,92 +1,91 @@
-# PATCH-012-01 A/B Hypothesis
+# PATCH-012-01 A/B 假设
 
-## Patch Summary
+## Patch 摘要
 
-| Field | Content |
+| 字段 | 内容 |
 | --- | --- |
 | Patch ID | PATCH-012-01 |
-| Patch type | Numeric patch |
-| Patch name | Repair pacing numeric change |
-| Final file | `Assets/Configs/InteractionStats_Default.asset` |
-| Final field | `repairHoldSeconds` |
-| v0.1 baseline value | `2` |
-| v0.2 final value | `10` |
-| Final implementation commit | `9fb827ac698501fdd6ad28ee5bff24e47db4276c` |
+| Patch 类型 | 数值改动 |
+| Patch 名称 | 修机节奏数值改动 |
+| 最终文件 | `Assets/Configs/InteractionStats_Default.asset` |
+| 最终字段 | `repairHoldSeconds` |
+| v0.1 baseline 值 | `2` |
+| v0.2 final 值 | `10` |
+| 最终实现 commit | `9fb827ac698501fdd6ad28ee5bff24e47db4276c` |
 
-## Baseline Problem
+## Baseline 问题
 
-In v0.1, `repairHoldSeconds = 2` was still a debug-speed value. Under the Week 12 test condition of Map2, 4 ciphers, 2 Survivors, and local dual-control testing, this made the main objective phase too short to observe stable patrol, chase interruption, and mid-match pressure.
+在 v0.1 中，`repairHoldSeconds = 2` 仍是 debug 速度。Week 12 的测试条件是 Map2、4 台密码机、2 名 Survivor、本地双控；在该条件下，主目标阶段过短，难以稳定观察 Hunter 巡逻、追击、打断修机与中段对抗。
 
-## Baseline Evidence
+## Baseline 证据
 
-- v0.1 valid sample mean match duration: `126.9` seconds.
-- v0.1 valid sample median match duration: `114.5` seconds.
-- v0.1 valid sample repair completion mean: `78.1%`.
-- v0.1 escape rate: `4 / 16` Survivor seats, or `25%`.
-- The baseline data indicates that short matches and high repair progress can coexist, so repair pacing must be evaluated together with match duration and escape outcome.
+- v0.1 有效局平均对局时长：`126.9s`。
+- v0.1 有效局中位数对局时长：`114.5s`。
+- v0.1 有效局修机完成率均值：`78.1%`。
+- v0.1 逃生率：`4 / 16 = 25%`。
+- Baseline 数据显示，短对局与较高修机进度可以同时出现，因此 `repairHoldSeconds` 需要与对局时长、修机完成率和逃生结果一起解释。
 
-## Hypothesis
+## 假设
 
-If `repairHoldSeconds` is changed from `2` to `10`, the main objective phase should last longer. Hunter should have more time to patrol, start chases, and interrupt repairs before all ciphers are completed.
+如果将 `repairHoldSeconds` 从 `2` 调整为 `10`，主目标阶段应延长。Hunter 应获得更多巡逻、启动追击和打断修机的时间。
 
-## Target Metric
+## 目标指标
 
-- Match duration.
-- Repair completion rate.
+- 对局时长。
+- 修机完成率。
 
-## Guardrail Metric
+## 护栏指标
 
-- Escape rate.
-- First down time.
-- Abnormal match count.
+- 逃生率。
+- 首倒时间。
+- 异常局数量。
 
-## Planned Change
+## 计划改动
 
-Change only:
+只改动：
 
 - `Assets/Configs/InteractionStats_Default.asset`
 - `repairHoldSeconds: 2 -> 10`
 
-Implementation history note:
+实现历史说明：
 
-- A correction value `2 -> 6` existed before final Week 12 composition.
-- The final official Week 12 PATCH-012-01 is documented as `2 -> 10`.
-- The final commit changed the working value from `6 -> 10`.
+- 正式组合前曾存在 correction：`repairHoldSeconds: 2 -> 6`。
+- 最终正式 PATCH-012-01 记录为 baseline 到 final 的 `2 -> 10`。
+- 最终实现 commit 将工作树中的值从 `6` 收束为 `10`。
 
-## Expected Direction
+## 预期方向
 
-- Valid mean match duration should be higher than the v0.1 baseline value of `126.9` seconds.
-- Repair completion rate should not collapse near `0%`.
-- Repair progress should remain observable across valid matches.
+- v0.2 有效局平均对局时长应高于 v0.1 baseline 的 `126.9s`。
+- 修机完成率不应接近 `0%`。
+- 有效局中仍应能观察到修机进度推进。
 
-## Risk
+## 风险
 
-- If the value is too high for the current small Map2 test condition, repair completion rate may fall too far.
-- If the value is still too low, the main objective phase may remain too short for stable post-patch comparison.
-- Local dual-control testing limits conclusions about team coordination and skill timing.
+- 如果该值相对当前小地图测试条件过高，修机完成率可能下降到难以推进。
+- 如果该值仍过低，主目标阶段仍可能不足以支撑稳定 post-patch 对比。
+- 本地双控限制了对多人协作、技能时机和临场反应的结论强度。
 
-## Rollback Plan
+## Rollback 计划
 
-- Formal v0.2 to v0.1 rollback: set `repairHoldSeconds` from `10` back to `2`.
-- If reverting only the final PATCH-012-01 commit: set `repairHoldSeconds` from `10` back to `6`.
+正式 v0.2 到 v0.1 回滚：将 `repairHoldSeconds` 从 `10` 恢复为 `2`。
 
-## Validation Method
+## 验证方法
 
-- Run v0.2 post-patch matches with the same abnormal rule: matches shorter than 90 seconds are excluded from core metric calculation.
-- Compare valid-sample match duration and repair completion rate against v0.1 baseline.
-- Record abnormal matches separately.
-- Keep local dual-control mode clearly marked in the CSV.
+- v0.2 post-patch 测试沿用相同异常规则：单局时长少于 90 秒的局不进入核心指标计算。
+- 对比 v0.2 有效样本的对局时长和修机完成率与 v0.1 baseline。
+- 异常局单独记录。
+- CSV 中继续标注 `本地双控` 测试模式。
 
-## Decision Rule
+## 判定规则
 
-PATCH-012-01 supports the Week 12 hypothesis if:
+PATCH-012-01 支持假设的条件：
 
-- Valid mean match duration is higher than `126.9` seconds.
-- Repair completion rate does not approach `0%`.
-- Abnormal match count does not become the dominant sample group.
+- 有效局平均对局时长高于 `126.9s`。
+- 修机完成率不接近 `0%`。
+- 异常局数量不成为样本主体。
 
-If match duration rises while repair completion collapses, the patch should be treated as over-correcting the main objective phase.
+如果对局时长上升，但修机完成率接近 `0%`，则说明该数值对主目标阶段造成过度拉长。
 
-## Superseded Calibration Note
+## Superseded 记录
 
-`Hunter/PlayerController.externalSpeedMultiplier: 1 -> 0.93` remains in git history as an early calibration attempt. It is not the final PATCH-012-01 and must not be used in v0.2 post-patch metric attribution.
+`Hunter/PlayerController.externalSpeedMultiplier: 1 -> 0.93` 保留在 git 历史中作为早期 calibration attempt。它不是最终 PATCH-012-01，不进入 v0.2 post-patch 指标归因。

@@ -10,14 +10,14 @@
 | PATCH-012-02 正式机制改动 | `7c9011a96911e757a5ea6f9dae086644e302db57` |
 | PATCH-012-03 正式地图改动 | `0b97e1466696240889f0b3e4400765f556d3bdd3` |
 | Week 12 Patch 文档同步 | `59dbb3f1134cc7727bea5e629d582c5677053f04` |
-| `PatchRollback.cs` | `fd38395d3591006ab352d11eab8a0639a1ca23b2` |
+| `PatchRollback.cs` | `60f7c635a4eafc81b283db3cf2302d5fe403e5a1` |
 | v0.2 post-patch 测试日志 | `9a604bfb9d039f7b75a9c9998cde75223ee50e2b` |
 
 ## 最终正式 PATCH-012
 
 | Patch ID | 类型 | 文件 | 字段或对象 | v0.1 baseline 值 | v0.2 final 值 | 判定 | Rollback |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| PATCH-012-01 | 数值改动 | `Assets/Configs/InteractionStats_Default.asset` | `repairHoldSeconds` | `2` | `10` | ⚠ 部分达标 | 将 `repairHoldSeconds` 从 `10` 恢复为 `2`。如果只回滚最终提交，则从 `10` 恢复为 `6`。 |
+| PATCH-012-01 | 数值改动 | `Assets/Configs/InteractionStats_Default.asset` | `repairHoldSeconds` | `2` | `10` | ⚠ 部分达标 | 将 `repairHoldSeconds` 从 `10` 恢复为 `2`。 |
 | PATCH-012-02 | 机制参数改动 | `Assets/Configs/InteractionStats_Default.asset` | `rescueHoldSeconds` | `3.5` | `2.8` | 🚫 样本不足 / 继续观察 | 将 `rescueHoldSeconds` 从 `2.8` 恢复为 `3.5`。 |
 | PATCH-012-03 | 地图改动 | `Assets/Scenes/Map2_W7.unity` | `Map2_W7 / Cover1` `m_LocalPosition` | `{6.99, 0.51, -4.97}` | `{6.2, 0.51, -4.2}` | ⚠ 部分达标 | 将 `Cover1` position 从 `{6.2, 0.51, -4.2}` 恢复为 `{6.99, 0.51, -4.97}`。 |
 
@@ -50,6 +50,7 @@
   - `repairHoldSeconds: 10 -> 2`
   - `rescueHoldSeconds: 2.8 -> 3.5`
   - `Cover1 localPosition: {6.2, 0.51, -4.2} -> {6.99, 0.51, -4.97}`
+- Rollback demo 现在还会把 `BuildVersionLabel` 从 `v0.2` 回滚为 `v0.1`，用于演示版本归属。
 - Rollback 不包含 superseded 的 `Hunter/PlayerController.externalSpeedMultiplier` 或 `MatchManager.endgameDuration`。
 
 ## 版本显示检查
