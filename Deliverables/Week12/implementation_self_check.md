@@ -58,6 +58,14 @@
 - 结算页版本号显示为 `v0.2`。
 - 版本号显示只用于测试归属，不属于 PATCH-012 成功判据。
 
+## Demo 与 Telemetry 证据
+
+- Demo 视频文件名：`week12_demo_rollback.mp4`。
+- 视频应展示 v0.2 结算页版本号。
+- 视频应展示 `[Telemetry]` Console 输出。
+- 视频应展示菜单 `Tools/Patch/Rollback v0.2 -> v0.1`。
+- 视频应展示 rollback 后版本显示与字段回滚，包括 `repairHoldSeconds: 10 -> 2`、`rescueHoldSeconds: 2.8 -> 3.5`、`Cover1 localPosition: {6.2, 0.51, -4.2} -> {6.99, 0.51, -4.97}`、`BuildVersionLabel: v0.2 -> v0.1`。
+
 ## 测试前修复 / 版本边界说明
 
 - v0.1 baseline 正式测试前，Map2 做过可通行性修复：1F 在 2F 楼板下方、`Cipher_H3`、`Cipher_M`、`Cipher_H2`、`Chair_R`、`Chair_L`、`Cover1`、右侧楼梯附近曾出现卡边或被 invisible collider 阻挡的情况。

@@ -1,101 +1,26 @@
 # PATCH-012-03 A/B 假设
 
-## Patch 摘要
+## Week 11 A/B 模板 12 字段
 
 | 字段 | 内容 |
 | --- | --- |
-| Patch ID | PATCH-012-03 |
-| Patch 类型 | 地图改动 |
-| Patch 名称 | Cover1 追击路线位置调整 |
-| 最终文件 | `Assets/Scenes/Map2_W7.unity` |
-| 最终对象 | `Map2_W7 / Cover1` |
-| 最终字段 | `m_LocalPosition` |
-| v0.1 baseline 值 | `{ x: 6.99, y: 0.51, z: -4.97 }` |
-| v0.2 final 值 | `{ x: 6.2, y: 0.51, z: -4.2 }` |
-| 最终实现 commit | `0b97e1466696240889f0b3e4400765f556d3bdd3` |
+| Experiment ID | PATCH-012-03 |
+| Experiment name | Cover1 追击路线位置调整 |
+| Observed problem | v0.1 baseline 有效局首倒时间均值为 `50.9s`，不包含 `-1`；有效局中 `7 / 8` 局发生首倒。补充观察显示 Map2 局部追击路线和二次选择点较少。 |
+| Hypothesis | 如果将 `Cover1` 从 `{ x: 6.99, y: 0.51, z: -4.97 }` 移动到 `{ x: 6.2, y: 0.51, z: -4.2 }`，右侧局部路线应给 Survivor 提供更多二次选择空间；首倒时间应高于 `50.9s`，有效局平均对局时长应高于 `126.9s`。 |
+| Change content | 文件：`Assets/Scenes/Map2_W7.unity`；对象：`Map2_W7 / Cover1`；字段：`m_LocalPosition`；旧值：`{ x: 6.99, y: 0.51, z: -4.97 }`；新值：`{ x: 6.2, y: 0.51, z: -4.2 }`。 |
+| Affected telemetry | `match_start`、`match_end`、`survivor_down`、`survivor_eliminated`、`machine_repair_progress_25`、`machine_repair_progress_50`、`machine_repair_progress_75`、`machine_repair_complete`。 |
+| Affected core metrics | 主指标：首倒时间、对局时长。护栏指标：修机完成率、逃生率、救援成功率。 |
+| Expected change for main metric | v0.2 首倒时间均值应高于 v0.1 的 `50.9s`；有效局平均对局时长应高于 v0.1 的 `126.9s`。 |
+| Expected change for guardrail metric | 修机完成率不应接近 `0%`；逃生率只作方向性观察；救援成功率若样本不足则继续标记为 `样本不足`。 |
+| Success criteria | v0.2 剔除异常局后有效样本至少 8 局；首倒时间均值 `> 50.9s`；有效局平均对局时长 `> 126.9s`；Cover1 附近未出现新的卡边或碰撞阻挡。 |
+| Failure criteria | v0.2 首倒时间均值 `<= 50.9s`，或有效局平均对局时长 `<= 126.9s`，或 Cover1 附近出现新的卡边 / 碰撞阻挡，或剔除异常局后有效样本少于 8 局。 |
+| Sample size / duration / split method | v0.2 post-patch 至少 10 局；剔除异常局后有效样本至少 8 局；Hunter 与 Survivor 视角都覆盖；继续使用本地双控模式并在 CSV 中标注。 |
 
-## Baseline 问题
+## 实现与判定记录
 
-v0.1 定性观察显示，Map2 局部路线选择较少，部分追击区域容易形成较短闭环。这会让 Hunter 压力较早进入对局，也会减少 Survivor 在追击中的二次选择空间。
-
-## Baseline 证据
-
-- v0.1 有效局平均对局时长：`126.9s`。
-- v0.1 有效局中 `7 / 8` 局发生首倒。
-- v0.1 有效首倒时间均值：`50.9s`，不包含 `-1`。
-- 定性记录指出局部掩体、路线与二次选择点较少。
-
-## 假设
-
-如果将 `Cover1` 从 `{ x: 6.99, y: 0.51, z: -4.97 }` 移动到 `{ x: 6.2, y: 0.51, z: -4.2 }`，右侧局部路线应给 Survivor 提供更多二次选择空间。该变化可能延后首倒时间，并增加有效局对局时长。
-
-## 目标指标
-
-- 首倒时间。
-- 对局时长。
-
-## 护栏指标
-
-- 修机完成率。
-- 逃生率。
-- 异常局数量。
-
-## 辅助观察
-
-- Survivor 在 Cover1 附近追击时是否出现更多路线选择。
-- Cover1 位置是否引入新的卡边或碰撞阻挡。
-
-## 计划改动
-
-只改动：
-
-- `Assets/Scenes/Map2_W7.unity`
-- 对象：`Map2_W7 / Cover1`
-- 字段：`m_LocalPosition`
-- 旧位置：`{ x: 6.99, y: 0.51, z: -4.97 }`
-- 新位置：`{ x: 6.2, y: 0.51, z: -4.2 }`
-
-不改动：
-
-- Rotation。
-- Scale。
-- Collider。
-- Scripts。
-- Object count。
-
-## 预期方向
-
-- 首倒时间应相对 v0.1 向后移动。
-- 有效局平均对局时长应高于 v0.1 baseline。
-- 路线观察中应记录到 Survivor 在右侧路线附近出现更多二次选择。
-
-## 风险
-
-- 单个 Cover 位置改动可能影响有限，尤其当 repair pacing 对对局时长的影响更大时。
-- 地图改动与 repair pacing 存在耦合，因为更长修机时间会创造更多追击机会。
-- 地图改动与救援时间也存在耦合，因为延后首倒会改变挂椅时机。
-
-## Rollback 计划
-
-将 `Map2_W7 / Cover1` position 从 `{ x: 6.2, y: 0.51, z: -4.2 }` 恢复为 `{ x: 6.99, y: 0.51, z: -4.97 }`。
-
-## 验证方法
-
-- v0.2 post-patch 测试沿用 v0.1 的异常剔除规则。
-- 对比首倒时间和对局时长。
-- 记录 Cover1 附近路线选择。
-- 观察 Cover1 附近是否出现新的卡边或碰撞阻挡。
-
-## 判定规则
-
-PATCH-012-03 支持假设的条件：
-
-- 有效局首倒时间相对 v0.1 的 `50.9s` 向后移动。
-- 有效局平均对局时长高于 `126.9s`。
-- 路线记录显示 Cover1 附近出现更多二次选择，且未引入新的阻挡。
-
-如果首倒时间没有变化，且路线记录未出现差异，则该地图 Patch 在 v0.2 组合结果中应判定为影响有限。
-
-## Superseded 记录
-
-`MatchManager.endgameDuration: 15 -> 30` 保留在 git 历史中作为早期 calibration attempt。它不是最终 PATCH-012-03，不进入 v0.2 post-patch 指标归因。
+- 最终实现 commit：`0b97e1466696240889f0b3e4400765f556d3bdd3`。
+- 正式 v0.2 到 v0.1 回滚：将 `Map2_W7 / Cover1` position 从 `{ x: 6.2, y: 0.51, z: -4.2 }` 恢复为 `{ x: 6.99, y: 0.51, z: -4.97 }`。
+- PATCH-012-03 只移动 `Cover1` position，不修改 rotation、scale、collider、脚本或对象数量。
+- `MatchManager.endgameDuration: 15 -> 30` 是早期 calibration attempt，不进入 PATCH-012-03 的 v0.2 指标归因。
+- v0.2 实测判定：⚠ 部分达标。

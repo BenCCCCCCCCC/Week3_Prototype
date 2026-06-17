@@ -1,4 +1,4 @@
-match_no,mode,duration_seconds,escaped_count,first_down_time_seconds,repair_progress_percent,is_abnormal,abnormal_reason,observed_issue_cn_30chars
+match_no,mode,duration_seconds,escaped_count,first_down_time_seconds,repair_progress_percent,is_abnormal,abnormal_reason,observed_issue_cn_30_chars
 1,本地双控-主Survivor,98.4,1,70.0,100,FALSE,—,修完4机后1人逃生
 2,本地双控-主Survivor,137.2,0,92.0,100,FALSE,—,修满4机但无人逃生
 3,本地双控-主Hunter,99.6,0,58.0,75,FALSE,—,修3机后Hunter淘汰2人

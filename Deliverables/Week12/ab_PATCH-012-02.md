@@ -1,83 +1,26 @@
 # PATCH-012-02 A/B 假设
 
-## Patch 摘要
+## Week 11 A/B 模板 12 字段
 
 | 字段 | 内容 |
 | --- | --- |
-| Patch ID | PATCH-012-02 |
-| Patch 类型 | 机制参数改动 |
-| Patch 名称 | 救援窗口机制参数改动 |
-| 最终文件 | `Assets/Configs/InteractionStats_Default.asset` |
-| 最终字段 | `rescueHoldSeconds` |
-| v0.1 baseline 值 | `3.5` |
-| v0.2 final 值 | `2.8` |
-| 最终实现 commit | `7c9011a96911e757a5ea6f9dae086644e302db57` |
+| Experiment ID | PATCH-012-02 |
+| Experiment name | 救援窗口机制参数改动 |
+| Observed problem | v0.1 baseline 有效局平均对局时长为 `126.9s`，逃生率为 `4 / 16 = 25%`；救援成功率样本不足，不能作为主要触发理由，但挂椅后的救援窗口仍需要作为过程观察项。 |
+| Hypothesis | 如果将 `rescueHoldSeconds` 从 `3.5` 调整为 `2.8`，Survivor 完成救援交互所需连续按住时间会减少；挂椅后的救援反制窗口应扩大，但不改变椅上倒计时逻辑。 |
+| Change content | 文件：`Assets/Configs/InteractionStats_Default.asset`；字段：`rescueHoldSeconds`；旧值：`3.5`；新值：`2.8`。 |
+| Affected telemetry | `match_start`、`match_end`、`survivor_chair_start`、`survivor_rescue_start`、`survivor_rescue_complete`、`survivor_rescue_cancel`。 |
+| Affected core metrics | 主指标：对局时长、逃生率、救援成功率。护栏指标：首倒时间、修机完成率。 |
+| Expected change for main metric | v0.2 有效局平均对局时长应高于 v0.1 的 `126.9s`；救援过程记录中应观察到可完成救援交互的机会。 |
+| Expected change for guardrail metric | 首倒时间不应进入 `< 30s` 异常区间；修机完成率不应接近 `0%`；逃生率和救援成功率在小样本中只作方向性观察。 |
+| Success criteria | v0.2 剔除异常局后有效样本至少 8 局；对局时长方向上升；救援过程记录显示挂椅事件没有在多数有效样本中立即结束对局。 |
+| Failure criteria | v0.2 有效局平均对局时长 `<= 126.9s`，或救援过程记录不足以支持观察，或剔除异常局后有效样本少于 8 局。 |
+| Sample size / duration / split method | v0.2 post-patch 至少 10 局；剔除异常局后有效样本至少 8 局；Hunter 与 Survivor 视角都覆盖；继续使用本地双控模式并在 CSV 中标注。 |
 
-## Baseline 问题
+## 实现与判定记录
 
-v0.1 本地双控测试中，救援事件样本不足，无法把救援成功率作为主要判据。但挂椅后的流程仍可能影响对局收束速度，因此需要记录救援交互窗口是否给 Survivor 留出反制机会。
-
-## Baseline 证据
-
-- v0.1 有效局平均对局时长：`126.9s`。
-- v0.1 逃生率：`4 / 16 = 25%`。
-- v0.1 救援成功率样本不足，不能作为主要成功判据。
-- 本地双控会限制救援沟通、协作和技能使用频率。
-
-## 假设
-
-如果将 `rescueHoldSeconds` 从 `3.5` 调整为 `2.8`，Survivor 完成救援交互所需连续按住时间会减少。该改动应扩大挂椅后的救援反制窗口，但不改变椅上倒计时逻辑。
-
-## 目标指标
-
-- 对局时长。
-- 逃生率。
-- 救援过程观察记录。
-
-## 护栏指标
-
-- 首倒时间。
-- 修机完成率。
-- 异常局数量。
-
-## 计划改动
-
-只改动：
-
-- `Assets/Configs/InteractionStats_Default.asset`
-- `rescueHoldSeconds: 3.5 -> 2.8`
-
-该 Patch 是救援窗口机制参数改动，不是救援中暂停椅上倒计时。
-
-## 预期方向
-
-- 如果挂椅流程不再过快结束对局，有效局平均对局时长应高于 v0.1 baseline。
-- 如果救援窗口带来更多可完成交互，逃生结果或救援过程记录应出现对应变化。
-- 救援过程记录应说明 Survivor 是否更容易完成救援交互。
-
-## 风险
-
-- v0.1 救援成功率样本不足，单次救援结果不能证明该 Patch。
-- `rescueHoldSeconds` 与 `repairHoldSeconds`、`Cover1` 路线改动存在耦合，必要时只能写为 v0.2 组合效果。
-- 本地双控可能低估救援协作与技能使用。
-
-## Rollback 计划
-
-将 `Assets/Configs/InteractionStats_Default.asset` 中的 `rescueHoldSeconds` 从 `2.8` 恢复为 `3.5`。
-
-## 验证方法
-
-- v0.2 post-patch 测试沿用 v0.1 的异常剔除规则。
-- 对比有效样本的对局时长和逃生率。
-- 在单局记录中补充挂椅与救援过程观察。
-- 不把救援成功率作为唯一通过或失败判据。
-
-## 判定规则
-
-PATCH-012-02 支持假设的条件：
-
-- 有效局平均对局时长相对 v0.1 baseline 方向上升。
-- 逃生结果或救援过程记录显示挂椅事件没有在多数有效样本中立即结束对局。
-- 护栏指标没有出现新的失控模式，例如首倒时间过早或异常局占据样本主体。
-
-如果救援观察仍然过少，则该 Patch 应记录为救援专项证据不足，同时纳入 v0.2 组合分析。
+- 最终实现 commit：`7c9011a96911e757a5ea6f9dae086644e302db57`。
+- 正式 v0.2 到 v0.1 回滚：将 `rescueHoldSeconds` 从 `2.8` 恢复为 `3.5`。
+- 该 Patch 是救援窗口机制参数改动，不是救援中暂停椅上倒计时。
+- 救援成功率样本不足，不能作为 PATCH-012-02 的唯一成功判据。
+- v0.2 实测判定：🚫 样本不足 / 继续观察。
