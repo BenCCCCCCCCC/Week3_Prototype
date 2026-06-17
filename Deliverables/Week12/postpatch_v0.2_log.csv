@@ -1,1 +1,11 @@
-match_no,mode,duration_seconds,escaped_count,first_down_time_seconds,repair_progress_percent,is_abnormal,abnormal_reason,observed_issue_cn_30_chars
+match_no,mode,duration_seconds,escaped_count,first_down_time_seconds,repair_progress_percent,is_abnormal,abnormal_reason,observed_issue_cn_30chars
+1,本地双控-主Survivor,98.4,1,70.0,100,FALSE,—,修完4机后1人逃生
+2,本地双控-主Survivor,137.2,0,92.0,100,FALSE,—,修满4机但无人逃生
+3,本地双控-主Hunter,99.6,0,58.0,75,FALSE,—,修3机后Hunter淘汰2人
+4,本地双控-主Survivor,128.6,1,88.0,100,FALSE,—,修满4机后1人逃生
+5,本地双控-主Hunter,139.1,0,76.0,100,FALSE,—,修满4机但Hunter淘汰2人
+6,本地双控-主Hunter,173.9,0,96.0,50,FALSE,—,修机变慢后Hunter可巡逻
+7,本地双控-主Survivor,142.2,1,82.0,100,FALSE,—,救援后仍能完成逃生
+8,本地双控-主Hunter,183.7,0,110.0,100,FALSE,—,修满4机但未撤离
+9,本地双控-主Survivor,168.7,1,-1,100,FALSE,—,无首倒完成撤离
+10,本地双控-主Hunter,173.9,0,94.0,50,FALSE,—,Hunter仍可完整淘汰
