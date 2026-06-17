@@ -79,12 +79,6 @@ public static class PatchRollback
         {
             EditorSceneManager.CloseScene(mapScene, true);
         }
-
-        Debug.Log("Week 12 PATCH-012 rollback applied.");
-        Debug.Log($"repairHoldSeconds: {FormatNumber(RepairCurrentValue)} -> {FormatNumber(RepairRollbackValue)}");
-        Debug.Log($"rescueHoldSeconds: {FormatNumber(RescueCurrentValue)} -> {FormatNumber(RescueRollbackValue)}");
-        Debug.Log($"Cover1 localPosition: {FormatVector(CoverCurrentPosition)} -> {FormatVector(CoverRollbackPosition)}");
-        Debug.Log($"BuildVersionLabel: {VersionCurrentValue} -> {VersionRollbackValue}");
     }
 
     private static Scene GetLoadedScene(string scenePath)
@@ -149,9 +143,31 @@ public static class PatchRollback
             return false;
         }
 
+        EditorUtility.DisplayDialog("Week 12 Rollback", BuildRollbackSummary(), "OK");
+        LogRollbackSummary();
+
         File.WriteAllText(ResultPanelPath, source.Replace(VersionCurrentText, VersionRollbackText));
         AssetDatabase.ImportAsset(ResultPanelPath);
         return true;
+    }
+
+    private static string BuildRollbackSummary()
+    {
+        return
+            "Week 12 PATCH-012 rollback applied:\n" +
+            $"repairHoldSeconds: {FormatNumber(RepairCurrentValue)} -> {FormatNumber(RepairRollbackValue)}\n" +
+            $"rescueHoldSeconds: {FormatNumber(RescueCurrentValue)} -> {FormatNumber(RescueRollbackValue)}\n" +
+            $"Cover1 localPosition: {FormatVector(CoverCurrentPosition)} -> {FormatVector(CoverRollbackPosition)}\n" +
+            $"BuildVersionLabel: {VersionCurrentValue} -> {VersionRollbackValue}";
+    }
+
+    private static void LogRollbackSummary()
+    {
+        Debug.Log("Week 12 PATCH-012 rollback applied.");
+        Debug.Log($"repairHoldSeconds: {FormatNumber(RepairCurrentValue)} -> {FormatNumber(RepairRollbackValue)}");
+        Debug.Log($"rescueHoldSeconds: {FormatNumber(RescueCurrentValue)} -> {FormatNumber(RescueRollbackValue)}");
+        Debug.Log($"Cover1 localPosition: {FormatVector(CoverCurrentPosition)} -> {FormatVector(CoverRollbackPosition)}");
+        Debug.Log($"BuildVersionLabel: {VersionCurrentValue} -> {VersionRollbackValue}");
     }
 
     private static string FormatNumber(float value)
